@@ -1,0 +1,1154 @@
+Com certeza. A rolagem horizontal (estilo letreiro de cinema ou notícias) é mais tradicional e facilita a leitura rápida de nomes de lojas.
+
+Abaixo está o código completo e atualizado com a faixa de patrocinadores ajustada para rolagem horizontal da esquerda para a direita, mantendo todas as outras funcionalidades (quiz, CPF, transferência, etc.).
+
+Salve como index.html:
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>QuizLocal - Economia Colaborativa</title>
+<style>
+  :root { --gold: #ffd700; --dark: #1a0033; --purple: #4a0e7a; --green: #27ae60; --red: #c0392b; }
+  { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif; -webkit-tap-highlight-color:transparent; }
+  body { background:linear-gradient(135deg,var(--dark),var(--purple)); min-height:100vh; color:#fff; padding:15px; user-select:none; }
+  .container { max-width:800px; margin:0 auto; }
+  
+  /* Header */
+  header { text-align:center; padding:15px; background:linear-gradient(90deg,var(--gold),#ff8c00); border-radius:12px; color:var(--dark); margin-bottom:15px; box-shadow:0 0 20px rgba(255,215,0,0.4); }
+  header h1 { font-size:1.8em; } header p { font-size:0.9em; opacity:0.9; }
+
+  /* Marquee Horizontal (Esquerda para Direita) */
+  .marquee-container {
+    width: 100%;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(5px);
+    border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+    padding: 12px 0;
+    margin-bottom: 15px;
+    position: relative;
+    white-space: nowrap;
+  }
+
+  /* Máscara de fade nas bordas laterais */
+  .marquee-container::before,
+  .marquee-container::after {
+    content: "";
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 60px;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .marquee-container::before { left: 0; background: linear-gradient(to right, var(--dark), transparent); }
+  .marquee-container::after { right: 0; background: linear-gradient(to left, var(--dark), transparent); }
+
+  .marquee-track {
+    display: inline-flex;
+    animation: marquee-h-scroll 25s linear infinite;
+  }
+
+  .marquee-content {
+    display: flex;
+    align-items: center;
+    gap: 40px; /* Espaço entre os itens */
+    padding-right: 40px;
+  }
+
+  .marquee-content span {
+    color: var(--gold);
+    font-weight: bold;
+    font-size: 1em;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    opacity: 0.9;
+  }
+
+  /* Pausa ao passar o mouse */
+  .marquee-container:hover .marquee-track {
+    animation-play-state: paused;
+  }
+
+  /* Animação: Move de -50% (metade do conteúdo duplicado) para 0 */
+  @keyframes marquee-h-scroll {
+    0% { transform: translateX(-50%); }
+    100% { transform: translateX(0); }
+  }
+
+  /* Screens */
+  .screen { display:none; animation:fadeIn 0.4s; }
+  .screen.active { display:block; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+  /* Cards & Buttons */
+  .card { background:rgba(255,255,255,0.08); backdrop-filter:blur(8px); border:1px solid rgba(255,215,0,0.2); border-radius:12px; padding:20px; margin-bottom:15px; }
+  .btn { background:linear-gradient(90deg,var(--gold),#ff8c00); color:var(--dark); border:none; padding:12px 25px; border-radius:25px; font-weight:bold; cursor:pointer; width:100%; margin-top:10px; font-size:1em; transition:0.2s; }
+  .btn:active { transform:scale(0.97); }
+  .btn-sm { width:auto; padding:8px 18px; font-size:0.9em; }
+  .btn-red { background:linear-gradient(90deg,var(--red),#e74c3c); color:#fff; }
+  .btn-green { background:linear-gradient(90deg,var(--green),#2ecc71); color:#fff; }
+  .btn-purple { background:linear-gradient(90deg,#6a0dad,#9b30ff); color:#fff; }
+  .back-btn { background:none; border:1px solid rgba(255,255,255,0.3); color:#fff; padding:6px 15px; border-radius:20px; cursor:pointer; margin-bottom:10px; font-size:0.85em; }
+
+  /* Inputs */
+  input,select { width:100%; padding:12px; margin:6px 0; border-radius:8px; border:1px solid rgba(255,215,0,0.4); background:rgba(255,255,255,0.1); color:#fff; font-size:1em; }
+  input::placeholder { color:rgba(255,255,255,0.5); }
+  label { display:block; margin-top:10px; color:var(--gold); font-weight:bold; font-size:0.9em; }
+
+  /* Info Box */
+  .info { background:rgba(52,152,219,0.15); border-left:3px solid #3498db; padding:12px; border-radius:6px; margin:12px 0; font-size:0.9em; line-height:1.5; }
+  .info strong { color:#3498db; }
+
+  /* Quiz */
+  .q-box { background:linear-gradient(135deg,#2c0054,var(--purple)); border:2px solid var(--gold); border-radius:15px; padding:25px; text-align:center; margin:15px 0; }
+  .q-text { font-size:1.2em; margin-bottom:20px; line-height:1.4; }
+  .opt { background:rgba(255,255,255,0.1); border:2px solid rgba(255,215,0,0.4); padding:14px; border-radius:10px; margin:8px 0; cursor:pointer; text-align:left; transition:0.2s; }
+  .opt:active { transform:translateX(3px); }
+  .opt.correct { background:var(--green)!important; border-color:#2ecc71; }
+  .opt.wrong { background:var(--red)!important; border-color:#e74c3c; }
+  .timer-bar { height:6px; background:rgba(255,255,255,0.2); border-radius:3px; overflow:hidden; margin-bottom:15px; }
+  .timer-fill { height:100%; background:var(--gold); transition:width 1s linear; }
+
+  /* Stats Grid */
+  .stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; margin:15px 0; }
+  .stat { background:rgba(255,215,0,0.1); padding:15px; border-radius:10px; text-align:center; border:1px solid rgba(255,215,0,0.2); }
+  .stat-val { font-size:1.6em; color:var(--gold); font-weight:bold; }
+  .stat-lbl { font-size:0.75em; opacity:0.8; margin-top:4px; }
+
+  /* Top Bar */
+  .topbar { display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.3); padding:10px 15px; border-radius:10px; margin-bottom:12px; flex-wrap:wrap; gap:8px; }
+  .pts-badge { background:linear-gradient(90deg,var(--gold),#ff8c00); color:var(--dark); padding:6px 15px; border-radius:20px; font-weight:bold; font-size:0.9em; }
+
+  /* Product Card */
+  .prod-card { background:rgba(255,255,255,0.08); border:1px solid rgba(255,215,0,0.3); border-radius:10px; padding:15px; margin:10px 0; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }
+  .prod-card h4 { color:var(--gold); margin-bottom:4px; }
+
+  /* Toast */
+  .toast { position:fixed; top:15px; right:15px; padding:12px 20px; border-radius:10px; color:#fff; font-weight:bold; z-index:9999; animation:slideIn 0.3s; font-size:0.9em; max-width:90%; }
+  .toast.success { background:var(--green); } .toast.error { background:var(--red); } .toast.info { background:#2980b9; }
+  @keyframes slideIn { from{transform:translateX(100%)} to{transform:translateX(0)} }
+
+  /* Modal */
+  .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:9998; justify-content:center; align-items:center; padding:20px; }
+  .modal.active { display:flex; }
+  .modal-box { background:linear-gradient(135deg,#2c0054,var(--purple)); border:2px solid var(--gold); border-radius:15px; padding:25px; max-width:450px; width:100%; text-align:center; }
+  .modal-icon { font-size:3em; margin-bottom:10px; }
+
+  /* Table */
+  table { width:100%; border-collapse:collapse; margin-top:10px; font-size:0.85em; }
+  th,td { padding:8px; text-align:left; border-bottom:1px solid rgba(255,215,0,0.15); }
+  th { color:var(--gold); background:rgba(255,215,0,0.1); }
+
+  .hidden { display:none!important; }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>🎯 QuizLocal</h1>
+    <p>Conectando Saberes e Comércio Local</p>
+  </header>
+
+  <!-- FAIXA DE PATROCINADORES HORIZONTAL -->
+  <div class="marquee-container">
+    <div class="marquee-track">
+      <!-- Conjunto 1 -->
+      <div class="marquee-content">
+        <span>🏪 Padaria Central</span>
+        <span>💊 Farmácia Saúde</span>
+        <span>🛒 Mercado Bom Preço</span>
+        <span>✂️ Salão Estilo</span>
+        <span>🔧 Oficina Mecânica Silva</span>
+        <span>🍕 Pizzaria da Nonna</span>
+        <span>👗 Moda Elegante</span>
+        <span>🏗️ Material Construção João</span>
+      </div>
+      <!-- Conjunto 2 (Duplicado para loop infinito) -->
+      <div class="marquee-content" aria-hidden="true">
+        <span>🏪 Padaria Central</span>
+        <span>💊 Farmácia Saúde</span>
+        <span>🛒 Mercado Bom Preço</span>
+        <span>✂️ Salão Estilo</span>
+        <span>🔧 Oficina Mecânica Silva</span>
+        <span>🍕 Pizzaria da Nonna</span>
+        <span>👗 Moda Elegante</span>
+        <span>🏗️ Material Construção João</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== TELA: HOME / LOGIN ========== -->
+  <div id="scr-home" class="screen active">
+    <div class="card">
+      <div class="info">
+        <strong>📋 Como funciona:</strong><br>
+        • Responda perguntas e acumule pontos<br>
+        • <strong>1.000 pontos = R 1,00</strong> em desconto<br>
+        • Desconto máximo de <strong>10% por compra</strong><br>
+        • Válido apenas no comércio local parceiro<br>
+        • Não aplicável a taxas de entrega
+      </div>
+      <label>Nome Completo:</label>
+      <input type="text" id="reg-name" placeholder="Seu nome completo">
+      <label>CPF (apenas números):</label>
+      <input type="tel" id="reg-cpf" placeholder="00000000000" maxlength="11" inputmode="numeric">
+      <label>E-mail Pessoal:</label>
+      <input type="email" id="reg-email" placeholder="seu@email.com">
+      <label>Senha:</label>
+      <input type="password" id="reg-pass" placeholder="Crie uma senha forte">
+      <label>Tipo de Conta:</label>
+      <select id="reg-type">
+        <option value="cliente">👤 Cliente</option>
+        <option value="lojista">🏪 Lojista</option>
+        <option value="admin">🛡️ Administrador</option>
+      </select>
+      <div id="store-field" class="hidden">
+        <label>Nome do Estabelecimento:</label>
+        <input type="text" id="reg-store" placeholder="Ex: Padaria Central">
+      </div>
+      <button class="btn" onclick="handleRegister()">Cadastrar / Entrar</button>
+      <p style="text-align:center;margin-top:12px;font-size:0.8em;opacity:0.6;">Ao continuar, você concorda com os Termos de Uso.</p>
+    </div>
+  </div>
+
+  <!-- ========== TELA: VERIFICAÇÃO DE E-MAIL ========== -->
+  <div id="scr-verify" class="screen">
+    <div class="card" style="text-align:center;">
+      <div style="font-size:3em;margin-bottom:10px;">📧</div>
+      <h2 style="color:var(--gold);margin-bottom:10px;">Verifique seu E-mail</h2>
+      <p style="margin-bottom:15px;">Enviamos um código de 6 dígitos para <strong id="verify-email-display"></strong></p>
+      <div class="info">
+        <strong>⚠️ Importante:</strong> O código expira em 10 minutos. Verifique também sua caixa de spam.
+      </div>
+      <label>Código de Verificação:</label>
+      <input type="tel" id="verify-code" placeholder="000000" maxlength="6" inputmode="numeric" style="text-align:center;font-size:1.5em;letter-spacing:8px;">
+      <button class="btn btn-green" onclick="confirmVerification()">Verificar Código</button>
+      <button class="btn btn-purple btn-sm" onclick="resendCode()" style="margin-top:8px;">Reenviar Código</button>
+      <button class="back-btn" onclick="showScreen('scr-home')" style="margin-top:15px;">← Voltar</button>
+    </div>
+  </div>
+
+  <!-- ========== TELA: DASHBOARD CLIENTE ========== -->
+  <div id="scr-client" class="screen">
+    <div class="topbar">
+      <span>👤 <strong id="cli-name"></strong></span>
+      <span class="pts-badge">💰 <span id="cli-pts">0</span> pts</span>
+      <button class="back-btn" onclick="logout()" style="margin:0;">Sair</button>
+    </div>
+    <div class="card">
+      <div class="stats">
+        <div class="stat"><div class="stat-val" id="cli-balance">R 0</div><div class="stat-lbl">Saldo em Reais</div></div>
+        <div class="stat"><div class="stat-val" id="cli-games">0</div><div class="stat-lbl">Quizes Jogados</div></div>
+        <div class="stat"><div class="stat-val" id="cli-redeemed">R 0</div><div class="stat-lbl">Total Resgatado</div></div>
+      </div>
+      <button class="btn" onclick="startQuiz()">🎯 JOGAR QUIZ AGORA</button>
+      <button class="btn btn-green" onclick="showScreen('scr-redeem')">🛍️ Resgatar Desconto</button>
+      <button class="btn btn-purple" onclick="showScreen('scr-transfer')">🔄 Transferir Pontos</button>
+      <button class="btn btn-sm" onclick="showScreen('scr-profile')" style="background:rgba(255,255,255,0.15);color:#fff;">📊 Meu Perfil</button>
+    </div>
+    <div class="info">
+      <strong>💡 Dica:</strong> Jogue diariamente para manter seus pontos ativos. Transfira pontos para amigos (taxa de 20%). Limite: 5.000/dia e 150.000/mês.
+    </div>
+  </div>
+
+  <!-- ========== TELA: QUIZ ========== -->
+  <div id="scr-quiz" class="screen">
+    <div class="topbar">
+      <span>🎯 Pergunta <span id="q-num">1</span>/<span id="q-total">10</span></span>
+      <span class="pts-badge">+<span id="q-round-pts">0</span> pts</span>
+    </div>
+    <div class="timer-bar"><div class="timer-fill" id="timer-fill" style="width:100%"></div></div>
+    <div class="q-box">
+      <div class="q-text" id="q-text">Carregando...</div>
+      <div id="q-options"></div>
+    </div>
+  </div>
+
+  <!-- ========== TELA: RESULTADO QUIZ ========== -->
+  <div id="scr-result" class="screen">
+    <div class="card" style="text-align:center;">
+      <div style="font-size:4em;margin-bottom:10px;" id="res-icon">🏆</div>
+      <h2 style="color:var(--gold);" id="res-title">Parabéns!</h2>
+      <p id="res-msg" style="margin:15px 0;font-size:1.1em;"></p>
+      <div class="stats">
+        <div class="stat"><div class="stat-val" id="res-correct">0</div><div class="stat-lbl">Acertos</div></div>
+        <div class="stat"><div class="stat-val" id="res-wrong">0</div><div class="stat-lbl">Erros</div></div>
+        <div class="stat"><div class="stat-val" id="res-earned">0</div><div class="stat-lbl">Pontos Ganhos</div></div>
+      </div>
+      <button class="btn" onclick="showScreen('scr-client')">Voltar ao Menu</button>
+      <button class="btn btn-green" onclick="startQuiz()">Jogar Novamente</button>
+    </div>
+  </div>
+
+  <!-- ========== TELA: RESGATAR DESCONTO ========== -->
+  <div id="scr-redeem" class="screen">
+    <button class="back-btn" onclick="showScreen('scr-client')">← Voltar</button>
+    <div class="card">
+      <h2 style="color:var(--gold);margin-bottom:10px;">🛍️ Resgatar Desconto</h2>
+      <div class="info">
+        <strong>Regras de Resgate:</strong><br>
+        • Desconto máximo: <strong>10% do valor da compra</strong><br>
+        • 1.000 pontos = R 1,00 de desconto<br>
+        • <strong>Não aplicável</strong> a taxas de entrega/frete<br>
+        • Informe apenas o valor dos produtos/serviços
+      </div>
+      <label>Loja Parceira:</label>
+      <select id="redeem-store"></select>
+      <label>Valor da Compra (sem entrega):</label>
+      <input type="number" id="redeem-value" placeholder="Ex: 150.00" step="0.01" min="0">
+      <div id="redeem-preview" class="hidden" style="background:rgba(255,215,0,0.1);padding:12px;border-radius:8px;margin:10px 0;font-size:0.9em;"></div>
+      <button class="btn btn-green" onclick="previewRedeem()">Calcular Desconto</button>
+      <button class="btn hidden" id="btn-confirm-redeem" onclick="confirmRedeem()">✅ Confirmar Resgate</button>
+    </div>
+  </div>
+
+  <!-- ========== TELA: TRANSFERIR PONTOS ========== -->
+  <div id="scr-transfer" class="screen">
+    <button class="back-btn" onclick="showScreen('scr-client')">← Voltar</button>
+    <div class="card">
+      <h2 style="color:var(--gold);margin-bottom:10px;">🔄 Transferir Pontos</h2>
+      <div class="info">
+        <strong>Regras de Transferência:</strong><br>
+        • Taxa: <strong>20%</strong> (vai para o caixa do projeto)<br>
+        • Limite diário: <strong>5.000 pontos</strong><br>
+        • Limite mensal: <strong>150.000 pontos</strong><br>
+        • O destinatário recebe o valor líquido (após taxa)
+      </div>
+      <label>CPF do Destinatário:</label>
+      <input type="tel" id="tr-cpf" placeholder="00000000000" maxlength="11" inputmode="numeric">
+      <label>Quantidade de Pontos:</label>
+      <input type="number" id="tr-amount" placeholder="Ex: 5000" min="100">
+      <div id="tr-preview" class="hidden" style="background:rgba(255,215,0,0.1);padding:12px;border-radius:8px;margin:10px 0;font-size:0.9em;"></div>
+      <button class="btn btn-purple" onclick="previewTransfer()">Simular Transferência</button>
+      <button class="btn btn-green hidden" id="btn-confirm-tr" onclick="confirmTransfer()">✅ Confirmar Transferência</button>
+    </div>
+  </div>
+
+  <!-- ========== TELA: PERFIL ========== -->
+  <div id="scr-profile" class="screen">
+    <button class="back-btn" onclick="showScreen('scr-client')">← Voltar</button>
+    <div class="card">
+      <h2 style="color:var(--gold);margin-bottom:15px;">📊 Meu Perfil</h2>
+      <div class="stats">
+        <div class="stat"><div class="stat-val" id="prof-pts">0</div><div class="stat-lbl">Pontos Atuais</div></div>
+        <div class="stat"><div class="stat-val" id="prof-games">0</div><div class="stat-lbl">Quizes</div></div>
+        <div class="stat"><div class="stat-val" id="prof-correct">0</div><div class="stat-lbl">Acertos Totais</div></div>
+        <div class="stat"><div class="stat-val" id="prof-redeemed">R 0</div><div class="stat-lbl">Resgatado</div></div>
+      </div>
+      <h3 style="color:var(--gold);margin-top:15px;">📜 Histórico Recente</h3>
+      <div id="prof-history"></div>
+    </div>
+  </div>
+
+  <!-- ========== TELA: LOJISTA ========== -->
+  <div id="scr-shopkeeper" class="screen">
+    <div class="topbar">
+      <span>🏪 <strong id="shop-name"></strong></span>
+      <button class="back-btn" onclick="logout()" style="margin:0;">Sair</button>
+    </div>
+    <div class="card">
+      <h2 style="color:var(--gold);text-align:center;margin-bottom:15px;">Painel do Lojista</h2>
+      <div class="stats">
+        <div class="stat"><div class="stat-val" id="shop-redeems">0</div><div class="stat-lbl">Resgates</div></div>
+        <div class="stat"><div class="stat-val" id="shop-clients">0</div><div class="stat-lbl">Clientes</div></div>
+        <div class="stat"><div class="stat-val" id="shop-total">R 0</div><div class="stat-lbl">Descontos Aplicados</div></div>
+      </div>
+      <button class="btn btn-green" onclick="showScreen('scr-validate')">✅ Validar Cupom</button>
+      <button class="btn btn-purple" onclick="showScreen('scr-shop-products')">📦 Meus Produtos/Ofertas</button>
+      <button class="btn" onclick="showScreen('scr-shop-add')">➕ Nova Oferta</button>
+    </div>
+  </div>
+
+  <!-- ========== TELA: VALIDAR CUPOM ========== -->
+  <div id="scr-validate" class="screen">
+    <button class="back-btn" onclick="showScreen('scr-shopkeeper')">← Voltar</button>
+    <div class="card">
+      <h2 style="color:var(--gold);margin-bottom:10px;">✅ Validar Cupom</h2>
+      <div class="info">Peça ao cliente o código do cupom e insira abaixo.</div>
+      <label>Código do Cupom:</label>
+      <input type="text" id="val-code" placeholder="QL-XXXXXX" style="text-transform:uppercase;text-align:center;font-size:1.3em;letter-spacing:3px;">
+      <button class="btn btn-green" onclick="validateCoupon()">Validar</button>
+      <div id="val-result" style="margin-top:15px;"></div>
+    </div>
+  </div>
+
+  <!-- ========== TELA: NOVA OFERTA LOJISTA ========== -->
+  <div id="scr-shop-add" class="screen">
+    <button class="back-btn" onclick="showScreen('scr-shopkeeper')">← Voltar</button>
+    <div class="card">
+      <h2 style="color:var(--gold);margin-bottom:10px;">➕ Nova Oferta</h2>
+      <label>Nome da Oferta:</label>
+      <input type="text" id="offer-name" placeholder="Ex: Café Grátis">
+      <label>Descrição:</label>
+      <input type="text" id="offer-desc" placeholder="Ex: Café expresso gratuito na compra de qualquer salgado">
+      <label>Pontos Necessários (mín. 1000):</label>
+      <input type="number" id="offer-pts" placeholder="Ex: 5000" min="1000">
+      <label>Estoque Disponível:</label>
+      <input type="number" id="offer-stock" placeholder="Ex: 20" min="1">
+      <button class="btn btn-green" onclick="addOffer()">Cadastrar Oferta</button>
+    </div>
+  </div>
+
+  <!-- ========== TELA: MEUS PRODUTOS LOJISTA ========== -->
+  <div id="scr-shop-products" class="screen">
+    <button class="back-btn" onclick="showScreen('scr-shopkeeper')">← Voltar</button>
+    <div class="card">
+      <h2 style="color:var(--gold);margin-bottom:10px;">📦 Minhas Ofertas</h2>
+      <div id="shop-prod-list"></div>
+    </div>
+  </div>
+
+  <!-- ========== TELA: ADMIN ========== -->
+  <div id="scr-admin" class="screen">
+    <div class="topbar">
+      <span>🛡️ <strong id="adm-name"></strong></span>
+      <button class="back-btn" onclick="logout()" style="margin:0;">Sair</button>
+    </div>
+    <div class="card">
+      <h2 style="color:var(--gold);text-align:center;margin-bottom:15px;">Painel Administrativo</h2>
+      <div class="stats">
+        <div class="stat"><div class="stat-val" id="adm-users">0</div><div class="stat-lbl">Usuários</div></div>
+        <div class="stat"><div class="stat-val" id="adm-shops">0</div><div class="stat-lbl">Lojistas</div></div>
+        <div class="stat"><div class="stat-val" id="adm-fund">R 0</div><div class="stat-lbl">Caixa do Projeto</div></div>
+        <div class="stat"><div class="stat-val" id="adm-transfers">0</div><div class="stat-lbl">Transferências</div></div>
+      </div>
+      <button class="btn" onclick="renderAdminUsers()">👥 Usuários</button>
+      <button class="btn btn-purple" onclick="renderAdminTransactions()">💳 Transações</button>
+      <button class="btn btn-green" onclick="renderAdminStats()">📊 Estatísticas</button>
+      <div id="adm-content" style="margin-top:15px;"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- MODAL GENÉRICO -->
+<div id="modal" class="modal">
+  <div class="modal-box">
+    <div class="modal-icon" id="m-icon">🎉</div>
+    <h2 id="m-title" style="color:var(--gold);margin-bottom:10px;"></h2>
+    <p id="m-text" style="margin-bottom:15px;line-height:1.5;"></p>
+    <button class="btn" onclick="closeModal()">OK</button>
+  </div>
+</div>
+
+<script>
+// ==================== BANCO DE DADOS ====================
+const DB_KEY = 'quizlocal_db_v3';
+let db = JSON.parse(localStorage.getItem(DB_KEY)) || {
+  users: [],
+  offers: [],
+  transactions: [],
+  projectFund: 0, // Caixa do projeto (recebe taxas de 20%)
+  pendingVerifications: [] // {email, code, expiresAt, userData}
+};
+
+function saveDB() { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
+function getUser(id) { return db.users.find(u => u.id === id); }
+function updateUser(u) { const i = db.users.findIndex(x => x.id === u.id); if(i>=0) db.users[i] = u; saveDB(); }
+function currentUser() { return db.users.find(u => u.id === SESSION.userId); }
+
+// Sessão temporária (não persiste logout)
+let SESSION = { userId: null, tempUser: null };
+
+// ==================== SONS (Web Audio API) ====================
+const actx = new (window.AudioContext || window.webkitAudioContext)();
+function playTone(freqs, type, durations) {
+  const now = actx.currentTime;
+  freqs.forEach((f,i) => {
+    const o = actx.createOscillator(), g = actx.createGain();
+    o.type = type; o.frequency.value = f;
+    g.gain.setValueAtTime(0, now + durations[i][0]);
+    g.gain.linearRampToValueAtTime(durations[i][1], now + durations[i][0] + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.001, now + durations[i][0] + durations[i][2]);
+    o.connect(g); g.connect(actx.destination);
+    o.start(now + durations[i][0]); o.stop(now + durations[i][0] + durations[i][2]);
+  });
+}
+function sndCorrect() { playTone([523,659,784,1047],'sine',[[0,0.3,0.2],[0.1,0.3,0.2],[0.2,0.3,0.2],[0.3,0.3,0.3]]); }
+function sndWrong() { playTone([300,200],'sawtooth',[[0,0.25,0.3],[0.15,0.25,0.4]]); }
+function sndWin() { playTone([523,659,784,1047,1319],'triangle',[[0,0.3,0.3],[0.12,0.3,0.3],[0.24,0.3,0.3],[0.36,0.3,0.3],[0.48,0.3,0.4]]); }
+function sndClick() { const o=actx.createOscillator(),g=actx.createGain();o.frequency.value=800;g.gain.setValueAtTime(0.08,actx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,actx.currentTime+0.08);o.connect(g);g.connect(actx.destination);o.start();o.stop(actx.currentTime+0.08); }
+
+// ==================== NAVEGAÇÃO ====================
+function showScreen(id) {
+  sndClick();
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+  // Refresh dinâmico
+  if(id==='scr-client') refreshClient();
+  if(id==='scr-shopkeeper') refreshShop();
+  if(id==='scr-admin') refreshAdmin();
+  if(id==='scr-redeem') loadRedeemStores();
+  if(id==='scr-profile') refreshProfile();
+  if(id==='scr-shop-products') renderShopProducts();
+}
+
+// ==================== TOAST & MODAL ====================
+function toast(msg, type='info') {
+  const t = document.createElement('div');
+  t.className = 'toast '+type; t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+function showModal(icon, title, text) {
+  document.getElementById('m-icon').textContent = icon;
+  document.getElementById('m-title').textContent = title;
+  document.getElementById('m-text').textContent = text;
+  document.getElementById('modal').classList.add('active');
+}
+function closeModal() { document.getElementById('modal').classList.remove('active'); }
+
+// ==================== UTILITÁRIOS ====================
+function cleanCPF(cpf) { return cpf.replace(/D/g,''); }
+function isValidCPF(cpf) {
+  cpf = cleanCPF(cpf);
+  if(cpf.length !== 11 || /^(d)1+/.test(cpf)) return false;
+  let sum=0, rest;
+  for(let i=1;i<=9;i++) sum += parseInt(cpf[i-1])*(11-i);
+  rest = (sum*10)%11; if(rest>=10) rest=0;
+  if(rest !== parseInt(cpf[9])) return false;
+  sum=0;
+  for(let i=1;i<=10;i++) sum += parseInt(cpf[i-1])*(12-i);
+  rest = (sum*10)%11; if(rest>=10) rest=0;
+  return rest === parseInt(cpf[10]);
+}
+function genCode(len=6) { return Math.random().toString(36).substr(2,len).toUpperCase(); }
+function fmtMoney(v) { return 'R '+Number(v).toFixed(2); }
+function todayStr() { return new Date().toISOString().slice(0,10); }
+function monthStr() { return new Date().toISOString().slice(0,7); }
+
+// Toggle campo loja
+document.getElementById('reg-type').addEventListener('change', e => {
+  document.getElementById('store-field').classList.toggle('hidden', e.target.value !== 'lojista');
+});
+
+// ==================== CADASTRO & VERIFICAÇÃO ====================
+function handleRegister() {
+  const name = document.getElementById('reg-name').value.trim();
+  const cpf = cleanCPF(document.getElementById('reg-cpf').value);
+  const email = document.getElementById('reg-email').value.trim().toLowerCase();
+  const pass = document.getElementById('reg-pass').value;
+  const type = document.getElementById('reg-type').value;
+  const store = document.getElementById('reg-store').value.trim();
+
+  if(!name||!cpf||!email||!pass) { toast('Preencha todos os campos!','error'); return; }
+  if(!isValidCPF(cpf)) { toast('CPF inválido!','error'); return; }
+  if(type==='lojista' && !store) { toast('Informe o nome do estabelecimento!','error'); return; }
+
+  // Verificar CPF único
+  if(db.users.find(u => u.cpf === cpf)) {
+    // Tentar login
+    const existing = db.users.find(u => u.cpf === cpf);
+    if(existing.pass === pass) {
+      if(!existing.verified) { startVerification(existing); return; }
+      SESSION.userId = existing.id;
+      toast('Login realizado!','success');
+      redirectToRole(existing.type);
+      return;
+    }
+    toast('CPF já cadastrado com outra senha!','error');
+    return;
+  }
+
+  // Criar usuário pendente
+  const userData = {
+    id: Date.now(), type, name, cpf, email, pass,
+    store: type==='lojista'?store:null,
+    points: 0, gamesPlayed: 0, correctAnswers: 0, totalRedeemed: 0,
+    verified: false, createdAt: new Date().toISOString()
+  };
+
+  startVerification(userData);
+}
+
+function startVerification(userData) {
+  const code = String(Math.floor(100000 + Math.random()*900000));
+  const expiresAt = Date.now() + 1601000; // 10 min
+
+  // Remover verificações antigas deste email
+  db.pendingVerifications = db.pendingVerifications.filter(p => p.email !== userData.email);
+  db.pendingVerifications.push({ email: userData.email, code, expiresAt, userData });
+  saveDB();
+
+  SESSION.tempUser = userData;
+  document.getElementById('verify-email-display').textContent = userData.email;
+  document.getElementById('verify-code').value = '';
+
+  // SIMULAÇÃO DE ENVIO DE E-MAIL
+  console.log(📧 CÓDIGO DE VERIFICAÇÃO PARA {userData.email}: {code});
+  alert(📧 SIMULAÇÃO DE E-MAILnnPara: {userData.email}nCódigo: {code}nn(Em produção, este código seria enviado por e-mail));
+
+  showScreen('scr-verify');
+}
+
+function confirmVerification() {
+  const code = document.getElementById('verify-code').value.trim();
+  const pending = db.pendingVerifications.find(p =>
+    p.email === SESSION.tempUser.email && p.code === code
+  );
+
+  if(!pending) { toast('Código inválido!','error'); sndWrong(); return; }
+  if(Date.now() > pending.expiresAt) { toast('Código expirado! Solicite novo.','error'); sndWrong(); return; }
+
+  // Verificar se usuário já existe (login) ou criar novo
+  let user = db.users.find(u => u.cpf === SESSION.tempUser.cpf);
+  if(!user) {
+    user = SESSION.tempUser;
+    user.verified = true;
+    db.users.push(user);
+  } else {
+    user.verified = true;
+  }
+
+  // Limpar pendência
+  db.pendingVerifications = db.pendingVerifications.filter(p => p.email !== SESSION.tempUser.email);
+  saveDB();
+
+  SESSION.userId = user.id;
+  SESSION.tempUser = null;
+  sndCorrect();
+  toast('Conta verificada com sucesso!','success');
+  redirectToRole(user.type);
+}
+
+function resendCode() {
+  if(!SESSION.tempUser) return;
+  startVerification(SESSION.tempUser);
+  toast('Novo código enviado!','info');
+}
+
+function redirectToRole(type) {
+  if(type==='cliente') showScreen('scr-client');
+  else if(type==='lojista') showScreen('scr-shopkeeper');
+  else if(type==='admin') showScreen('scr-admin');
+}
+
+function logout() {
+  SESSION = { userId:null, tempUser:null };
+  showScreen('scr-home');
+  toast('Você saiu do sistema','info');
+}
+
+// ==================== BANCO DE PERGUNTAS EXPANDIDO ====================
+const QUESTIONS = [
+  // FÁCIL (d:1) - 10 segundos
+  {q:"Capital do Brasil?",o:["São Paulo","Rio de Janeiro","Brasília","Salvador"],a:2,c:"Geografia",d:1},
+  {q:"Quem pintou a Mona Lisa?",o:["Van Gogh","Da Vinci","Picasso","Michelangelo"],a:1,c:"Arte",d:1},
+  {q:"7 × 8 = ?",o:["54","56","58","64"],a:1,c:"Matemática",d:1},
+  {q:"Maior planeta do Sistema Solar?",o:["Terra","Marte","Júpiter","Saturno"],a:2,c:"Ciências",d:1},
+  {q:"Ano do descobrimento do Brasil?",o:["1492","1500","1510","1488"],a:1,c:"História",d:1},
+  {q:"Símbolo químico da água?",o:["H2O","CO2","O2","HO"],a:0,c:"Química",d:1},
+  {q:"Campeã Copa 2022?",o:["Brasil","França","Argentina","Alemanha"],a:2,c:"Esportes",d:1},
+  {q:"Jogadores em campo no futebol?",o:["10","11","12","9"],a:1,c:"Esportes",d:1},
+  {q:"Moeda do Japão?",o:["Yuan","Won","Iene","Dólar"],a:2,c:"Economia",d:1},
+  {q:"Maior oceano?",o:["Atlântico","Índico","Pacífico","Ártico"],a:2,c:"Geografia",d:1},
+  {q:"Homem na Lua?",o:["1965","1969","1972","1975"],a:1,c:"História",d:1},
+  {q:"Maior mamífero?",o:["Elefante","Baleia Azul","Girafa","Tubarão"],a:1,c:"Biologia",d:1},
+  {q:"Fórmula do CO2?",o:["CO","CO2","C2O","O2C"],a:1,c:"Química",d:1},
+  {q:"Capital da França?",o:["Lyon","Paris","Marselha","Nice"],a:1,c:"Geografia",d:1},
+  {q:"Unidade básica da vida?",o:["Átomo","Molécula","Célula","Tecido"],a:2,c:"Biologia",d:1},
+  {q:"Cordas do violão clássico?",o:["4","5","6","7"],a:2,c:"Música",d:1},
+  {q:"Capital do Japão?",o:["Osaka","Kyoto","Tóquio","Hiroshima"],a:2,c:"Geografia",d:1},
+  {q:"Maior animal terrestre?",o:["Rinoceronte","Elefante Africano","Hipopótamo","Girafa"],a:1,c:"Biologia",d:1},
+  {q:"Planeta mais próximo do Sol?",o:["Vênus","Terra","Mercúrio","Marte"],a:2,c:"Ciências",d:1},
+  {q:"Quantos continentes existem?",o:["5","6","7","8"],a:2,c:"Geografia",d:1},
+  {q:"Cor da esmeralda?",o:["Azul","Vermelho","Verde","Amarelo"],a:2,c:"Geral",d:1},
+  {q:"Animal conhecido como rei da selva?",o:["Tigre","Leão","Urso","Pantera"],a:1,c:"Biologia",d:1},
+  {q:"Quantas patas tem uma aranha?",o:["6","8","10","12"],a:1,c:"Biologia",d:1},
+  {q:"Idioma falado na Argentina?",o:["Português","Espanhol","Italiano","Francês"],a:1,c:"Geografia",d:1},
+  {q:"O que é H2O?",o:["Sal","Açúcar","Água","Oxigênio"],a:2,c:"Química",d:1},
+  {q:"Quem escreveu Cinderela?",o:["Irmãos Grimm","Disney","Andersen","Perrault"],a:0,c:"Literatura",d:1},
+  {q:"Qual a cor do céu em um dia limpo?",o:["Verde","Azul","Roxo","Amarelo"],a:1,c:"Geral",d:1},
+  {q:"Quantos dias tem um ano bissexto?",o:["364","365","366","367"],a:2,c:"Geral",d:1},
+  {q:"O que mede um termômetro?",o:["Pressão","Umidade","Temperatura","Velocidade"],a:2,c:"Ciências",d:1},
+  {q:"Qual é o satélite natural da Terra?",o:["Sol","Lua","Marte","Vênus"],a:1,c:"Ciências",d:1},
+
+  // MÉDIO (d:2) - 15 segundos
+  {q:"Quantos estados tem o Brasil?",o:["25","26","27","28"],a:1,c:"Geografia",d:2},
+  {q:"Autor de Dom Casmurro?",o:["Alencar","Machado","Graciliano","Amado"],a:1,c:"Literatura",d:2},
+  {q:"Velocidade da luz?",o:["300.000 km/s","150.000 km/s","500.000 km/s","1.000.000 km/s"],a:0,c:"Física",d:2},
+  {q:"Rio mais longo do mundo?",o:["Amazonas","Nilo","Mississipi","Yangtze"],a:0,c:"Geografia",d:2},
+  {q:"1º presidente do Brasil?",o:["Pedro II","Deodoro","Getúlio","JK"],a:1,c:"História",d:2},
+  {q:"Elemento mais abundante no universo?",o:["Oxigênio","Carbono","Hidrogênio","Hélio"],a:2,c:"Química",d:2},
+  {q:"Queda do Muro de Berlim?",o:["1987","1989","1991","1985"],a:1,c:"História",d:2},
+  {q:"Teoria da Relatividade?",o:["Newton","Einstein","Tesla","Hawking"],a:1,c:"Ciências",d:2},
+  {q:"Osso mais longo do corpo?",o:["Tíbia","Fêmur","Úmero","Rádio"],a:1,c:"Biologia",d:2},
+  {q:"Descobridor da penicilina?",o:["Pasteur","Fleming","Koch","Curie"],a:1,c:"Ciências",d:2},
+  {q:"Compositor da 9ª Sinfonia?",o:["Mozart","Beethoven","Bach","Chopin"],a:1,c:"Música",d:2},
+  {q:"Dentes de um adulto?",o:["28","30","32","34"],a:2,c:"Biologia",d:2},
+  {q:"País mais populoso (2024)?",o:["EUA","Índia","China","Indonésia"],a:1,c:"Geografia",d:2},
+  {q:"Instrumento com 88 teclas?",o:["Órgão","Piano","Acordeão","Cravo"],a:1,c:"Música",d:2},
+  {q:"Noite Estrelada foi pintada por?",o:["Monet","Van Gogh","Renoir","Cézanne"],a:1,c:"Arte",d:2},
+  {q:"Autor de Romeu e Julieta?",o:["Dante","Shakespeare","Cervantes","Goethe"],a:1,c:"Literatura",d:2},
+  {q:"Início da 2ª Guerra Mundial?",o:["1935","1939","1941","1945"],a:1,c:"História",d:2},
+  {q:"Capital da Austrália?",o:["Sydney","Melbourne","Canberra","Perth"],a:2,c:"Geografia",d:2},
+  {q:"Qual é o metal líquido à temperatura ambiente?",o:["Ferro","Mercúrio","Chumbo","Ouro"],a:1,c:"Química",d:2},
+  {q:"Quem descobriu o Brasil?",o:["Cabral","Colombo","Vespucci","Magalhães"],a:0,c:"História",d:2},
+  {q:"Quantos lados tem um hexágono?",o:["5","6","7","8"],a:1,c:"Matemática",d:2},
+  {q:"Qual é o maior órgão do corpo humano?",o:["Fígado","Coração","Pele","Pulmão"],a:2,c:"Biologia",d:2},
+  {q:"Em que continente fica o Egito?",o:["Ásia","África","Europa","América"],a:1,c:"Geografia",d:2},
+  {q:"Quem inventou a lâmpada elétrica?",o:["Tesla","Edison","Bell","Watt"],a:1,c:"História",d:2},
+  {q:"Qual é a raiz quadrada de 144?",o:["10","11","12","14"],a:2,c:"Matemática",d:2},
+  {q:"Qual é o símbolo do ouro na tabela periódica?",o:["Ag","Au","Fe","Cu"],a:1,c:"Química",d:2},
+  {q:"Quem foi o primeiro homem no espaço?",o:["Armstrong","Gagarin","Aldrin","Collins"],a:1,c:"História",d:2},
+  {q:"Qual é a capital da Itália?",o:["Milão","Roma","Veneza","Nápoles"],a:1,c:"Geografia",d:2},
+  {q:"Quantas cores tem o arco-íris?",o:["5","6","7","8"],a:2,c:"Geral",d:2},
+  {q:"Qual é o animal mais rápido do mundo?",o:["Guepardo","Leão","Águia","Falcão"],a:0,c:"Biologia",d:2},
+
+  // DIFÍCIL (d:3) - 20 segundos
+  {q:"Capital da Austrália?",o:["Sydney","Melbourne","Canberra","Perth"],a:2,c:"Geografia",d:3},
+  {q:"Metal mais leve?",o:["Alumínio","Lítio","Magnésio","Sódio"],a:1,c:"Química",d:3},
+  {q:"Maior deserto do mundo?",o:["Saara","Gobi","Antártica","Atacama"],a:2,c:"Geografia",d:3},
+  {q:"Autor de 'Em Busca do Tempo Perdido'?",o:["Proust","Joyce","Kafka","Woolf"],a:0,c:"Literatura",d:3},
+  {q:"Ano da Proclamação da República no Brasil?",o:["1888","1889","1890","1891"],a:1,c:"História",d:3},
+  {q:"Qual é o elemento mais eletronegativo?",o:["Oxigênio","Flúor","Cloro","Nitrogênio"],a:1,c:"Química",d:3},
+  {q:"Quem formulou as leis do movimento?",o:["Galileu","Newton","Kepler","Copérnico"],a:1,c:"Física",d:3},
+  {q:"Qual é a montanha mais alta do mundo?",o:["K2","Everest","Kilimanjaro","Aconcágua"],a:1,c:"Geografia",d:3},
+  {q:"Em que ano foi fundado o Google?",o:["1996","1998","2000","2002"],a:1,c:"Tecnologia",d:3},
+  {q:"Qual é o menor país do mundo?",o:["Mônaco","Vaticano","San Marino","Liechtenstein"],a:1,c:"Geografia",d:3},
+  {q:"Quem pintou 'O Grito'?",o:["Van Gogh","Munch","Dalí","Kandinsky"],a:1,c:"Arte",d:3},
+  {q:"Qual é a moeda oficial da Suíça?",o:["Euro","Franco Suíço","Libra","Dólar"],a:1,c:"Economia",d:3},
+  {q:"Quantos ossos tem o corpo humano adulto?",o:["206","210","215","200"],a:0,c:"Biologia",d:3},
+  {q:"Qual é o rio mais caudaloso do mundo?",o:["Nilo","Amazonas","Mississipi","Congo"],a:1,c:"Geografia",d:3},
+  {q:"Quem escreveu '1984'?",o:["Huxley","Orwell","Bradbury","Asimov"],a:1,c:"Literatura",d:3},
+  {q:"Qual é a velocidade do som no ar?",o:["340 m/s","500 m/s","1000 m/s","1200 m/s"],a:0,c:"Física",d:3},
+  {q:"Qual é o planeta mais quente do sistema solar?",o:["Mercúrio","Vênus","Marte","Júpiter"],a:1,c:"Ciências",d:3},
+  {q:"Quem descobriu a radioatividade?",o:["Curie","Becquerel","Rutherford","Thomson"],a:1,c:"Ciências",d:3},
+  {q:"Qual é a capital do Canadá?",o:["Toronto","Vancouver","Ottawa","Montreal"],a:2,c:"Geografia",d:3},
+  {q:"Em que ano caiu o Império Romano do Ocidente?",o:["476","500","450","410"],a:0,c:"História",d:3}
+];
+
+let quiz = {};
+let timerInterval = null;
+
+// Anti-cheat: detectar perda de foco
+document.addEventListener('visibilitychange', () => {
+  if(document.hidden && quiz.active) {
+    clearInterval(timerInterval);
+    quiz.caughtCheating = true;
+    toast('⚠️ Saída detectada! Pergunta anulada.','error');
+    sndWrong();
+    setTimeout(nextQuestion, 1500);
+  }
+});
+
+function startQuiz() {
+  // Embaralhamento aleatório para prevenir fraudes entre usuários simultâneos
+  const shuffled = [...QUESTIONS].sort(()=>Math.random()-0.5).slice(0,10);
+  quiz = { questions:shuffled, current:0, correct:0, wrong:0, points:0, active:true, caughtCheating:false };
+  document.getElementById('q-total').textContent = shuffled.length;
+  showScreen('scr-quiz');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  if(quiz.current >= quiz.questions.length) { finishQuiz(); return; }
+  const q = quiz.questions[quiz.current];
+  document.getElementById('q-num').textContent = quiz.current+1;
+  document.getElementById('q-round-pts').textContent = quiz.points;
+  document.getElementById('q-text').innerHTML = <small style="color:var(--gold)">[{q.c} • Dif. {q.d}]</small><br><br>{q.q};
+
+  const opts = document.getElementById('q-options');
+  opts.innerHTML = '';
+  q.o.forEach((o,i) => {
+    const d = document.createElement('div');
+    d.className = 'opt';
+    d.textContent = {String.fromCharCode(65+i)}) {o};
+    d.onclick = () => answerQ(i, d);
+    opts.appendChild(d);
+  });
+
+  // Timer baseado na dificuldade: Fácil=10, Médio=15, Difícil=20
+  const seconds = q.d === 1 ? 10 : q.d === 2 ? 15 : 20;
+  startTimer(seconds);
+}
+
+function startTimer(seconds) {
+  clearInterval(timerInterval);
+  const fill = document.getElementById('timer-fill');
+  fill.style.transition = 'none'; fill.style.width = '100%';
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      fill.style.transition = width {seconds}s linear;
+      fill.style.width = '0%';
+    });
+  });
+  let remaining = seconds;
+  timerInterval = setInterval(() => {
+    remaining--;
+    if(remaining <= 0) {
+      clearInterval(timerInterval);
+      quiz.wrong++;
+      sndWrong();
+      toast('⏰ Tempo esgotado!','error');
+      setTimeout(nextQuestion, 1200);
+    }
+  }, 1000);
+}
+
+function answerQ(idx, el) {
+  if(!quiz.active) return;
+  clearInterval(timerInterval);
+  quiz.active = false; // Previne duplo clique
+
+  const q = quiz.questions[quiz.current];
+  document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
+
+  const ptsValue = q.d * 100;
+
+  if(idx === q.a) {
+    el.classList.add('correct');
+    quiz.correct++; 
+    quiz.points += ptsValue; // Ganha pontos
+    sndCorrect();
+    toast(✅ Correto! +{ptsValue} pts,'success');
+  } else {
+    el.classList.add('wrong');
+    document.querySelectorAll('.opt')[q.a]?.classList.add('correct');
+    quiz.wrong++;
+    quiz.points -= ptsValue; // Perde pontos (penalidade)
+    sndWrong();
+    toast(❌ Errado! -{ptsValue} pts,'error');
+  }
+  setTimeout(nextQuestion, 1600);
+}
+
+function nextQuestion() {
+  quiz.active = true;
+  quiz.current++;
+  renderQuestion();
+}
+
+function finishQuiz() {
+  quiz.active = false;
+  clearInterval(timerInterval);
+  const u = currentUser();
+  u.points += quiz.points;
+  u.gamesPlayed++;
+  u.correctAnswers += quiz.correct;
+  updateUser(u);
+
+  document.getElementById('res-correct').textContent = quiz.correct;
+  document.getElementById('res-wrong').textContent = quiz.wrong;
+  document.getElementById('res-earned').textContent = quiz.points;
+
+  const pct = quiz.correct / quiz.questions.length;
+  if(pct >= 0.8) { document.getElementById('res-icon').textContent='🏆'; document.getElementById('res-title').textContent='Excelente!'; sndWin(); }
+  else if(pct >= 0.5) { document.getElementById('res-icon').textContent='👍'; document.getElementById('res-title').textContent='Muito Bem!'; sndCorrect(); }
+  else { document.getElementById('res-icon').textContent='💪'; document.getElementById('res-title').textContent='Continue Tentando!'; }
+  document.getElementById('res-msg').textContent = Você acertou {quiz.correct}/{quiz.questions.length}. Saldo final da rodada: {quiz.points} pontos.;
+  showScreen('scr-result');
+}
+
+// ==================== CLIENTE: REFRESH ====================
+function refreshClient() {
+  const u = currentUser(); if(!u) return;
+  document.getElementById('cli-name').textContent = u.name;
+  document.getElementById('cli-pts').textContent = u.points;
+  document.getElementById('cli-balance').textContent = fmtMoney(u.points/1000);
+  document.getElementById('cli-games').textContent = u.gamesPlayed;
+  document.getElementById('cli-redeemed').textContent = fmtMoney(u.totalRedeemed);
+}
+
+// ==================== RESGATE (DESCONTO MÁX 10%) ====================
+function loadRedeemStores() {
+  const sel = document.getElementById('redeem-store');
+  const shops = db.users.filter(u => u.type==='lojista');
+  sel.innerHTML = '<option value="">Selecione a loja...</option>';
+  shops.forEach(s => { sel.innerHTML += <option value="{s.id}">{s.store}</option>; });
+  document.getElementById('redeem-value').value = '';
+  document.getElementById('redeem-preview').classList.add('hidden');
+  document.getElementById('btn-confirm-redeem').classList.add('hidden');
+}
+
+function previewRedeem() {
+  const storeId = document.getElementById('redeem-store').value;
+  const val = parseFloat(document.getElementById('redeem-value').value);
+  const u = currentUser();
+
+  if(!storeId) { toast('Selecione uma loja!','error'); return; }
+  if(!val || val <= 0) { toast('Informe um valor válido!','error'); return; }
+
+  const maxDiscount = val * 0.10; // 10% máximo
+  const neededPoints = Math.ceil(maxDiscount * 1000);
+  const actualDiscount = Math.min(maxDiscount, u.points / 1000);
+  const actualPoints = Math.ceil(actualDiscount * 1000);
+
+  const prev = document.getElementById('redeem-preview');
+  prev.classList.remove('hidden');
+  prev.innerHTML = 
+    <strong>📋 Resumo do Resgate:</strong><br>
+    Valor da compra: {fmtMoney(val)}<br>
+    Desconto máximo (10%): {fmtMoney(maxDiscount)}<br>
+    Seus pontos disponíveis: {u.points} ({fmtMoney(u.points/1000)})<br>
+    <strong style="color:var(--gold);font-size:1.1em;">Desconto aplicado: {fmtMoney(actualDiscount)}</strong><br>
+    Pontos a deduzir: <strong>{actualPoints}</strong><br>
+    {actualPoints > u.points ? '<span style="color:var(--red)">⚠️ Pontos insuficientes para desconto máximo</span>' : ''}
+  ;
+
+  SESSION.redeemData = { storeId, actualDiscount, actualPoints, purchaseValue: val };
+  document.getElementById('btn-confirm-redeem').classList.remove('hidden');
+}
+
+function confirmRedeem() {
+  const d = SESSION.redeemData;
+  const u = currentUser();
+  if(!d) return;
+  if(u.points < d.actualPoints) { toast('Pontos insuficientes!','error'); return; }
+
+  const code = 'QL-' + genCode(6);
+  u.points -= d.actualPoints;
+  u.totalRedeemed += d.actualDiscount;
+  updateUser(u);
+
+  db.transactions.push({
+    id: Date.now(), type:'redeem', userId:u.id, userName:u.name,
+    storeId:d.storeId, storeName:getUser(d.storeId)?.store,
+    discount:d.actualDiscount, pointsUsed:d.actualPoints,
+    purchaseValue:d.purchaseValue, code, status:'pendente',
+    date: new Date().toISOString()
+  });
+  saveDB();
+
+  sndWin();
+  showModal('🎫','Cupom Gerado!',Código: {code}nnDesconto: {fmtMoney(d.actualDiscount)}nApresente este código no caixa da loja.nn⚠️ Não aplicável a taxas de entrega.);
+  document.getElementById('redeem-preview').classList.add('hidden');
+  document.getElementById('btn-confirm-redeem').classList.add('hidden');
+  refreshClient();
+}
+
+// ==================== TRANSFERÊNCIA (20% TAXA, LIMITES) ====================
+function previewTransfer() {
+  const cpf = cleanCPF(document.getElementById('tr-cpf').value);
+  const amount = parseInt(document.getElementById('tr-amount').value);
+  const u = currentUser();
+
+  if(!cpf || cpf.length!==11) { toast('CPF inválido!','error'); return; }
+  if(!amount || amount < 100) { toast('Mínimo de 100 pontos!','error'); return; }
+  if(amount > u.points) { toast('Saldo insuficiente!','error'); return; }
+
+  // Verificar limites
+  const today = todayStr();
+  const month = monthStr();
+  const todayTransfers = db.transactions.filter(t => t.type==='transfer' && t.fromId===u.id && t.date?.startsWith(today));
+  const monthTransfers = db.transactions.filter(t => t.type==='transfer' && t.fromId===u.id && t.date?.startsWith(month));
+
+  const todaySent = todayTransfers.reduce((s,t)=>s+t.amount,0);
+  const monthSent = monthTransfers.reduce((s,t)=>s+t.amount,0);
+
+  if(todaySent + amount > 5000) { toast(Limite diário excedido! Enviado hoje: {todaySent}/5.000,'error'); return; }
+  if(monthSent + amount > 150000) { toast(Limite mensal excedido! Enviado este mês: {monthSent}/150.000,'error'); return; }
+
+  // Verificar destinatário
+  const dest = db.users.find(x => x.cpf === cpf && x.type === 'cliente');
+  if(!dest) { toast('Destinatário não encontrado!','error'); return; }
+  if(dest.id === u.id) { toast('Não pode transferir para si mesmo!','error'); return; }
+
+  const tax = Math.floor(amount * 0.20);
+  const net = amount - tax;
+
+  const prev = document.getElementById('tr-preview');
+  prev.classList.remove('hidden');
+  prev.innerHTML = 
+    <strong>📋 Simulação:</strong><br>
+    Destinatário: <strong>{dest.name}</strong><br>
+    Pontos enviados: {amount}<br>
+    Taxa (20%): <strong>-{tax} pts</strong> → Caixa do Projeto<br>
+    <strong style="color:var(--gold);font-size:1.1em;">Destinatário recebe: {net} pts</strong><br>
+    Seu saldo após: {u.points - amount} pts
+  ;
+
+  SESSION.transferData = { destId:dest.id, destName:dest.name, amount, tax, net };
+  document.getElementById('btn-confirm-tr').classList.remove('hidden');
+}
+
+function confirmTransfer() {
+  const d = SESSION.transferData;
+  const u = currentUser();
+  if(!d) return;
+
+  // Revalidar limites (segurança)
+  const today = todayStr();
+  const month = monthStr();
+  const todaySent = db.transactions.filter(t=>t.type==='transfer'&&t.fromId===u.id&&t.date?.startsWith(today)).reduce((s,t)=>s+t.amount,0);
+  const monthSent = db.transactions.filter(t=>t.type==='transfer'&&t.fromId===u.id&&t.date?.startsWith(month)).reduce((s,t)=>s+t.amount,0);
+  if(todaySent+d.amount>5000||monthSent+d.amount>150000) { toast('Limites excedidos entre simulação e confirmação!','error'); return; }
+
+  u.points -= d.amount;
+  updateUser(u);
+
+  const dest = getUser(d.destId);
+  dest.points += d.net;
+  updateUser(dest);
+
+  db.projectFund += d.tax / 1000; // Taxa vai para caixa em reais
+
+  db.transactions.push({
+    id:Date.now(), type:'transfer', fromId:u.id, fromName:u.name,
+    toId:d.destId, toName:d.destName,
+    amount:d.amount, tax:d.tax, net:d.net,
+    date:new Date().toISOString()
+  });
+  saveDB();
+
+  sndCorrect();
+  showModal('✅','Transferência Realizada!',{d.net} pontos enviados para {d.destName}.nTaxa de {d.tax} pts revertida ao caixa do projeto.);
+  document.getElementById('tr-preview').classList.add('hidden');
+  document.getElementById('btn-confirm-tr').classList.add('hidden');
+  document.getElementById('tr-cpf').value = '';
+  document.getElementById('tr-amount').value = '';
+  refreshClient();
+}
+
+// ==================== PERFIL ====================
+function refreshProfile() {
+  const u = currentUser(); if(!u) return;
+  document.getElementById('prof-pts').textContent = u.points;
+  document.getElementById('prof-games').textContent = u.gamesPlayed;
+  document.getElementById('prof-correct').textContent = u.correctAnswers;
+  document.getElementById('prof-redeemed').textContent = fmtMoney(u.totalRedeemed);
+
+  const hist = db.transactions.filter(t => t.userId===u.id || t.fromId===u.id || t.toId===u.id).slice(-10).reverse();
+  const cont = document.getElementById('prof-history');
+  if(!hist.length) { cont.innerHTML='<p style="opacity:0.6;text-align:center;padding:15px;">Sem histórico recente.</p>'; return; }
+  cont.innerHTML='<table><tr><th>Data</th><th>Tipo</th><th>Detalhe</th></tr>';
+  hist.forEach(t => {
+    const d = new Date(t.date).toLocaleDateString('pt-BR');
+    let detail = '';
+    if(t.type==='redeem') detail=-{t.pointsUsed} pts → {t.storeName};
+    else if(t.type==='transfer' && t.fromId===u.id) detail=-{t.amount} pts → {t.toName};
+    else if(t.type==='transfer' && t.toId===u.id) detail=+{t.net} pts ← {t.fromName};
+    else if(t.type==='quiz') detail=+{t.points} pts;
+    cont.innerHTML+=<tr><td>{d}</td><td>{t.type}</td><td>{detail}</td></tr>;
+  });
+  cont.innerHTML+='</table>';
+}
+
+// ==================== LOJISTA ====================
+function refreshShop() {
+  const u = currentUser(); if(!u) return;
+  document.getElementById('shop-name').textContent = u.store;
+  const redeems = db.transactions.filter(t=>t.storeId===u.id && t.type==='redeem');
+  const clients = [...new Set(redeems.map(r=>r.userId))].length;
+  const total = redeems.reduce((s,t)=>s+(t.discount||0),0);
+  document.getElementById('shop-redeems').textContent = redeems.length;
+  document.getElementById('shop-clients').textContent = clients;
+  document.getElementById('shop-total').textContent = fmtMoney(total);
+}
+
+function validateCoupon() {
+  const code = document.getElementById('val-code').value.trim().toUpperCase();
+  const u = currentUser();
+  const cont = document.getElementById('val-result');
+
+  if(!code) { toast('Digite o código!','error'); return; }
+  const t = db.transactions.find(x=>x.code===code);
+  if(!t) { cont.innerHTML='<div class="toast error" style="position:static;">❌ Cupom não encontrado!</div>'; sndWrong(); return; }
+  if(t.storeId!==u.id) { cont.innerHTML='<div class="toast error" style="position:static;">⚠️ Cupom de outra loja!</div>'; sndWrong(); return; }
+  if(t.status==='validado') { cont.innerHTML='<div class="toast error" style="position:static;">⚠️ Cupom já utilizado!</div>'; return; }
+
+  t.status = 'validado';
+  saveDB();
+  sndCorrect();
+  cont.innerHTML=
+    <div class="card" style="background:rgba(39,174,96,0.2);border-color:var(--green);">
+      <h3 style="color:var(--green);">✅ Cupom Válido!</h3>
+      <p><strong>Cliente:</strong> {t.userName}</p>
+      <p><strong>Desconto:</strong> {fmtMoney(t.discount)}</p>
+      <p><strong>Compra:</strong> {fmtMoney(t.purchaseValue)}</p>
+      <p>Aplique o desconto e entregue o produto.</p>
+    </div>;
+  document.getElementById('val-code').value='';
+  refreshShop();
+}
+
+function addOffer() {
+  const name=document.getElementById('offer-name').value.trim();
+  const desc=document.getElementById('offer-desc').value.trim();
+  const pts=parseInt(document.getElementById('offer-pts').value);
+  const stock=parseInt(document.getElementById('offer-stock').value);
+  const u=currentUser();
+
+  if(!name||!desc||!pts||!stock) { toast('Preencha tudo!','error'); return; }
+  if(pts<1000) { toast('Mínimo 1000 pontos!','error'); return; }
+
+  db.offers.push({ id:Date.now(), name, desc, points:pts, stock, storeId:u.id, storeName:u.store, createdAt:new Date().toISOString() });
+  saveDB();
+  sndCorrect(); toast('Oferta criada!','success');
+  ['offer-name','offer-desc','offer-pts','offer-stock'].forEach(id=>document.getElementById(id).value='');
+  showScreen('scr-shopkeeper');
+}
+
+function renderShopProducts() {
+  const u=currentUser(); if(!u) return;
+  const list=db.offers.filter(o=>o.storeId===u.id);
+  const cont=document.getElementById('shop-prod-list');
+  if(!list.length) { cont.innerHTML='<p style="opacity:0.6;text-align:center;padding:15px;">Nenhuma oferta cadastrada.</p>'; return; }
+  cont.innerHTML='';
+  list.forEach(o => {
+    cont.innerHTML+=<div class="prod-card"><div><h4>{o.name}</h4><p style="font-size:0.85em;opacity:0.8;">{o.desc}</p><small>{o.points} pts | Estoque: {o.stock}</small></div><button class="btn btn-red btn-sm" onclick="deleteOffer({o.id})">🗑️</button></div>;
+  });
+}
+
+function deleteOffer(id) {
+  if(!confirm('Excluir oferta?')) return;
+  db.offers=db.offers.filter(o=>o.id!==id); saveDB(); renderShopProducts(); toast('Oferta excluída','info');
+}
+
+// ==================== ADMIN ====================
+function refreshAdmin() {
+  const u=currentUser(); if(!u) return;
+  document.getElementById('adm-name').textContent=u.name;
+  document.getElementById('adm-users').textContent=db.users.filter(x=>x.type==='cliente').length;
+  document.getElementById('adm-shops').textContent=db.users.filter(x=>x.type==='lojista').length;
+  document.getElementById('adm-fund').textContent=fmtMoney(db.projectFund);
+  document.getElementById('adm-transfers').textContent=db.transactions.filter(t=>t.type==='transfer').length;
+}
+
+function renderAdminUsers() {
+  const cont=document.getElementById('adm-content');
+  cont.innerHTML='<table><tr><th>Nome</th><th>Tipo</th><th>CPF</th><th>Pts</th><th>Verif.</th></tr>';
+  db.users.forEach(u => {
+    cont.innerHTML+=<tr><td>{u.name}</td><td>{u.type}{u.store?' ('+u.store+')':''}</td><td>{u.cpf}</td><td>{u.points||0}</td><td>{u.verified?'✅':'❌'}</td></tr>;
+  });
+  cont.innerHTML+='</table>';
+}
+
+function renderAdminTransactions() {
+  const cont=document.getElementById('adm-content');
+  const txs=[...db.transactions].reverse().slice(0,50);
+  if(!txs.length) { cont.innerHTML='<p>Sem transações.</p>'; return; }
+  cont.innerHTML='<table><tr><th>Data</th><th>Tipo</th><th>De</th><th>Para</th><th>Valor</th><th>Taxa</th></tr>';
+  txs.forEach(t => {
+    const d=new Date(t.date).toLocaleDateString('pt-BR');
+    if(t.type==='transfer') cont.innerHTML+=<tr><td>{d}</td><td>Transfer</td><td>{t.fromName}</td><td>{t.toName}</td><td>{t.amount} pts</td><td>{t.tax} pts</td></tr>;
+    else if(t.type==='redeem') cont.innerHTML+=<tr><td>{d}</td><td>Resgate</td><td>{t.userName}</td><td>{t.storeName}</td><td>-{t.pointsUsed} pts</td><td>-</td></tr>;
+  });
+  cont.innerHTML+='</table>';
+}
+
+function renderAdminStats() {
+  const cont=document.getElementById('adm-content');
+  const totalPts=db.users.reduce((s,u)=>s+(u.points||0),0);
+  const totalGames=db.users.reduce((s,u)=>s+(u.gamesPlayed||0),0);
+  const totalRedeem=db.transactions.filter(t=>t.type==='redeem').reduce((s,t)=>s+(t.discount||0),0);
+  const totalTax=db.transactions.filter(t=>t.type==='transfer').reduce((s,t)=>s+(t.tax||0),0);
+  cont.innerHTML=
+    <div class="stats">
+      <div class="stat"><div class="stat-val">{totalPts}</div><div class="stat-lbl">Pontos em Circulação</div></div>
+      <div class="stat"><div class="stat-val">{totalGames}</div><div class="stat-lbl">Quizes Realizados</div></div>
+      <div class="stat"><div class="stat-val">{fmtMoney(totalRedeem)}</div><div class="stat-lbl">Total Resgatado</div></div>
+      <div class="stat"><div class="stat-val">{totalTax}</div><div class="stat-lbl">Pontos Taxados</div></div>
+      <div class="stat"><div class="stat-val">${fmtMoney(db.projectFund)}</div><div class="stat-lbl">Caixa do Projeto</div></div>
+    </div>;
+}
+
+// ==================== INIT ====================
+window.addEventListener('load', () => { showScreen('scr-home'); });
+</script>
+</body>
+</html>
