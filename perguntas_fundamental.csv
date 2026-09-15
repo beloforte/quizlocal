@@ -1,0 +1,51 @@
+question,option_a,option_b,option_c,option_d,correct_answer,category,difficulty,active
+Qual é o sujeito da frase "O gato dormia no sofá"?,No sofá,Dormia,O gato,Gato,2,Língua Portuguesa,1,true
+Quanto é 45 + 28?,63,73,83,93,1,Matemática,1,true
+Qual palavra abaixo é um substantivo próprio?,cidade,Maria,bonito,correr,1,Língua Portuguesa,1,true
+Se João tinha 15 figurinhas e ganhou 10, quantas ele tem agora?,5,15,25,35,2,Matemática,1,true
+Em "As crianças brincavam felizes", qual é o verbo?,Crianças,Felizes,Brincavam,As,2,Língua Portuguesa,1,true
+Qual é o resultado de 9 x 7?,56,63,72,81,1,Matemática,1,true
+Qual é o plural correto de "pão"?,Pãos,Pães,Pões,Pães,1,Língua Portuguesa,1,true
+Uma caixa tem 6 ovos. Quantos ovos há em 4 caixas iguais?,10,18,24,30,2,Matemática,1,true
+Assinale a alternativa que contém apenas verbos:,Casa,Corre,Bonito,Rua,1,Língua Portuguesa,1,true
+Qual número vem depois do 199?,198,200,210,190,1,Matemática,1,true
+Na frase "Pedro comeu a maçã", "a maçã" exerce a função de:,Sujeito,Verbo,Objeto Direto,Adjunto,2,Língua Portuguesa,1,true
+Se uma dúzia são 12 unidades, quantas unidades há em meia dúzia?,3,5,6,8,2,Matemática,1,true
+Qual é o antônimo de "alegre"?,Feliz,Triste,Rápido,Alto,1,Língua Portuguesa,1,true
+Quantos minutos há em 1 hora e meia?,60,75,90,120,2,Matemática,1,true
+Em "A menina comprou livros", "livros" é classificado como:,Sujeito,Objeto Direto,Adjunto Adverbial,Predicativo,1,Língua Portuguesa,1,true
+Qual é o dobro de 25?,40,45,50,60,2,Matemática,1,true
+Qual palavra abaixo é um adjetivo?,Menino,Casa,Grande,Andar,2,Língua Portuguesa,1,true
+Ana tinha R$ 50,00 e gastou R$ 18,00. Quanto sobrou?,R$ 22,00,R$ 32,00,R$ 38,00,R$ 42,00,1,Matemática,1,true
+Qual é o sinônimo de "rápido"?,Lento,Veloz,Parado,Calmo,1,Língua Portuguesa,1,true
+Qual é a metade de 100?,25,40,50,75,2,Matemática,1,true
+Em "Os alunos estudaram muito", "muito" é um:,Substantivo,Verbo,Advérbio,Adjetivo,2,Língua Portuguesa,2,true
+Um retângulo tem base 8 cm e altura 5 cm. Qual sua área?,13 cm²,26 cm²,40 cm²,80 cm²,2,Matemática,2,true
+Qual figura de linguagem existe em "Estou morrendo de fome"?,Metáfora,Hipérbole,Ironia,Onomatopeia,1,Língua Portuguesa,2,true
+Se 3 cadernos custam R$ 27,00, quanto custa 1 caderno?,R$ 6,00,R$ 7,00,R$ 8,00,R$ 9,00,3,Matemática,2,true
+Assinale a alternativa com erro de concordância verbal:,Faz dois anos,Era muitas pessoas,Havia poucos alunos,Choveu ontem,1,Língua Portuguesa,2,true
+Qual é o perímetro de um quadrado cujo lado mede 6 cm?,12 cm,18 cm,24 cm,36 cm,2,Matemática,2,true
+Na oração "O sol brilha forte", o predicado é classificado como:,Nominal,Verbal,Verbo-nominal,Intransitivo,1,Língua Portuguesa,2,true
+Converta 3/4 para número decimal:,0,25,0,50,0,75,0,80,2,Matemática,2,true
+Qual é o significado da expressão "dar com os burros n'água"?,Ter sucesso,Fracassar,Encontrar água,Viajar,1,Língua Portuguesa,2,true
+Um ônibus saiu às 14h30 e chegou às 16h15. Quanto tempo durou a viagem?,1h15min,1h30min,1h45min,2h15min,2,Matemática,2,true
+Em "Preciso de silêncio", "de silêncio" é:,Objeto Direto,Complemento Nominal,Sujeito,Aposto,1,Língua Portuguesa,2,true
+Qual é o MDC entre 12 e 18?,2,3,6,12,2,Matemática,2,true
+Qual é o tipo de sujeito em "Vende-se casa"?,Simples,Composto,Oculto,Indeterminado,3,Língua Portuguesa,2,true
+Se f(x) = x + 5, quanto vale f(10)?,5,10,15,20,2,Matemática,2,true
+Assinale a frase escrita corretamente:,Eu vi ele ontem,Eu o vi ontem,Vi ele hoje,Vi-o amanhã,1,Língua Portuguesa,2,true
+Qual é a soma dos ângulos internos de um triângulo?,90°,180°,270°,360°,1,Matemática,2,true
+Qual é o sinônimo de "inequívoco"?,Dúbio,Claro,Confuso,Ambíguo,1,Língua Portuguesa,2,true
+Resolva: (3² + 4²) = ?,7,12,25,49,2,Matemática,2,true
+Em "O livro que li era bom", "que li" é uma oração subordinada:,Adjetiva,Substantiva,Adverbial,Coordenada,0,Língua Portuguesa,2,true
+Qual é a probabilidade de sair cara ao lançar uma moeda justa?,1/4,1/3,1/2,3/4,2,Matemática,2,true
+Qual é a classe da palavra "onde" em "O lugar onde nasci"?,Pronome Relativo,Advérbio,Conjunção,Preposição,0,Língua Portuguesa,2,true
+Qual é o MMC entre 4 e 6?,8,12,16,24,1,Matemática,2,true
+Assinale a alternativa com uso correto de "mas" e "mais".,Ele estudou mas não passou,Ele quer mais dinheiro,Ele é inteligente mas preguiçoso,Todas estão corretas,3,Língua Portuguesa,2,true
+Se um carro percorre 120 km em 2h, qual sua velocidade média?,40 km/h,50 km/h,60 km/h,80 km/h,2,Matemática,2,true
+Qual é o objeto direto em "Ela enviou a carta ao amigo"?,Ela,Enviou,A carta,Ao amigo,2,Língua Portuguesa,2,true
+Qual é o valor de log₁₀(100)?,1,2,10,100,1,Matemática,2,true
+Em "Cheguei cedo", "cedo" é classificado como:,Adjunto Adverbial de Tempo,Predicativo,Complemento Verbal,Sujeito,0,Língua Portuguesa,2,true
+Qual é a diagonal de um quadrado de lado 5√2?,5,10,10√2,25,1,Matemática,2,true
+Qual é o emprego correto de "por que" separado e sem acento?,Não sei por que ele veio,Por que você foi?,Os motivos por que lutei,Diga-me por que,2,Língua Portuguesa,2,true
+Qual é a equação da reta que passa por (0,3) e (2,7)?,y = 2x + 3,y = 3x + 2,y = x + 3,y = 2x - 3,0,Matemática,2,true
