@@ -816,6 +816,10 @@ document.addEventListener('visibilitychange', () => {
 });
 
 async function startQuiz() {
+  // 1. Log no Console para saber que a função começou
+  console.log("🎯 Função startQuiz iniciada...");
+  
+  // 2. Mensagem visual na tela (Toast)
   toast('Carregando perguntas...', 'info');
   
   let questionsList = [];
@@ -823,13 +827,18 @@ async function startQuiz() {
   // Tenta buscar do Supabase primeiro
   if (supabaseClient) {
     try {
+      console.log("📡 Buscando perguntas no Supabase...");
       const { data, error } = await supabaseClient
         .from('questions')
         .select('*')
-        .eq('active', true); // Busca apenas perguntas ativas
+        .eq('active', true); 
       
-      if (!error && data && data.length > 0) {
-        // Converte o formato do banco para o formato que o jogo usa
+      if (error) {
+        console.error("❌ Erro ao buscar perguntas:", error);
+      } else if (data && data.length > 0) {
+        console.log(`✅ ${data.length} perguntas encontradas no banco!`);
+        
+        // Converte o formato do banco para o formato do jogo
         questionsList = data.map(q => ({
           q: q.question,
           o: [q.option_a, q.option_b, q.option_c, q.option_d],
@@ -838,18 +847,41 @@ async function startQuiz() {
           d: q.difficulty
         }));
         
-        // Embaralha as perguntas para não serem sempre na mesma ordem
-        questionsList.sort(() => Math.random() - 0.5);
-        
-        // Pega apenas 10 perguntas para a rodada
-        questionsList = questionsList.slice(0, 10);
+        // Embaralha e pega 10
+        questionsList.sort(() => Math.random() - 0.5).slice(0, 10);
       } else {
-        console.log('Nenhuma pergunta encontrada ou erro:', error);
+        console.warn("⚠️ Nenhuma pergunta ativa encontrada.");
       }
     } catch(e) {
-      console.error('Erro ao buscar perguntas do Supabase:', e);
+      console.error('💥 Erro crítico ao buscar perguntas:', e);
     }
+  } else {
+    console.warn("⚠️ Cliente Supabase não inicializado. Usando fallback local.");
   }
+  
+  // Fallback: Se o Supabase falhar ou estiver vazio, usa o array local
+  if (questionsList.length === 0) {
+    console.log("🔄 Usando perguntas locais (array QUESTIONS)...");
+    const shuffled = [...QUESTIONS].sort(() => Math.random() - 0.5).slice(0, 10);
+    questionsList = shuffled;
+  }
+  
+  quiz = { 
+    questions: questionsList, 
+    current: 0, 
+    correct: 0, 
+    wrong: 0, 
+    points: 0, 
+    active: true, 
+    caughtCheating: false 
+  };
+  
+  const qTotal = document.getElementById('q-total');
+  if (qTotal) qTotal.textContent = questionsList.length;
+  
+  showScreen('scr-quiz');
+  renderQuestion();
+}
   
   // Fallback: Se o Supabase falhar ou estiver vazio, usa o array local
   if (questionsList.length === 0) {
