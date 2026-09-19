@@ -266,7 +266,7 @@
     </div>
   </div>
 
-  <!-- COUPONS (NOVO) -->
+  <!-- COUPONS -->
   <div id="scr-coupons" class="screen">
     <button class="back-btn" onclick="showScreen('scr-client')">← Voltar</button>
     <div class="card">
@@ -371,7 +371,7 @@
   </div>
 </div>
 
-<!-- MODAL CONFIRM (novo — substitui confirm() nativo) -->
+<!-- MODAL CONFIRM -->
 <div id="modal-confirm" class="modal">
   <div class="modal-box">
     <div class="modal-icon" id="mc-icon">⚠️</div>
@@ -387,9 +387,9 @@
 <script>
 // ==================== CONSTANTES CENTRALIZADAS ====================
 const CFG = {
-  POINTS_PER_REAL: 1000,          // 1.000 pts = R$ 1,00
-  MAX_DISCOUNT_PCT: 0.10,         // desconto máx 10%
-  TRANSFER_TAX_PCT: 0.20,         // taxa 20%
+  POINTS_PER_REAL: 1000,
+  MAX_DISCOUNT_PCT: 0.10,
+  TRANSFER_TAX_PCT: 0.20,
   TRANSFER_DAILY_LIMIT: 5000,
   TRANSFER_MONTHLY_LIMIT: 150000,
   TRANSFER_MIN: 100,
@@ -414,14 +414,67 @@ let supabaseClient = null;
   } catch (e) { console.error('Erro ao iniciar Supabase:', e); }
 })();
 
-// SQL de setup exibido em caso de tabelas faltando
+// ✅ ATUALIZADO: reflete o schema real (bigint + colunas de transfer em transactions)
 const SETUP_SQL = `
-create table if not exists users ( id uuid primary key default gen_random_uuid(), type text not null default 'cliente', name text not null, cpf text unique, email text unique, pass text, store text, points int default 0, games_played int default 0, correct_answers int default 0, total_redeemed numeric default 0, verified boolean default true, created_at timestamptz default now() );
-create table if not exists transactions ( id bigserial primary key, type text, user_id uuid, store_id uuid, from_user_id uuid, to_user_id uuid, amount int, tax int, net int, discount numeric, points_used int, purchase_value numeric, code text unique, status text, created_at timestamptz default now() );
-create table if not exists offers ( id bigserial primary key, store_id uuid, name text, description text, points int, stock int, created_at timestamptz default now() );
-create table if not exists questions ( id bigserial primary key, question text not null, option_a text not null, option_b text not null, option_c text not null, option_d text not null, correct_answer int not null, category text default 'Geral', difficulty int default 1, active boolean default true, created_at timestamptz default now() );
-create table if not exists project_fund ( id int primary key, amount numeric default 0, updated_at timestamptz default now() );
-insert into project_fund (id, amount) values (1,0) on conflict (id) do nothing;
+-- schema real deste projeto: ids numéricos (bigint) na tabela public.users
+create table if not exists users (
+  id bigserial primary key,
+  type text not null default 'cliente',
+  name text not null,
+  cpf text unique,
+  email text unique,
+  pass text,
+  store text,
+  points int default 0,
+  games_played int default 0,
+  correct_answers int default 0,
+  total_redeemed numeric default 0,
+  verified boolean default true,
+  created_at timestamptz default now()
+);
+
+create table if not exists transactions (
+  id bigserial primary key,
+  type text,
+  user_id bigint,
+  store_id bigint,
+  from_user_id bigint,
+  to_user_id bigint,
+  amount int, tax int, net int,
+  discount numeric, points_used int, purchase_value numeric,
+  code text unique, status text,
+  created_at timestamptz default now()
+);
+
+create table if not exists offers (
+  id bigserial primary key,
+  store_id bigint,
+  name text, description text,
+  points int, stock int,
+  created_at timestamptz default now()
+);
+
+create table if not exists questions (
+  id bigserial primary key,
+  question text not null,
+  option_a text not null,
+  option_b text not null,
+  option_c text not null,
+  option_d text not null,
+  correct_answer int not null,
+  category text default 'Geral',
+  difficulty int default 1,
+  active boolean default true,
+  created_at timestamptz default now()
+);
+
+create table if not exists project_fund (
+  id int primary key,
+  amount numeric default 0,
+  updated_at timestamptz default now()
+);
+insert into project_fund (id, amount) values (1, 0) on conflict (id) do nothing;
+
 alter table users disable row level security;
 alter table transactions disable row level security;
 alter table offers disable row level security;
@@ -491,26 +544,20 @@ function todayStr() { return new Date().toISOString().slice(0,10); }
 function monthStr() { return new Date().toISOString().slice(0,7); }
 function isEmail(s) { return /\S+@\S+\.\S+/.test(s); }
 
-// ✅ Melhoria: hash de senha (SHA-256 + salt fixo). Não substitui bcrypt no servidor,
-// mas elimina plaintext no banco. Usuários legados com senha em claro continuam funcionando.
 async function hashPassword(pass) {
   try {
     const buf = new TextEncoder().encode('quizlocal:' + pass);
     const hashBuf = await crypto.subtle.digest('SHA-256', buf);
     const hex = Array.from(new Uint8Array(hashBuf)).map(b => b.toString(16).padStart(2,'0')).join('');
     return 'sha256:' + hex;
-  } catch(e) {
-    console.warn('Crypto não disponível, mantendo senha como texto.');
-    return pass;
-  }
+  } catch(e) { return pass; }
 }
 async function verifyPassword(input, stored) {
   if (!stored) return false;
   if (stored.startsWith('sha256:')) return (await hashPassword(input)) === stored;
-  return input === stored; // legado
+  return input === stored;
 }
 
-// ✅ Melhoria: loading visual em botões
 function setLoading(btn, isLoading, customText) {
   if (!btn) return;
   if (isLoading) {
@@ -523,14 +570,12 @@ function setLoading(btn, isLoading, customText) {
   }
 }
 
-// ✅ Melhoria: modal de confirmação próprio (substitui confirm() nativo)
 function confirmDialog(title, text) {
   return new Promise(resolve => {
     const modal = document.getElementById('modal-confirm');
     document.getElementById('mc-title').textContent = title;
     document.getElementById('mc-text').textContent = text;
     modal.classList.add('active');
-
     const yes = document.getElementById('mc-yes');
     const no  = document.getElementById('mc-no');
     const cleanup = () => {
@@ -545,14 +590,11 @@ function confirmDialog(title, text) {
   });
 }
 
-// ==================== SESSÃO PERSISTENTE ====================
-// ✅ Melhoria: mantém sessão no sessionStorage (fecha aba = logout)
+// ==================== SESSÃO ====================
 function saveSession() {
   if (!SESSION.userId) return;
   try {
-    sessionStorage.setItem('ql_session', JSON.stringify({
-      userId: SESSION.userId, ts: Date.now()
-    }));
+    sessionStorage.setItem('ql_session', JSON.stringify({ userId: SESSION.userId, ts: Date.now() }));
   } catch(e) {}
 }
 function clearSessionStorage() {
@@ -668,7 +710,6 @@ async function handleLogin(btn) {
     if (!user) { toast('Usuário não encontrado!','error'); sndWrong(); return; }
     if (!(await verifyPassword(pass, user.pass))) { toast('Senha incorreta!','error'); sndWrong(); return; }
 
-    // Migração silenciosa de senha legada → hash
     if (!user.pass.startsWith('sha256:')) {
       try { await supabaseClient.from('users').update({ pass: await hashPassword(pass) }).eq('id', user.id); }
       catch(e) {}
@@ -759,7 +800,6 @@ async function requestPasswordReset(btn) {
     const code = String(Math.floor(100000 + Math.random() * 900000));
     SESSION.resetData = { userId: user.id, code, email: user.email, expiresAt: Date.now() + 10*60*1000 };
 
-    // DEMO: em produção o código iria por email/SMS
     console.log(`\n🔐 CÓDIGO DE RECUPERAÇÃO PARA ${user.email}: ${code}\n⏰ Válido por 10 minutos\n`);
 
     document.getElementById('forgot-step2').classList.remove('hidden');
@@ -900,7 +940,7 @@ const QUESTIONS = [
   {q:"Em que ano caiu o Império Romano do Ocidente?",o:["476","500","450","410"],a:0,c:"História",d:3}
 ];
 
-// ==================== CARREGAMENTO DE PERGUNTAS DO SUPABASE ====================
+// ==================== CARREGAMENTO DE PERGUNTAS ====================
 async function loadQuestionsFromDB() {
   if (!supabaseClient) return null;
   try {
@@ -940,7 +980,6 @@ let quiz = {};
 let timerInterval = null;
 let timerState = { seconds: 0, remaining: 0, paused: false };
 
-// ✅ Melhoria: pausa o timer em vez de anular a pergunta
 document.addEventListener('visibilitychange', () => {
   if (!quiz.active) return;
   if (document.hidden) {
@@ -1036,7 +1075,6 @@ function answerQ(idx, el) {
     el.classList.add('wrong');
     document.querySelectorAll('.opt')[q.a]?.classList.add('correct');
     quiz.wrong++;
-    // ✅ Melhoria: pontos nunca ficam abaixo do que já foi conquistado na rodada
     quiz.points = Math.max(0, quiz.points - ptsValue);
     sndWrong(); toast(`❌ Errado! -${ptsValue} pts`,'error');
   }
@@ -1055,7 +1093,6 @@ async function finishQuiz() {
     return;
   }
 
-  // ✅ Melhoria: pontos não ficam negativos
   const earnedPoints = Math.max(0, quiz.points);
 
   try {
@@ -1068,7 +1105,6 @@ async function finishQuiz() {
         games_played: user.games_played + 1,
         correct_answers: user.correct_answers + quiz.correct
       }).eq('id', SESSION.userId);
-      // Invalida cache local
       SESSION.user = null;
     }
   } catch(e) { console.error('Erro ao salvar quiz:', e); }
@@ -1127,7 +1163,6 @@ async function previewRedeem(btn) {
     const maxDiscount = val * CFG.MAX_DISCOUNT_PCT;
     const actualPoints = Math.ceil(maxDiscount * CFG.POINTS_PER_REAL);
 
-    // ✅ Melhoria: mostra saldo atual e resultante
     const { data: u } = await supabaseClient.from('users').select('points').eq('id', SESSION.userId).single();
     const saldoAtual = u?.points || 0;
     const saldoDepois = saldoAtual - actualPoints;
@@ -1165,11 +1200,11 @@ async function confirmRedeem(btn) {
 
   setLoading(btn, true, 'Gerando cupom...');
   try {
-    // ✅ Melhoria: RPC atômica (elimina race condition e atualiza total_redeemed)
+    // ✅ AJUSTE 1: força Number nos parâmetros (users.id e store_id são bigint no schema real)
     const { data, error } = await supabaseClient.rpc('redeem_discount', {
-      p_user_id: SESSION.userId,
-      p_store_id: storeId,
-      p_purchase_value: val
+      p_user_id: Number(SESSION.userId),
+      p_store_id: Number(storeId),
+      p_purchase_value: Number(val)
     });
     if (error) { toast('Erro: ' + error.message, 'error'); return; }
     if (data?.error) { toast(data.error, 'error'); sndWrong(); return; }
@@ -1210,7 +1245,6 @@ async function previewTransfer(btn) {
     if(todaySent + amount > CFG.TRANSFER_DAILY_LIMIT) { toast(`Limite diário excedido (${todaySent}/${CFG.TRANSFER_DAILY_LIMIT}).`,'error'); return; }
     if(monthSent + amount > CFG.TRANSFER_MONTHLY_LIMIT) { toast(`Limite mensal excedido.`,'error'); return; }
 
-    // ✅ Melhoria: valida destinatário ANTES de mostrar preview
     const { data: dest } = await supabaseClient.from('users')
       .select('id, name').eq('cpf', cpf).eq('type', 'cliente').maybeSingle();
     if(!dest) { toast('Destinatário não encontrado!','error'); return; }
@@ -1247,11 +1281,11 @@ async function confirmTransfer(btn) {
 
   setLoading(btn, true, 'Transferindo...');
   try {
-    // ✅ Melhoria: RPC atômica
+    // ✅ AJUSTE 2: força Number nos parâmetros (users.id é bigint no schema real)
     const { data, error } = await supabaseClient.rpc('transfer_points', {
-      p_from_user_id: SESSION.userId,
+      p_from_user_id: Number(SESSION.userId),
       p_to_cpf: cleanCPF(document.getElementById('tr-cpf').value),
-      p_amount: d.amount
+      p_amount: Number(d.amount)
     });
     if (error) { toast('Erro: ' + error.message, 'error'); return; }
     if (data?.error) { toast(data.error, 'error'); sndWrong(); return; }
@@ -1272,7 +1306,7 @@ async function confirmTransfer(btn) {
   }
 }
 
-// ==================== MEUS CUPONS (NOVO) ====================
+// ==================== MEUS CUPONS ====================
 async function renderCoupons() {
   if (!SESSION.userId || !supabaseClient) return;
   const cont = document.getElementById('coupons-list');
@@ -1290,7 +1324,6 @@ async function renderCoupons() {
       return;
     }
 
-    // Busca nomes das lojas (em uma única query)
     const storeIds = [...new Set(coupons.map(c => c.store_id).filter(Boolean))];
     let storeMap = {};
     if (storeIds.length) {
@@ -1473,7 +1506,6 @@ async function refreshAdmin() {
     const { count: shopsCount } = await supabaseClient.from('users').select('id', { count: 'exact', head: true }).eq('type', 'lojista');
     const { count: transfersCount } = await supabaseClient.from('transactions').select('id', { count: 'exact', head: true }).eq('type', 'transfer');
 
-    // ✅ Melhoria: lê o caixa real da tabela project_fund
     const { data: fund } = await supabaseClient.from('project_fund').select('amount').eq('id', 1).single();
 
     document.getElementById('adm-users').textContent = usersCount || 0;
@@ -1487,7 +1519,6 @@ async function renderAdminUsers(btn) {
   if (!supabaseClient) return;
   setLoading(btn, true, 'Carregando...');
   try {
-    // ✅ Melhoria: select sem 'pass' + limit
     const { data: users } = await supabaseClient
       .from('users')
       .select('name, type, cpf, points, verified, store')
@@ -1550,7 +1581,6 @@ async function renderAdminStats(btn) {
 
 // ==================== INIT ====================
 window.addEventListener('load', async () => {
-  // ✅ Melhoria: restaura sessão se existir
   try {
     const saved = sessionStorage.getItem('ql_session');
     if (saved && supabaseClient) {
