@@ -347,7 +347,7 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 
 let supabaseClient = null;
 try {
-  if (SUPABASE_URL !== 'SUA_SUPABASE_URL_AQUI' && SUPABASE_KEY !== 'SUA_SUPABASE_ANON_KEY_AQUI') {
+  if (SUPABASE_URL !== 'https://klzjcpogqsasfigyxgxp.supabase.co' && SUPABASE_KEY !== 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtsempjcG9ncXNhc2ZpZ3l4Z3hwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzMDMxMjYsImV4cCI6MjEwNDg3OTEyNn0.0ENvP05STQtzrwAktvtJwdK8If7zSmamBTPlHcpF-KE') {
     supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   } else {
     console.warn('⚠️ Chaves do Supabase não configuradas. Substitua os placeholders.');
