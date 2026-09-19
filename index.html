@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>QuizLocal - Economia Colaborativa</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root { --gold: #ffd700; --dark: #1a0033; --purple: #4a0e7a; --green: #27ae60; --red: #c0392b; }
   * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif; -webkit-tap-highlight-color:transparent; }
@@ -90,6 +90,7 @@
       <p style="margin-bottom:20px;opacity:0.9;">Responda perguntas, acumule pontos e troque por descontos no comércio local.</p>
       <button class="btn" onclick="showScreen('scr-login')">🔑 Já tenho conta</button>
       <button class="btn btn-outline" onclick="showScreen('scr-register')" style="margin-top:10px;">✨ Criar nova conta</button>
+      <button class="btn btn-sm" onclick="runDiagnostics()" style="background:rgba(255,255,255,0.15);color:#fff;margin-top:15px;">🩺 Testar conexão com o banco</button>
     </div>
     <div class="info">
       <strong>📋 Como funciona:</strong><br>
@@ -121,14 +122,14 @@
   <div id="scr-forgot" class="screen">
     <button class="back-btn" onclick="showScreen('scr-login')">← Voltar ao Login</button>
     <div class="card">
-      <h2 style="color:var(--gold);text-align:center;margin-bottom:15px;"> Recuperar Senha</h2>
+      <h2 style="color:var(--gold);text-align:center;margin-bottom:15px;">🔐 Recuperar Senha</h2>
       <div class="info">
         <strong>Como funciona:</strong><br>
         1. Informe seu email ou CPF cadastrado<br>
         2. Um código de verificação será gerado<br>
         3. Digite o código e crie uma nova senha<br>
         <br>
-        <em>️ No modo atual, o código aparece no console do navegador (F12). Em produção, seria enviado por email/SMS.</em>
+        <em>⚠️ No modo atual, o código aparece no console do navegador (F12). Em produção, seria enviado por email/SMS.</em>
       </div>
       <label>E-mail ou CPF cadastrado:</label>
       <input type="text" id="forgot-id" placeholder="seu@email.com ou 00000000000">
@@ -162,8 +163,8 @@
       <label>Tipo de Conta:</label>
       <select id="reg-type">
         <option value="cliente">👤 Cliente</option>
-        <option value="lojista"> Lojista</option>
-        <option value="admin"> Administrador</option>
+        <option value="lojista">🏪 Lojista</option>
+        <option value="admin">👑 Administrador</option>
       </select>
       <div id="store-field" class="hidden">
         <label>Nome do Estabelecimento:</label>
@@ -178,24 +179,24 @@
 
   <!-- DASHBOARD CLIENTE -->
   <div id="scr-client" class="screen">
-    <div class="topbar"><span> <strong id="cli-name"></strong></span><span class="pts-badge"> <span id="cli-pts">0</span> pts</span><button class="back-btn" onclick="logout()" style="margin:0;">Sair</button></div>
+    <div class="topbar"><span>👤 <strong id="cli-name"></strong></span><span class="pts-badge">⭐ <span id="cli-pts">0</span> pts</span><button class="back-btn" onclick="logout()" style="margin:0;">Sair</button></div>
     <div class="card">
       <div class="stats">
         <div class="stat"><div class="stat-val" id="cli-balance">R$ 0</div><div class="stat-lbl">Saldo em Reais</div></div>
         <div class="stat"><div class="stat-val" id="cli-games">0</div><div class="stat-lbl">Quizes Jogados</div></div>
         <div class="stat"><div class="stat-val" id="cli-redeemed">R$ 0</div><div class="stat-lbl">Total Resgatado</div></div>
       </div>
-      <button class="btn" onclick="startQuiz()"> JOGAR QUIZ AGORA</button>
-      <button class="btn btn-green" onclick="showScreen('scr-redeem')">️ Resgatar Desconto</button>
-      <button class="btn btn-purple" onclick="showScreen('scr-transfer')"> Transferir Pontos</button>
-      <button class="btn btn-sm" onclick="showScreen('scr-profile')" style="background:rgba(255,255,255,0.15);color:#fff;"> Meu Perfil</button>
+      <button class="btn" onclick="startQuiz()">🎮 JOGAR QUIZ AGORA</button>
+      <button class="btn btn-green" onclick="showScreen('scr-redeem')">🏷️ Resgatar Desconto</button>
+      <button class="btn btn-purple" onclick="showScreen('scr-transfer')">💸 Transferir Pontos</button>
+      <button class="btn btn-sm" onclick="showScreen('scr-profile')" style="background:rgba(255,255,255,0.15);color:#fff;">👤 Meu Perfil</button>
     </div>
-    <div class="info"><strong> Dica:</strong> Jogue diariamente para manter seus pontos ativos. Transfira pontos para amigos (taxa de 20%). Limite: 5.000/dia e 150.000/mês.</div>
+    <div class="info"><strong>💡 Dica:</strong> Jogue diariamente para manter seus pontos ativos. Transfira pontos para amigos (taxa de 20%). Limite: 5.000/dia e 150.000/mês.</div>
   </div>
 
   <!-- QUIZ -->
   <div id="scr-quiz" class="screen">
-    <div class="topbar"><span> Pergunta <span id="q-num">1</span>/<span id="q-total">10</span></span><span class="pts-badge">+<span id="q-round-pts">0</span> pts</span></div>
+    <div class="topbar"><span>Pergunta <span id="q-num">1</span>/<span id="q-total">10</span></span><span class="pts-badge">+<span id="q-round-pts">0</span> pts</span></div>
     <div class="timer-bar"><div class="timer-fill" id="timer-fill" style="width:100%"></div></div>
     <div class="q-box"><div class="q-text" id="q-text">Carregando...</div><div id="q-options"></div></div>
   </div>
@@ -220,7 +221,7 @@
   <div id="scr-redeem" class="screen">
     <button class="back-btn" onclick="showScreen('scr-client')">← Voltar</button>
     <div class="card">
-      <h2 style="color:var(--gold);margin-bottom:10px;">️ Resgatar Desconto</h2>
+      <h2 style="color:var(--gold);margin-bottom:10px;">🏷️ Resgatar Desconto</h2>
       <div class="info"><strong>Regras de Resgate:</strong><br>• Desconto máximo: <strong>10% do valor da compra</strong><br>• 1.000 pontos = R$ 1,00 de desconto<br>• <strong>Não aplicável</strong> a taxas de entrega/frete<br>• Informe apenas o valor dos produtos/serviços</div>
       <label>Loja Parceira:</label><select id="redeem-store"></select>
       <label>Valor da Compra (sem entrega):</label><input type="number" id="redeem-value" placeholder="Ex: 150.00" step="0.01" min="0">
@@ -234,7 +235,7 @@
   <div id="scr-transfer" class="screen">
     <button class="back-btn" onclick="showScreen('scr-client')">← Voltar</button>
     <div class="card">
-      <h2 style="color:var(--gold);margin-bottom:10px;"> Transferir Pontos</h2>
+      <h2 style="color:var(--gold);margin-bottom:10px;">💸 Transferir Pontos</h2>
       <div class="info"><strong>Regras de Transferência:</strong><br>• Taxa: <strong>20%</strong> (vai para o caixa do projeto)<br>• Limite diário: <strong>5.000 pontos</strong><br>• Limite mensal: <strong>150.000 pontos</strong><br>• O destinatário recebe o valor líquido (após taxa)</div>
       <label>CPF do Destinatário:</label><input type="tel" id="tr-cpf" placeholder="00000000000" maxlength="11" inputmode="numeric">
       <label>Quantidade de Pontos:</label><input type="number" id="tr-amount" placeholder="Ex: 5000" min="100">
@@ -248,21 +249,21 @@
   <div id="scr-profile" class="screen">
     <button class="back-btn" onclick="showScreen('scr-client')">← Voltar</button>
     <div class="card">
-      <h2 style="color:var(--gold);margin-bottom:15px;"> Meu Perfil</h2>
+      <h2 style="color:var(--gold);margin-bottom:15px;">👤 Meu Perfil</h2>
       <div class="stats">
         <div class="stat"><div class="stat-val" id="prof-pts">0</div><div class="stat-lbl">Pontos Atuais</div></div>
         <div class="stat"><div class="stat-val" id="prof-games">0</div><div class="stat-lbl">Quizes</div></div>
         <div class="stat"><div class="stat-val" id="prof-correct">0</div><div class="stat-lbl">Acertos Totais</div></div>
         <div class="stat"><div class="stat-val" id="prof-redeemed">R$ 0</div><div class="stat-lbl">Resgatado</div></div>
       </div>
-      <h3 style="color:var(--gold);margin-top:15px;"> Histórico Recente</h3>
+      <h3 style="color:var(--gold);margin-top:15px;">📜 Histórico Recente</h3>
       <div id="prof-history"></div>
     </div>
   </div>
 
   <!-- LOJISTA -->
   <div id="scr-shopkeeper" class="screen">
-    <div class="topbar"><span> <strong id="shop-name"></strong></span><button class="back-btn" onclick="logout()" style="margin:0;">Sair</button></div>
+    <div class="topbar"><span>🏪 <strong id="shop-name"></strong></span><button class="back-btn" onclick="logout()" style="margin:0;">Sair</button></div>
     <div class="card">
       <h2 style="color:var(--gold);text-align:center;margin-bottom:15px;">Painel do Lojista</h2>
       <div class="stats">
@@ -271,7 +272,7 @@
         <div class="stat"><div class="stat-val" id="shop-total">R$ 0</div><div class="stat-lbl">Descontos Aplicados</div></div>
       </div>
       <button class="btn btn-green" onclick="showScreen('scr-validate')">✅ Validar Cupom</button>
-      <button class="btn btn-purple" onclick="showScreen('scr-shop-products')"> Meus Produtos/Ofertas</button>
+      <button class="btn btn-purple" onclick="showScreen('scr-shop-products')">📦 Meus Produtos/Ofertas</button>
       <button class="btn" onclick="showScreen('scr-shop-add')">➕ Nova Oferta</button>
     </div>
   </div>
@@ -305,14 +306,14 @@
   <div id="scr-shop-products" class="screen">
     <button class="back-btn" onclick="showScreen('scr-shopkeeper')">← Voltar</button>
     <div class="card">
-      <h2 style="color:var(--gold);margin-bottom:10px;"> Minhas Ofertas</h2>
+      <h2 style="color:var(--gold);margin-bottom:10px;">📦 Minhas Ofertas</h2>
       <div id="shop-prod-list"></div>
     </div>
   </div>
 
   <!-- ADMIN -->
   <div id="scr-admin" class="screen">
-    <div class="topbar"><span> <strong id="adm-name"></strong></span><button class="back-btn" onclick="logout()" style="margin:0;">Sair</button></div>
+    <div class="topbar"><span>👑 <strong id="adm-name"></strong></span><button class="back-btn" onclick="logout()" style="margin:0;">Sair</button></div>
     <div class="card">
       <h2 style="color:var(--gold);text-align:center;margin-bottom:15px;">Painel Administrativo</h2>
       <div class="stats">
@@ -321,9 +322,9 @@
         <div class="stat"><div class="stat-val" id="adm-fund">R$ 0</div><div class="stat-lbl">Caixa do Projeto</div></div>
         <div class="stat"><div class="stat-val" id="adm-transfers">0</div><div class="stat-lbl">Transferências</div></div>
       </div>
-      <button class="btn" onclick="renderAdminUsers()"> Usuários</button>
-      <button class="btn btn-purple" onclick="renderAdminTransactions()"> Transações</button>
-      <button class="btn btn-green" onclick="renderAdminStats()"> Estatísticas</button>
+      <button class="btn" onclick="renderAdminUsers()">👥 Usuários</button>
+      <button class="btn btn-purple" onclick="renderAdminTransactions()">📊 Transações</button>
+      <button class="btn btn-green" onclick="renderAdminStats()">📈 Estatísticas</button>
       <div id="adm-content" style="margin-top:15px;"></div>
     </div>
   </div>
@@ -341,33 +342,102 @@
 
 <script>
 // ==================== CONFIGURAÇÃO SUPABASE ====================
-// ⚠️ SUBSTITUA ABAIXO PELAS SUAS CHAVES REAIS DO SUPABASE
-const SUPABASE_URL = 'https://klzjcpogqsasfigyxgxp.supabase.co'; 
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtsempjcG9ncXNhc2ZpZ3l4Z3hwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzMDMxMjYsImV4cCI6MjEwNDg3OTEyNn0.0ENvP05STQtzrwAktvtJwdK8If7zSmamBTPlHcpF-KE'; 
+const SUPABASE_URL = 'https://klzjcpogqsasfigyxgxp.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtsempjcG9ncXNhc2ZpZ3l4Z3hwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzMDMxMjYsImV4cCI6MjEwNDg3OTEyNn0.0ENvP05STQtzrwAktvtJwdK8If7zSmamBTPlHcpF-KE';
 
 let supabaseClient = null;
-try {
-  if (SUPABASE_URL !== 'https://klzjcpogqsasfigyxgxp.supabase.co' && SUPABASE_KEY !== 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtsempjcG9ncXNhc2ZpZ3l4Z3hwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzMDMxMjYsImV4cCI6MjEwNDg3OTEyNn0.0ENvP05STQtzrwAktvtJwdK8If7zSmamBTPlHcpF-KE') {
+// ✅ CORRIGIDO: inicialização sem comparação circular.
+(function initSupabase() {
+  try {
+    if (typeof window.supabase === 'undefined' || typeof window.supabase.createClient !== 'function') {
+      console.error('❌ Biblioteca do Supabase não foi carregada. Verifique a tag <script> no <head>.');
+      return;
+    }
+    if (!SUPABASE_URL || !SUPABASE_KEY ||
+        SUPABASE_URL.includes('SUA_URL') || SUPABASE_KEY.includes('SUA_CHAVE')) {
+      console.warn('⚠️ Chaves do Supabase não configuradas. Substitua os placeholders.');
+      return;
+    }
     supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-  } else {
-    console.warn('⚠️ Chaves do Supabase não configuradas. Substitua os placeholders.');
+    console.log('✅ Cliente Supabase inicializado.');
+  } catch (e) {
+    console.error('Erro ao iniciar Supabase:', e);
   }
-} catch(e) { 
-  console.error("Erro ao iniciar Supabase:", e); 
-}
+})();
 
-let SESSION = { userId: null, resetData: null };
+// SQL de setup exibido no console caso tabelas estejam faltando
+const SETUP_SQL = `
+-- Execute no SQL Editor do Supabase:
+
+create table if not exists users (
+  id uuid primary key default gen_random_uuid(),
+  type text not null default 'cliente',
+  name text not null,
+  cpf text unique,
+  email text unique,
+  pass text,
+  store text,
+  points int default 0,
+  games_played int default 0,
+  correct_answers int default 0,
+  total_redeemed numeric default 0,
+  verified boolean default true,
+  created_at timestamptz default now()
+);
+
+create table if not exists transactions (
+  id bigserial primary key,
+  type text,
+  user_id uuid,
+  store_id uuid,
+  from_user_id uuid,
+  to_user_id uuid,
+  amount int, tax int, net int,
+  discount numeric, points_used int, purchase_value numeric,
+  code text unique, status text,
+  created_at timestamptz default now()
+);
+
+create table if not exists offers (
+  id bigserial primary key,
+  store_id uuid,
+  name text, description text,
+  points int, stock int,
+  created_at timestamptz default now()
+);
+
+-- Tabela de perguntas (caso ainda não exista — o formato real já está definido)
+create table if not exists questions (
+  id bigserial primary key,
+  question text not null,
+  option_a text not null,
+  option_b text not null,
+  option_c text not null,
+  option_d text not null,
+  correct_answer int not null,   -- índice 0-based: 0=A, 1=B, 2=C, 3=D
+  category text default 'Geral',
+  difficulty int default 1,
+  active boolean default true,
+  created_at timestamptz default now()
+);
+
+-- Para testes (protótipo). Em produção use RLS + Auth:
+alter table users disable row level security;
+alter table transactions disable row level security;
+alter table offers disable row level security;
+alter table questions disable row level security;
+`;
+
+let SESSION = { userId: null, resetData: null, transferData: null };
 
 // ==================== SONS ====================
 let actx = null;
 function initAudio() {
   if (!actx) {
-    try {
-      actx = new (window.AudioContext || window.webkitAudioContext)();
-    } catch(e) { console.log('Audio não suportado'); }
+    try { actx = new (window.AudioContext || window.webkitAudioContext)(); }
+    catch(e) { console.log('Audio não suportado'); }
   }
 }
-
 function playTone(freqs, type, durations) {
   initAudio();
   if (!actx) return;
@@ -387,7 +457,7 @@ function playTone(freqs, type, durations) {
 function sndCorrect() { playTone([523,659,784,1047],'sine',[[0,0.3,0.2],[0.1,0.3,0.2],[0.2,0.3,0.2],[0.3,0.3,0.3]]); }
 function sndWrong() { playTone([300,200],'sawtooth',[[0,0.25,0.3],[0.15,0.25,0.4]]); }
 function sndWin() { playTone([523,659,784,1047,1319],'triangle',[[0,0.3,0.3],[0.12,0.3,0.3],[0.24,0.3,0.3],[0.36,0.3,0.3],[0.48,0.3,0.4]]); }
-function sndClick() { 
+function sndClick() {
   initAudio();
   if (!actx) return;
   try {
@@ -416,40 +486,27 @@ function showScreen(id) {
   if(id==='scr-forgot') {
     const step2 = document.getElementById('forgot-step2');
     if (step2) step2.classList.add('hidden');
-    const forgotId = document.getElementById('forgot-id');
-    if (forgotId) forgotId.value = '';
-    const forgotCode = document.getElementById('forgot-code');
-    if (forgotCode) forgotCode.value = '';
-    const forgotNew = document.getElementById('forgot-newpass');
-    if (forgotNew) forgotNew.value = '';
-    const forgotConfirm = document.getElementById('forgot-confirmpass');
-    if (forgotConfirm) forgotConfirm.value = '';
+    ['forgot-id','forgot-code','forgot-newpass','forgot-confirmpass'].forEach(i => {
+      const el = document.getElementById(i); if (el) el.value = '';
+    });
   }
 }
 
 function toast(msg, type='info') {
   const t = document.createElement('div');
-  t.className = 'toast '+type; 
+  t.className = 'toast '+type;
   t.textContent = msg;
   document.body.appendChild(t);
   setTimeout(() => { if(t.parentNode) t.remove(); }, 3500);
 }
 
 function showModal(icon, title, text) {
-  const mIcon = document.getElementById('m-icon');
-  const mTitle = document.getElementById('m-title');
-  const mText = document.getElementById('m-text');
-  const modal = document.getElementById('modal');
-  if (mIcon) mIcon.textContent = icon;
-  if (mTitle) mTitle.textContent = title;
-  if (mText) mText.textContent = text;
-  if (modal) modal.classList.add('active');
+  document.getElementById('m-icon').textContent = icon;
+  document.getElementById('m-title').textContent = title;
+  document.getElementById('m-text').textContent = text;
+  document.getElementById('modal').classList.add('active');
 }
-
-function closeModal() { 
-  const modal = document.getElementById('modal');
-  if (modal) modal.classList.remove('active'); 
-}
+function closeModal() { document.getElementById('modal').classList.remove('active'); }
 
 // ==================== UTILITÁRIOS ====================
 function cleanCPF(cpf) { return cpf ? cpf.replace(/\D/g,'') : ''; }
@@ -471,66 +528,113 @@ function genCode(len=6) { return Math.random().toString(36).substr(2,len).toUppe
 function fmtMoney(v) { return 'R$ '+Number(v||0).toFixed(2); }
 function todayStr() { return new Date().toISOString().slice(0,10); }
 function monthStr() { return new Date().toISOString().slice(0,7); }
+function isEmail(s) { return /\S+@\S+\.\S+/.test(s); }
 
 document.addEventListener('DOMContentLoaded', function() {
   const regType = document.getElementById('reg-type');
   if (regType) {
     regType.addEventListener('change', function(e) {
       const storeField = document.getElementById('store-field');
-      if (storeField) {
-        storeField.classList.toggle('hidden', e.target.value !== 'lojista');
-      }
+      if (storeField) storeField.classList.toggle('hidden', e.target.value !== 'lojista');
     });
   }
 });
 
-// ==================== TESTE DE CONEXÃO ====================
+// ==================== DIAGNÓSTICO ====================
+async function runDiagnostics() {
+  console.group('🩺 Diagnóstico QuizLocal');
+
+  if (typeof window.supabase === 'undefined') {
+    console.error('❌ Biblioteca Supabase não carregada (CDN falhou?).');
+    toast('❌ Biblioteca Supabase não carregada.', 'error');
+    console.groupEnd(); return;
+  }
+  if (!supabaseClient) {
+    console.error('❌ supabaseClient não foi instanciado.');
+    toast('❌ Cliente Supabase não inicializado.', 'error');
+    console.groupEnd(); return;
+  }
+
+  const tables = ['users','transactions','offers','questions'];
+  const missing = [];
+  for (const t of tables) {
+    const { error } = await supabaseClient.from(t).select('id').limit(1);
+    if (error) {
+      missing.push(`${t} → ${error.message}`);
+      console.error(`❌ Tabela "${t}": ${error.message}`);
+    } else {
+      console.log(`✅ Tabela "${t}" OK.`);
+    }
+  }
+
+  // Checa a contagem de perguntas ativas
+  if (!missing.includes('questions')) {
+    const { count } = await supabaseClient
+      .from('questions')
+      .select('*', { count: 'exact', head: true })
+      .eq('active', true);
+    console.log(`📚 Perguntas ativas na tabela "questions": ${count || 0}`);
+    if ((count || 0) < 10) {
+      console.warn('⚠️ Menos de 10 perguntas ativas — o quiz usará o banco local como fallback.');
+    }
+  }
+
+  if (missing.length) {
+    console.warn('⚠️ Execute o SQL abaixo no Supabase SQL Editor:');
+    console.log(SETUP_SQL);
+    toast('⚠️ Tabelas faltando. Veja o console (F12).', 'error');
+  } else {
+    console.log('✅ Banco de dados conectado e tabelas OK!');
+    toast('✅ Banco de dados conectado!', 'success');
+  }
+  console.groupEnd();
+}
+
 async function testSupabaseConnection() {
-  if (!supabaseClient) { 
-    toast('⚠️ Supabase não configurado. Adicione suas chaves.', 'error'); 
-    return; 
+  if (!supabaseClient) {
+    console.warn('⚠️ Supabase não configurado. Edite SUPABASE_URL e SUPABASE_KEY.');
+    return;
   }
   try {
     const { error } = await supabaseClient.from('users').select('id').limit(1);
-    if (error) throw error;
-    toast('✅ Banco de dados conectado!', 'success');
+    if (error) {
+      console.warn('⚠️ Não foi possível consultar "users":', error.message);
+      console.warn('Execute este SQL no Supabase:', SETUP_SQL);
+      return;
+    }
+    console.log('✅ Banco de dados conectado.');
   } catch (err) {
-    toast(`❌ Erro DB: ${err.message}`, 'error');
-    console.error(err);
+    console.error('Erro DB:', err);
   }
 }
 
 // ==================== LOGIN ====================
 async function handleLogin() {
   if (!supabaseClient) { toast('Configure as chaves do Supabase primeiro!', 'error'); return; }
-  
-  const loginIdEl = document.getElementById('login-id');
-  const loginPassEl = document.getElementById('login-pass');
-  if (!loginIdEl || !loginPassEl) return;
-  
-  const loginId = loginIdEl.value.trim().toLowerCase();
-  const pass = loginPassEl.value;
+
+  const loginId = document.getElementById('login-id').value.trim().toLowerCase();
+  const pass = document.getElementById('login-pass').value;
 
   if(!loginId || !pass) { toast('Preencha email/CPF e senha!','error'); return; }
 
   try {
-    const { data: user, error } = await supabaseClient
-      .from('users')
-      .select('*')
-      .or(`email.eq.${loginId},cpf.eq.${cleanCPF(loginId)}`)
-      .single();
-
-    if(error || !user) {
-      toast('Usuário não encontrado! Verifique email/CPF.','error');
-      sndWrong();
-      return;
+    let query = supabaseClient.from('users').select('*');
+    if (isEmail(loginId)) {
+      query = query.eq('email', loginId);
+    } else {
+      const cpf = cleanCPF(loginId);
+      if (cpf.length !== 11) {
+        toast('CPF deve ter 11 dígitos ou informe um e-mail válido.','error');
+        return;
+      }
+      query = query.eq('cpf', cpf);
     }
 
-    if(user.pass !== pass) {
-      toast('Senha incorreta!','error');
-      sndWrong();
-      return;
-    }
+    const { data: user, error } = await query.maybeSingle();
+    if (error) { toast('Erro na consulta: ' + error.message, 'error'); return; }
+    if (!user) { toast('Usuário não encontrado! Verifique email/CPF.','error'); sndWrong(); return; }
+
+    if(user.pass !== pass) { toast('Senha incorreta!','error'); sndWrong(); return; }
 
     SESSION.userId = user.id;
     toast(`Bem-vindo, ${user.name}!`,'success');
@@ -545,38 +649,22 @@ async function handleLogin() {
 // ==================== CADASTRO ====================
 async function handleRegister() {
   if (!supabaseClient) { toast('Configure as chaves do Supabase primeiro!', 'error'); return; }
-  
-  const regName = document.getElementById('reg-name');
-  const regCpf = document.getElementById('reg-cpf');
-  const regEmail = document.getElementById('reg-email');
-  const regPass = document.getElementById('reg-pass');
-  const regType = document.getElementById('reg-type');
-  const regStore = document.getElementById('reg-store');
-  
-  if (!regName || !regCpf || !regEmail || !regPass || !regType) return;
-  
-  const name = regName.value.trim();
-  const cpf = cleanCPF(regCpf.value);
-  const email = regEmail.value.trim().toLowerCase();
-  const pass = regPass.value;
-  const type = regType.value;
-  const store = regStore ? regStore.value.trim() : '';
+
+  const name = document.getElementById('reg-name').value.trim();
+  const cpf = cleanCPF(document.getElementById('reg-cpf').value);
+  const email = document.getElementById('reg-email').value.trim().toLowerCase();
+  const pass = document.getElementById('reg-pass').value;
+  const type = document.getElementById('reg-type').value;
+  const store = (document.getElementById('reg-store')?.value || '').trim();
 
   if(!name||!cpf||!email||!pass) { toast('Preencha todos os campos!','error'); return; }
   if(!isValidCPF(cpf)) { toast('CPF inválido!','error'); return; }
   if(type==='lojista' && !store) { toast('Informe o nome do estabelecimento!','error'); return; }
 
   try {
-    const { data: existing } = await supabaseClient
-      .from('users')
-      .select('id')
-      .or(`cpf.eq.${cpf},email.eq.${email}`)
-      .single();
-
-    if(existing) {
-      toast('CPF ou Email já cadastrado! Faça login.','error');
-      return;
-    }
+    const { data: byEmail } = await supabaseClient.from('users').select('id').eq('email', email).maybeSingle();
+    const { data: byCpf } = await supabaseClient.from('users').select('id').eq('cpf', cpf).maybeSingle();
+    if (byEmail || byCpf) { toast('CPF ou Email já cadastrado! Faça login.','error'); return; }
 
     const newUser = {
       type, name, cpf, email, pass,
@@ -586,28 +674,20 @@ async function handleRegister() {
     };
 
     const { error: insertError } = await supabaseClient.from('users').insert([newUser]);
-    
-    if(insertError) {
-      toast('Erro ao cadastrar: ' + insertError.message, 'error');
-      return;
-    }
+    if(insertError) { toast('Erro ao cadastrar: ' + insertError.message, 'error'); return; }
 
     toast('Conta criada com sucesso! Faça login.','success');
     sndCorrect();
-    
+
     ['reg-name','reg-cpf','reg-email','reg-pass','reg-store'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.value = '';
+      const el = document.getElementById(id); if (el) el.value = '';
     });
-    if (regType) regType.value = 'cliente';
-    const storeField = document.getElementById('store-field');
-    if (storeField) storeField.classList.add('hidden');
-    
-    const loginId = document.getElementById('login-id');
-    const loginPass = document.getElementById('login-pass');
-    if (loginId) loginId.value = email;
-    if (loginPass) { loginPass.value = ''; loginPass.focus(); }
-    
+    document.getElementById('reg-type').value = 'cliente';
+    document.getElementById('store-field').classList.add('hidden');
+
+    document.getElementById('login-id').value = email;
+    const lp = document.getElementById('login-pass');
+    lp.value = ''; lp.focus();
     showScreen('scr-login');
   } catch(e) {
     toast('Erro ao cadastrar: ' + e.message, 'error');
@@ -618,36 +698,29 @@ async function handleRegister() {
 // ==================== RECUPERAÇÃO DE SENHA ====================
 async function requestPasswordReset() {
   if (!supabaseClient) { toast('Configure as chaves do Supabase primeiro!', 'error'); return; }
-  
-  const forgotIdEl = document.getElementById('forgot-id');
-  if (!forgotIdEl) return;
-  
-  const loginId = forgotIdEl.value.trim().toLowerCase();
+
+  const loginId = document.getElementById('forgot-id').value.trim().toLowerCase();
   if(!loginId) { toast('Informe seu email ou CPF!','error'); return; }
 
   try {
-    const { data: user, error } = await supabaseClient
-      .from('users')
-      .select('id, name, email')
-      .or(`email.eq.${loginId},cpf.eq.${cleanCPF(loginId)}`)
-      .single();
-
-    if(error || !user) {
-      toast('Email/CPF não encontrado no sistema!','error');
-      sndWrong();
-      return;
+    let query = supabaseClient.from('users').select('id, name, email');
+    if (isEmail(loginId)) query = query.eq('email', loginId);
+    else {
+      const cpf = cleanCPF(loginId);
+      if (cpf.length !== 11) { toast('CPF inválido!','error'); return; }
+      query = query.eq('cpf', cpf);
     }
+    const { data: user, error } = await query.maybeSingle();
+    if(error || !user) { toast('Email/CPF não encontrado no sistema!','error'); sndWrong(); return; }
 
     const code = String(Math.floor(100000 + Math.random() * 900000));
     SESSION.resetData = { userId: user.id, code, email: user.email, expiresAt: Date.now() + 10*60*1000 };
-    
-    console.log(`\n CÓDIGO DE RECUPERAÇÃO PARA ${user.email}: ${code}\n⏰ Válido por 10 minutos\n`);
-    
-    const step2 = document.getElementById('forgot-step2');
-    if (step2) step2.classList.remove('hidden');
-    const forgotCode = document.getElementById('forgot-code');
-    if (forgotCode) forgotCode.focus();
-    
+
+    console.log(`\n🔐 CÓDIGO DE RECUPERAÇÃO PARA ${user.email}: ${code}\n⏰ Válido por 10 minutos\n`);
+
+    document.getElementById('forgot-step2').classList.remove('hidden');
+    document.getElementById('forgot-code').focus();
+
     toast('Código enviado! Verifique o console (F12) para ver o código.', 'info');
     sndCorrect();
   } catch(e) {
@@ -657,46 +730,26 @@ async function requestPasswordReset() {
 }
 
 async function confirmPasswordReset() {
-  if (!supabaseClient || !SESSION.resetData) { 
-    toast('Solicite um novo código primeiro!','error'); 
-    return; 
-  }
-  
-  const forgotCode = document.getElementById('forgot-code');
-  const forgotNew = document.getElementById('forgot-newpass');
-  const forgotConfirm = document.getElementById('forgot-confirmpass');
-  
-  if (!forgotCode || !forgotNew || !forgotConfirm) return;
-  
-  const code = forgotCode.value.trim();
-  const newPass = forgotNew.value;
-  const confirmPass = forgotConfirm.value;
-  
+  if (!supabaseClient || !SESSION.resetData) { toast('Solicite um novo código primeiro!','error'); return; }
+
+  const code = document.getElementById('forgot-code').value.trim();
+  const newPass = document.getElementById('forgot-newpass').value;
+  const confirmPass = document.getElementById('forgot-confirmpass').value;
+
   if(code !== SESSION.resetData.code) { toast('Código inválido!','error'); sndWrong(); return; }
   if(Date.now() > SESSION.resetData.expiresAt) { toast('Código expirado! Solicite novo.','error'); sndWrong(); return; }
   if(!newPass || newPass.length < 4) { toast('Senha deve ter pelo menos 4 caracteres!','error'); return; }
   if(newPass !== confirmPass) { toast('As senhas não coincidem!','error'); sndWrong(); return; }
 
   try {
-    const { error } = await supabaseClient
-      .from('users')
-      .update({ pass: newPass })
-      .eq('id', SESSION.resetData.userId);
-
-    if(error) {
-      toast('Erro ao atualizar senha: ' + error.message, 'error');
-      return;
-    }
+    const { error } = await supabaseClient.from('users').update({ pass: newPass }).eq('id', SESSION.resetData.userId);
+    if(error) { toast('Erro ao atualizar senha: ' + error.message, 'error'); return; }
 
     SESSION.resetData = null;
     toast('Senha redefinida com sucesso! Faça login.','success');
     sndWin();
     showModal('✅','Senha Atualizada!','Sua senha foi redefinida com sucesso. Agora você pode fazer login com sua nova senha.');
-    
-    setTimeout(() => {
-      closeModal();
-      showScreen('scr-login');
-    }, 2000);
+    setTimeout(() => { closeModal(); showScreen('scr-login'); }, 2000);
   } catch(e) {
     toast('Erro ao redefinir senha: ' + e.message, 'error');
     console.error(e);
@@ -709,17 +762,15 @@ function redirectToRole(type) {
   else if(type==='admin') showScreen('scr-admin');
 }
 
-function logout() { 
-  SESSION = { userId:null, resetData:null }; 
-  const loginId = document.getElementById('login-id');
-  const loginPass = document.getElementById('login-pass');
-  if (loginId) loginId.value = '';
-  if (loginPass) loginPass.value = '';
-  showScreen('scr-home'); 
-  toast('Você saiu do sistema','info'); 
+function logout() {
+  SESSION = { userId:null, resetData:null, transferData:null };
+  document.getElementById('login-id').value = '';
+  document.getElementById('login-pass').value = '';
+  showScreen('scr-home');
+  toast('Você saiu do sistema','info');
 }
 
-// ==================== BANCO DE PERGUNTAS ====================
+// ==================== BANCO DE PERGUNTAS LOCAL (FALLBACK) ====================
 const QUESTIONS = [
   {q:"Capital do Brasil?",o:["São Paulo","Rio de Janeiro","Brasília","Salvador"],a:2,c:"Geografia",d:1},
   {q:"Quem pintou a Mona Lisa?",o:["Van Gogh","Da Vinci","Picasso","Michelangelo"],a:1,c:"Arte",d:1},
@@ -802,6 +853,56 @@ const QUESTIONS = [
   {q:"Em que ano caiu o Império Romano do Ocidente?",o:["476","500","450","410"],a:0,c:"História",d:3}
 ];
 
+// ==================== CARREGAMENTO DE PERGUNTAS DO SUPABASE ====================
+// ✅ Adaptado ao schema real: option_a..option_d + correct_answer (índice 0-based)
+async function loadQuestionsFromDB() {
+  if (!supabaseClient) return null;
+  try {
+    const { data, error } = await supabaseClient
+      .from('questions')
+      .select('id, question, option_a, option_b, option_c, option_d, correct_answer, category, difficulty')
+      .eq('active', true);
+
+    if (error) { console.warn('Erro ao buscar questions:', error.message); return null; }
+
+    if (!data || data.length < 10) {
+      console.warn(`⚠️ Tabela "questions" tem apenas ${data?.length || 0} linhas ativas. Mínimo: 10.`);
+      return null;
+    }
+
+    const valid = data.map(normalizeQuestion).filter(Boolean);
+    if (valid.length < 10) {
+      console.warn(`⚠️ Apenas ${valid.length} perguntas válidas após normalização.`);
+      return null;
+    }
+    console.log(`✅ ${valid.length} perguntas carregadas do Supabase.`);
+    return valid;
+  } catch(e) {
+    console.error('Erro loadQuestionsFromDB:', e);
+    return null;
+  }
+}
+
+// Converte uma linha de "questions" no formato interno do quiz: {q, o, a, c, d}
+function normalizeQuestion(row) {
+  const opts = [row.option_a, row.option_b, row.option_c, row.option_d];
+  if (opts.some(o => o === null || o === undefined || String(o).trim() === '')) return null;
+
+  const ans = Number(row.correct_answer);
+  if (!Number.isInteger(ans) || ans < 0 || ans > 3) return null;
+
+  if (!row.question || String(row.question).trim() === '') return null;
+
+  return {
+    q: String(row.question),
+    o: opts.map(String),
+    a: ans,
+    c: row.category || 'Geral',
+    d: Math.min(3, Math.max(1, Number(row.difficulty) || 1))
+  };
+}
+
+// ==================== QUIZ ====================
 let quiz = {};
 let timerInterval = null;
 
@@ -815,11 +916,18 @@ document.addEventListener('visibilitychange', () => {
   }
 });
 
-function startQuiz() {
-  const shuffled = [...QUESTIONS].sort(()=>Math.random()-0.5).slice(0,10);
-  quiz = { questions:shuffled, current:0, correct:0, wrong:0, points:0, active:true, caughtCheating:false };
-  const qTotal = document.getElementById('q-total');
-  if (qTotal) qTotal.textContent = shuffled.length;
+// ✅ startQuiz agora é async: tenta Supabase primeiro, cai no local se falhar
+async function startQuiz() {
+  let pool = await loadQuestionsFromDB();
+
+  if (!pool) {
+    console.warn('⚠️ Usando banco local de perguntas (fallback).');
+    pool = [...QUESTIONS];
+  }
+
+  const shuffled = pool.sort(()=>Math.random()-0.5).slice(0,10);
+  quiz = { questions: shuffled, current:0, correct:0, wrong:0, points:0, active:true, caughtCheating:false };
+  document.getElementById('q-total').textContent = shuffled.length;
   showScreen('scr-quiz');
   renderQuestion();
 }
@@ -827,25 +935,19 @@ function startQuiz() {
 function renderQuestion() {
   if(quiz.current >= quiz.questions.length) { finishQuiz(); return; }
   const q = quiz.questions[quiz.current];
-  const qNum = document.getElementById('q-num');
-  const qRoundPts = document.getElementById('q-round-pts');
-  const qText = document.getElementById('q-text');
-  const qOptions = document.getElementById('q-options');
-  
-  if (qNum) qNum.textContent = quiz.current+1;
-  if (qRoundPts) qRoundPts.textContent = quiz.points;
-  if (qText) qText.innerHTML = `<small style="color:var(--gold)">[${q.c} • Dif. ${q.d}]</small><br><br>${q.q}`;
+  document.getElementById('q-num').textContent = quiz.current+1;
+  document.getElementById('q-round-pts').textContent = quiz.points;
+  document.getElementById('q-text').innerHTML = `<small style="color:var(--gold)">[${q.c} • Dif. ${q.d}]</small><br><br>${q.q}`;
 
-  if (qOptions) {
-    qOptions.innerHTML = '';
-    q.o.forEach((o,i) => {
-      const d = document.createElement('div');
-      d.className = 'opt';
-      d.textContent = `${String.fromCharCode(65+i)}) ${o}`;
-      d.onclick = () => answerQ(i, d);
-      qOptions.appendChild(d);
-    });
-  }
+  const qOptions = document.getElementById('q-options');
+  qOptions.innerHTML = '';
+  q.o.forEach((o,i) => {
+    const d = document.createElement('div');
+    d.className = 'opt';
+    d.textContent = `${String.fromCharCode(65+i)}) ${o}`;
+    d.onclick = () => answerQ(i, d);
+    qOptions.appendChild(d);
+  });
 
   const seconds = q.d === 1 ? 10 : q.d === 2 ? 15 : 20;
   startTimer(seconds);
@@ -854,9 +956,7 @@ function renderQuestion() {
 function startTimer(seconds) {
   clearInterval(timerInterval);
   const fill = document.getElementById('timer-fill');
-  if (!fill) return;
-  
-  fill.style.transition = 'none'; 
+  fill.style.transition = 'none';
   fill.style.width = '100%';
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
@@ -880,17 +980,16 @@ function startTimer(seconds) {
 function answerQ(idx, el) {
   if(!quiz.active) return;
   clearInterval(timerInterval);
-  quiz.active = false; 
+  quiz.active = false;
 
   const q = quiz.questions[quiz.current];
   document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
-
   const ptsValue = q.d * 100;
 
   if(idx === q.a) {
     el.classList.add('correct');
-    quiz.correct++; 
-    quiz.points += ptsValue; 
+    quiz.correct++;
+    quiz.points += ptsValue;
     sndCorrect();
     toast(`✅ Correto! +${ptsValue} pts`,'success');
   } else {
@@ -898,7 +997,7 @@ function answerQ(idx, el) {
     const correctOpt = document.querySelectorAll('.opt')[q.a];
     if (correctOpt) correctOpt.classList.add('correct');
     quiz.wrong++;
-    quiz.points -= ptsValue; 
+    quiz.points -= ptsValue;
     sndWrong();
     toast(`❌ Errado! -${ptsValue} pts`,'error');
   }
@@ -914,7 +1013,7 @@ function nextQuestion() {
 async function finishQuiz() {
   quiz.active = false;
   clearInterval(timerInterval);
-  
+
   if (!SESSION.userId || !supabaseClient) {
     toast('Faça login para salvar pontos!', 'error');
     showScreen('scr-home');
@@ -923,50 +1022,27 @@ async function finishQuiz() {
 
   try {
     const { data: user, error } = await supabaseClient
-      .from('users')
-      .select('points, games_played, correct_answers')
-      .eq('id', SESSION.userId)
-      .single();
+      .from('users').select('points, games_played, correct_answers')
+      .eq('id', SESSION.userId).single();
 
     if (!error && user) {
-      const newPoints = user.points + quiz.points;
-      const newGames = user.games_played + 1;
-      const newCorrect = user.correct_answers + quiz.correct;
-
-      await supabaseClient
-        .from('users')
-        .update({ points: newPoints, games_played: newGames, correct_answers: newCorrect })
-        .eq('id', SESSION.userId);
+      await supabaseClient.from('users').update({
+        points: user.points + quiz.points,
+        games_played: user.games_played + 1,
+        correct_answers: user.correct_answers + quiz.correct
+      }).eq('id', SESSION.userId);
     }
-  } catch(e) {
-    console.error('Erro ao salvar quiz:', e);
-  }
+  } catch(e) { console.error('Erro ao salvar quiz:', e); }
 
-  const resCorrect = document.getElementById('res-correct');
-  const resWrong = document.getElementById('res-wrong');
-  const resEarned = document.getElementById('res-earned');
-  const resIcon = document.getElementById('res-icon');
-  const resTitle = document.getElementById('res-title');
-  const resMsg = document.getElementById('res-msg');
-  
-  if (resCorrect) resCorrect.textContent = quiz.correct;
-  if (resWrong) resWrong.textContent = quiz.wrong;
-  if (resEarned) resEarned.textContent = quiz.points;
+  document.getElementById('res-correct').textContent = quiz.correct;
+  document.getElementById('res-wrong').textContent = quiz.wrong;
+  document.getElementById('res-earned').textContent = quiz.points;
 
   const pct = quiz.correct / quiz.questions.length;
-  if(pct >= 0.8) { 
-    if (resIcon) resIcon.textContent='🏆'; 
-    if (resTitle) resTitle.textContent='Excelente!'; 
-    sndWin(); 
-  } else if(pct >= 0.5) { 
-    if (resIcon) resIcon.textContent=''; 
-    if (resTitle) resTitle.textContent='Muito Bem!'; 
-    sndCorrect(); 
-  } else { 
-    if (resIcon) resIcon.textContent=''; 
-    if (resTitle) resTitle.textContent='Continue Tentando!'; 
-  }
-  if (resMsg) resMsg.textContent = `Você acertou ${quiz.correct}/${quiz.questions.length}. Saldo final da rodada: ${quiz.points} pontos.`;
+  if(pct >= 0.8) { document.getElementById('res-icon').textContent='🏆'; document.getElementById('res-title').textContent='Excelente!'; sndWin(); }
+  else if(pct >= 0.5) { document.getElementById('res-icon').textContent='🥈'; document.getElementById('res-title').textContent='Muito Bem!'; sndCorrect(); }
+  else { document.getElementById('res-icon').textContent='🎯'; document.getElementById('res-title').textContent='Continue Tentando!'; }
+  document.getElementById('res-msg').textContent = `Você acertou ${quiz.correct}/${quiz.questions.length}. Saldo final da rodada: ${quiz.points} pontos.`;
   showScreen('scr-result');
 }
 
@@ -976,17 +1052,11 @@ async function refreshClient() {
   try {
     const { data: u } = await supabaseClient.from('users').select('*').eq('id', SESSION.userId).single();
     if(u) {
-      const cliName = document.getElementById('cli-name');
-      const cliPts = document.getElementById('cli-pts');
-      const cliBalance = document.getElementById('cli-balance');
-      const cliGames = document.getElementById('cli-games');
-      const cliRedeemed = document.getElementById('cli-redeemed');
-      
-      if (cliName) cliName.textContent = u.name;
-      if (cliPts) cliPts.textContent = u.points;
-      if (cliBalance) cliBalance.textContent = fmtMoney(u.points/1000);
-      if (cliGames) cliGames.textContent = u.games_played;
-      if (cliRedeemed) cliRedeemed.textContent = fmtMoney(u.total_redeemed);
+      document.getElementById('cli-name').textContent = u.name;
+      document.getElementById('cli-pts').textContent = u.points;
+      document.getElementById('cli-balance').textContent = fmtMoney(u.points/1000);
+      document.getElementById('cli-games').textContent = u.games_played;
+      document.getElementById('cli-redeemed').textContent = fmtMoney(u.total_redeemed);
     }
   } catch(e) { console.error('Erro refreshClient:', e); }
 }
@@ -997,49 +1067,33 @@ async function loadRedeemStores() {
   try {
     const sel = document.getElementById('redeem-store');
     const { data: shops } = await supabaseClient.from('users').select('id, store').eq('type', 'lojista');
-    if (sel) {
-      sel.innerHTML = '<option value="">Selecione a loja...</option>';
-      if(shops) shops.forEach(s => { sel.innerHTML += `<option value="${s.id}">${s.store}</option>`; });
-    }
-    const redeemValue = document.getElementById('redeem-value');
-    const redeemPreview = document.getElementById('redeem-preview');
-    const btnConfirm = document.getElementById('btn-confirm-redeem');
-    if (redeemValue) redeemValue.value = '';
-    if (redeemPreview) redeemPreview.classList.add('hidden');
-    if (btnConfirm) btnConfirm.classList.add('hidden');
+    sel.innerHTML = '<option value="">Selecione a loja...</option>';
+    if(shops) shops.forEach(s => { sel.innerHTML += `<option value="${s.id}">${s.store}</option>`; });
+    document.getElementById('redeem-value').value = '';
+    document.getElementById('redeem-preview').classList.add('hidden');
+    document.getElementById('btn-confirm-redeem').classList.add('hidden');
   } catch(e) { console.error('Erro loadRedeemStores:', e); }
 }
 
 function previewRedeem() {
-  const storeIdEl = document.getElementById('redeem-store');
-  const redeemValueEl = document.getElementById('redeem-value');
-  if (!storeIdEl || !redeemValueEl) return;
-  
-  const storeId = storeIdEl.value;
-  const val = parseFloat(redeemValueEl.value);
+  const storeId = document.getElementById('redeem-store').value;
+  const val = parseFloat(document.getElementById('redeem-value').value);
   if(!storeId || !val || val <= 0) { toast('Preencha corretamente!','error'); return; }
   const maxDiscount = val * 0.10;
   const actualPoints = Math.ceil(maxDiscount * 1000);
   const redeemPreview = document.getElementById('redeem-preview');
-  const btnConfirm = document.getElementById('btn-confirm-redeem');
-  if (redeemPreview) {
-    redeemPreview.classList.remove('hidden');
-    redeemPreview.innerHTML = `<strong>Desconto:</strong> ${fmtMoney(maxDiscount)} | <strong>Pontos:</strong> ${actualPoints}`;
-  }
-  if (btnConfirm) btnConfirm.classList.remove('hidden');
+  redeemPreview.classList.remove('hidden');
+  redeemPreview.innerHTML = `<strong>Desconto:</strong> ${fmtMoney(maxDiscount)} | <strong>Pontos:</strong> ${actualPoints}`;
+  document.getElementById('btn-confirm-redeem').classList.remove('hidden');
 }
 
 async function confirmRedeem() {
   if (!supabaseClient || !SESSION.userId) return;
-  const storeIdEl = document.getElementById('redeem-store');
-  const redeemValueEl = document.getElementById('redeem-value');
-  if (!storeIdEl || !redeemValueEl) return;
-  
-  const storeId = storeIdEl.value;
-  const val = parseFloat(redeemValueEl.value);
+  const storeId = document.getElementById('redeem-store').value;
+  const val = parseFloat(document.getElementById('redeem-value').value);
   const maxDiscount = val * 0.10;
   const actualPoints = Math.ceil(maxDiscount * 1000);
-  
+
   try {
     const { data: u } = await supabaseClient.from('users').select('points').eq('id', SESSION.userId).single();
     if(u.points < actualPoints) { toast('Pontos insuficientes!','error'); return; }
@@ -1047,13 +1101,13 @@ async function confirmRedeem() {
     const code = 'QL-' + genCode(6);
     await supabaseClient.from('users').update({ points: u.points - actualPoints }).eq('id', SESSION.userId);
     await supabaseClient.from('transactions').insert([{
-      user_id: SESSION.userId, store_id: storeId, discount: maxDiscount,
-      points_used: actualPoints, purchase_value: val, code: code,
-      status: 'pendente', created_at: new Date().toISOString()
+      type: 'redeem', user_id: SESSION.userId, store_id: storeId,
+      discount: maxDiscount, points_used: actualPoints, purchase_value: val,
+      code: code, status: 'pendente', created_at: new Date().toISOString()
     }]);
 
     sndWin();
-    showModal('','Cupom Gerado!',`Código: ${code}\n\nDesconto: ${fmtMoney(maxDiscount)}\nApresente este código no caixa da loja.`);
+    showModal('🏷️','Cupom Gerado!',`Código: ${code}\n\nDesconto: ${fmtMoney(maxDiscount)}\nApresente este código no caixa da loja.`);
     refreshClient();
   } catch(e) {
     toast('Erro ao resgatar: ' + e.message, 'error');
@@ -1064,13 +1118,9 @@ async function confirmRedeem() {
 // ==================== TRANSFERÊNCIA ====================
 async function previewTransfer() {
   if (!supabaseClient || !SESSION.userId) return;
-  const trCpf = document.getElementById('tr-cpf');
-  const trAmount = document.getElementById('tr-amount');
-  if (!trCpf || !trAmount) return;
-  
-  const cpf = cleanCPF(trCpf.value);
-  const amount = parseInt(trAmount.value);
-  
+  const cpf = cleanCPF(document.getElementById('tr-cpf').value);
+  const amount = parseInt(document.getElementById('tr-amount').value);
+
   try {
     const { data: u } = await supabaseClient.from('users').select('points').eq('id', SESSION.userId).single();
 
@@ -1078,39 +1128,35 @@ async function previewTransfer() {
     if(!amount || amount < 100) { toast('Mínimo de 100 pontos!','error'); return; }
     if(amount > u.points) { toast('Saldo insuficiente!','error'); return; }
 
-    const today = todayStr();
-    const month = monthStr();
-    const { data: txs } = await supabaseClient.from('transactions').select('amount, created_at').eq('from_user_id', SESSION.userId).eq('type', 'transfer');
-    
+    const today = todayStr(), month = monthStr();
+    const { data: txs } = await supabaseClient.from('transactions')
+      .select('amount, created_at').eq('from_user_id', SESSION.userId).eq('type', 'transfer');
+
     const todaySent = (txs||[]).filter(t=>t.created_at?.startsWith(today)).reduce((s,t)=>s+(t.amount||0),0);
     const monthSent = (txs||[]).filter(t=>t.created_at?.startsWith(month)).reduce((s,t)=>s+(t.amount||0),0);
 
     if(todaySent + amount > 5000) { toast(`Limite diário excedido! Enviado hoje: ${todaySent}/5.000`,'error'); return; }
     if(monthSent + amount > 150000) { toast(`Limite mensal excedido! Enviado este mês: ${monthSent}/150.000`,'error'); return; }
 
-    const { data: dest } = await supabaseClient.from('users').select('id, name').eq('cpf', cpf).eq('type', 'cliente').single();
+    const { data: dest } = await supabaseClient.from('users')
+      .select('id, name').eq('cpf', cpf).eq('type', 'cliente').maybeSingle();
     if(!dest) { toast('Destinatário não encontrado!','error'); return; }
     if(dest.id === SESSION.userId) { toast('Não pode transferir para si mesmo!','error'); return; }
 
     const tax = Math.floor(amount * 0.20);
     const net = amount - tax;
 
-    const trPreview = document.getElementById('tr-preview');
-    const btnConfirmTr = document.getElementById('btn-confirm-tr');
-    if (trPreview) {
-      trPreview.classList.remove('hidden');
-      trPreview.innerHTML = `
-        <strong> Simulação:</strong><br>
-        Destinatário: <strong>${dest.name}</strong><br>
-        Pontos enviados: ${amount}<br>
-        Taxa (20%): <strong>-${tax} pts</strong> → Caixa do Projeto<br>
-        <strong style="color:var(--gold);font-size:1.1em;">Destinatário recebe: ${net} pts</strong><br>
-        Seu saldo após: ${u.points - amount} pts
-      `;
-    }
-
+    document.getElementById('tr-preview').classList.remove('hidden');
+    document.getElementById('tr-preview').innerHTML = `
+      <strong>💸 Simulação:</strong><br>
+      Destinatário: <strong>${dest.name}</strong><br>
+      Pontos enviados: ${amount}<br>
+      Taxa (20%): <strong>-${tax} pts</strong> → Caixa do Projeto<br>
+      <strong style="color:var(--gold);font-size:1.1em;">Destinatário recebe: ${net} pts</strong><br>
+      Seu saldo após: ${u.points - amount} pts
+    `;
     SESSION.transferData = { destId:dest.id, destName:dest.name, amount, tax, net };
-    if (btnConfirmTr) btnConfirmTr.classList.remove('hidden');
+    document.getElementById('btn-confirm-tr').classList.remove('hidden');
   } catch(e) {
     toast('Erro ao simular transferência: ' + e.message, 'error');
     console.error(e);
@@ -1136,14 +1182,11 @@ async function confirmTransfer() {
 
     sndCorrect();
     showModal('✅','Transferência Realizada!',`${d.net} pontos enviados para ${d.destName}.\nTaxa de ${d.tax} pts revertida ao caixa do projeto.`);
-    const trPreview = document.getElementById('tr-preview');
-    const btnConfirmTr = document.getElementById('btn-confirm-tr');
-    const trCpf = document.getElementById('tr-cpf');
-    const trAmount = document.getElementById('tr-amount');
-    if (trPreview) trPreview.classList.add('hidden');
-    if (btnConfirmTr) btnConfirmTr.classList.add('hidden');
-    if (trCpf) trCpf.value = '';
-    if (trAmount) trAmount.value = '';
+    document.getElementById('tr-preview').classList.add('hidden');
+    document.getElementById('btn-confirm-tr').classList.add('hidden');
+    document.getElementById('tr-cpf').value = '';
+    document.getElementById('tr-amount').value = '';
+    SESSION.transferData = null;
     refreshClient();
   } catch(e) {
     toast('Erro ao transferir: ' + e.message, 'error');
@@ -1158,35 +1201,28 @@ async function refreshProfile() {
     const { data: u } = await supabaseClient.from('users').select('*').eq('id', SESSION.userId).single();
     if(!u) return;
 
-    const profPts = document.getElementById('prof-pts');
-    const profGames = document.getElementById('prof-games');
-    const profCorrect = document.getElementById('prof-correct');
-    const profRedeemed = document.getElementById('prof-redeemed');
-    
-    if (profPts) profPts.textContent = u.points;
-    if (profGames) profGames.textContent = u.games_played;
-    if (profCorrect) profCorrect.textContent = u.correct_answers;
-    if (profRedeemed) profRedeemed.textContent = fmtMoney(u.total_redeemed);
+    document.getElementById('prof-pts').textContent = u.points;
+    document.getElementById('prof-games').textContent = u.games_played;
+    document.getElementById('prof-correct').textContent = u.correct_answers;
+    document.getElementById('prof-redeemed').textContent = fmtMoney(u.total_redeemed);
 
     const { data: hist } = await supabaseClient
-      .from('transactions')
-      .select('*')
+      .from('transactions').select('*')
       .or(`user_id.eq.${SESSION.userId},from_user_id.eq.${SESSION.userId},to_user_id.eq.${SESSION.userId}`)
-      .order('created_at', { ascending: false })
-      .limit(10);
+      .order('created_at', { ascending: false }).limit(10);
 
     const cont = document.getElementById('prof-history');
-    if(!hist || !hist.length || !cont) { 
-      if (cont) cont.innerHTML='<p style="opacity:0.6;text-align:center;padding:15px;">Sem histórico recente.</p>'; 
-      return; 
+    if(!hist || !hist.length) {
+      cont.innerHTML='<p style="opacity:0.6;text-align:center;padding:15px;">Sem histórico recente.</p>';
+      return;
     }
     cont.innerHTML='<table><tr><th>Data</th><th>Tipo</th><th>Detalhe</th></tr>';
     hist.forEach(t => {
       const d = new Date(t.created_at).toLocaleDateString('pt-BR');
       let detail = '';
       if(t.type==='redeem') detail=`-${t.points_used} pts → Loja`;
-      else if(t.type==='transfer' && t.from_user_id===SESSION.userId) detail=`-${t.amount} pts → ${t.to_user_id}`;
-      else if(t.type==='transfer' && t.to_user_id===SESSION.userId) detail=`+${t.net} pts ← ${t.from_user_id}`;
+      else if(t.type==='transfer' && t.from_user_id===SESSION.userId) detail=`-${t.amount} pts (enviado)`;
+      else if(t.type==='transfer' && t.to_user_id===SESSION.userId) detail=`+${t.net} pts (recebido)`;
       cont.innerHTML+=`<tr><td>${d}</td><td>${t.type}</td><td>${detail}</td></tr>`;
     });
     cont.innerHTML+='</table>';
@@ -1199,20 +1235,16 @@ async function refreshShop() {
   try {
     const { data: u } = await supabaseClient.from('users').select('store').eq('id', SESSION.userId).single();
     if(!u) return;
-    const shopName = document.getElementById('shop-name');
-    if (shopName) shopName.textContent = u.store;
-    
-    const { data: redeems } = await supabaseClient.from('transactions').select('user_id, discount').eq('store_id', SESSION.userId).eq('type', 'redeem');
+    document.getElementById('shop-name').textContent = u.store;
+
+    const { data: redeems } = await supabaseClient.from('transactions')
+      .select('user_id, discount').eq('store_id', SESSION.userId).eq('type', 'redeem');
     const clients = [...new Set((redeems||[]).map(r=>r.user_id))].length;
     const total = (redeems||[]).reduce((s,t)=>s+(t.discount||0),0);
-    
-    const shopRedeems = document.getElementById('shop-redeems');
-    const shopClients = document.getElementById('shop-clients');
-    const shopTotal = document.getElementById('shop-total');
-    
-    if (shopRedeems) shopRedeems.textContent = (redeems||[]).length;
-    if (shopClients) shopClients.textContent = clients;
-    if (shopTotal) shopTotal.textContent = fmtMoney(total);
+
+    document.getElementById('shop-redeems').textContent = (redeems||[]).length;
+    document.getElementById('shop-clients').textContent = clients;
+    document.getElementById('shop-total').textContent = fmtMoney(total);
   } catch(e) { console.error('Erro refreshShop:', e); }
 }
 
@@ -1220,15 +1252,11 @@ async function validateCoupon() {
   if (!supabaseClient || !SESSION.userId) return;
   const valCode = document.getElementById('val-code');
   const valResult = document.getElementById('val-result');
-  if (!valCode || !valResult) return;
-  
   const code = valCode.value.trim().toUpperCase();
-
   if(!code) { toast('Digite o código!','error'); return; }
-  
+
   try {
-    const { data: t } = await supabaseClient.from('transactions').select('*').eq('code', code).single();
-    
+    const { data: t } = await supabaseClient.from('transactions').select('*').eq('code', code).maybeSingle();
     if(!t) { valResult.innerHTML='<div class="toast error" style="position:static;">❌ Cupom não encontrado!</div>'; sndWrong(); return; }
     if(t.store_id!==SESSION.userId) { valResult.innerHTML='<div class="toast error" style="position:static;">⚠️ Cupom de outra loja!</div>'; sndWrong(); return; }
     if(t.status==='validado') { valResult.innerHTML='<div class="toast error" style="position:static;">⚠️ Cupom já utilizado!</div>'; return; }
@@ -1252,31 +1280,20 @@ async function validateCoupon() {
 
 async function addOffer() {
   if (!supabaseClient || !SESSION.userId) return;
-  const offerName = document.getElementById('offer-name');
-  const offerDesc = document.getElementById('offer-desc');
-  const offerPts = document.getElementById('offer-pts');
-  const offerStock = document.getElementById('offer-stock');
-  
-  if (!offerName || !offerDesc || !offerPts || !offerStock) return;
-  
-  const name = offerName.value.trim();
-  const description = offerDesc.value.trim();
-  const pts = parseInt(offerPts.value);
-  const stock = parseInt(offerStock.value);
+  const name = document.getElementById('offer-name').value.trim();
+  const description = document.getElementById('offer-desc').value.trim();
+  const pts = parseInt(document.getElementById('offer-pts').value);
+  const stock = parseInt(document.getElementById('offer-stock').value);
 
   if(!name||!description||!pts||!stock) { toast('Preencha tudo!','error'); return; }
   if(pts<1000) { toast('Mínimo 1000 pontos!','error'); return; }
 
   try {
-    await supabaseClient.from('offers').insert([{ 
-      name, description, points:pts, stock, store_id:SESSION.userId, created_at:new Date().toISOString() 
+    await supabaseClient.from('offers').insert([{
+      name, description, points:pts, stock, store_id:SESSION.userId, created_at:new Date().toISOString()
     }]);
-    
     sndCorrect(); toast('Oferta criada!','success');
-    ['offer-name','offer-desc','offer-pts','offer-stock'].forEach(id=>{
-      const el = document.getElementById(id);
-      if (el) el.value='';
-    });
+    ['offer-name','offer-desc','offer-pts','offer-stock'].forEach(id=>document.getElementById(id).value='');
     showScreen('scr-shopkeeper');
   } catch(e) {
     toast('Erro ao criar oferta: ' + e.message, 'error');
@@ -1289,13 +1306,13 @@ async function renderShopProducts() {
   try {
     const { data: list } = await supabaseClient.from('offers').select('*').eq('store_id', SESSION.userId);
     const cont = document.getElementById('shop-prod-list');
-    if(!list || !list.length || !cont) { 
-      if (cont) cont.innerHTML='<p style="opacity:0.6;text-align:center;padding:15px;">Nenhuma oferta cadastrada.</p>'; 
-      return; 
+    if(!list || !list.length) {
+      cont.innerHTML='<p style="opacity:0.6;text-align:center;padding:15px;">Nenhuma oferta cadastrada.</p>';
+      return;
     }
     cont.innerHTML='';
     list.forEach(o => {
-      cont.innerHTML+=`<div class="prod-card"><div><h4>${o.name}</h4><p style="font-size:0.85em;opacity:0.8;">${o.description}</p><small>${o.points} pts | Estoque: ${o.stock}</small></div><button class="btn btn-red btn-sm" onclick="deleteOffer(${o.id})">️</button></div>`;
+      cont.innerHTML+=`<div class="prod-card"><div><h4>${o.name}</h4><p style="font-size:0.85em;opacity:0.8;">${o.description}</p><small>${o.points} pts | Estoque: ${o.stock}</small></div><button class="btn btn-red btn-sm" onclick="deleteOffer(${o.id})">🗑️</button></div>`;
     });
   } catch(e) { console.error('Erro renderShopProducts:', e); }
 }
@@ -1306,9 +1323,7 @@ async function deleteOffer(id) {
   try {
     await supabaseClient.from('offers').delete().eq('id', id);
     renderShopProducts(); toast('Oferta excluída','info');
-  } catch(e) {
-    toast('Erro ao excluir: ' + e.message, 'error');
-  }
+  } catch(e) { toast('Erro ao excluir: ' + e.message, 'error'); }
 }
 
 // ==================== ADMIN ====================
@@ -1316,22 +1331,16 @@ async function refreshAdmin() {
   if (!supabaseClient || !SESSION.userId) return;
   try {
     const { data: u } = await supabaseClient.from('users').select('name').eq('id', SESSION.userId).single();
-    const admName = document.getElementById('adm-name');
-    if(u && admName) admName.textContent=u.name;
-    
+    if(u) document.getElementById('adm-name').textContent=u.name;
+
     const { count: usersCount } = await supabaseClient.from('users').select('*', { count: 'exact', head: true }).eq('type', 'cliente');
     const { count: shopsCount } = await supabaseClient.from('users').select('*', { count: 'exact', head: true }).eq('type', 'lojista');
     const { count: transfersCount } = await supabaseClient.from('transactions').select('*', { count: 'exact', head: true }).eq('type', 'transfer');
-    
-    const admUsers = document.getElementById('adm-users');
-    const admShops = document.getElementById('adm-shops');
-    const admTransfers = document.getElementById('adm-transfers');
-    const admFund = document.getElementById('adm-fund');
-    
-    if (admUsers) admUsers.textContent = usersCount || 0;
-    if (admShops) admShops.textContent = shopsCount || 0;
-    if (admTransfers) admTransfers.textContent = transfersCount || 0;
-    if (admFund) admFund.textContent = "R$ 0,00";
+
+    document.getElementById('adm-users').textContent = usersCount || 0;
+    document.getElementById('adm-shops').textContent = shopsCount || 0;
+    document.getElementById('adm-transfers').textContent = transfersCount || 0;
+    document.getElementById('adm-fund').textContent = "R$ 0,00";
   } catch(e) { console.error('Erro refreshAdmin:', e); }
 }
 
@@ -1340,7 +1349,6 @@ async function renderAdminUsers() {
   try {
     const { data: users } = await supabaseClient.from('users').select('*');
     const cont = document.getElementById('adm-content');
-    if (!cont) return;
     cont.innerHTML='<table><tr><th>Nome</th><th>Tipo</th><th>CPF</th><th>Pts</th><th>Verif.</th></tr>';
     (users||[]).forEach(u => {
       cont.innerHTML+=`<tr><td>${u.name}</td><td>${u.type}${u.store?' ('+u.store+')':''}</td><td>${u.cpf}</td><td>${u.points||0}</td><td>${u.verified?'✅':'❌'}</td></tr>`;
@@ -1354,12 +1362,12 @@ async function renderAdminTransactions() {
   try {
     const { data: txs } = await supabaseClient.from('transactions').select('*').order('created_at', {ascending:false}).limit(50);
     const cont = document.getElementById('adm-content');
-    if(!txs || !txs.length || !cont) { if (cont) cont.innerHTML='<p>Sem transações.</p>'; return; }
-    cont.innerHTML='<table><tr><th>Data</th><th>Tipo</th><th>De</th><th>Para</th><th>Valor</th><th>Taxa</th></tr>';
+    if(!txs || !txs.length) { cont.innerHTML='<p>Sem transações.</p>'; return; }
+    cont.innerHTML='<table><tr><th>Data</th><th>Tipo</th><th>Valor</th><th>Taxa</th></tr>';
     txs.forEach(t => {
       const d=new Date(t.created_at).toLocaleDateString('pt-BR');
-      if(t.type==='transfer') cont.innerHTML+=`<tr><td>${d}</td><td>Transfer</td><td>${t.from_user_id}</td><td>${t.to_user_id}</td><td>${t.amount} pts</td><td>${t.tax} pts</td></tr>`;
-      else if(t.type==='redeem') cont.innerHTML+=`<tr><td>${d}</td><td>Resgate</td><td>${t.user_id}</td><td>${t.store_id}</td><td>-${t.points_used} pts</td><td>-</td></tr>`;
+      if(t.type==='transfer') cont.innerHTML+=`<tr><td>${d}</td><td>Transfer</td><td>${t.amount} pts</td><td>${t.tax} pts</td></tr>`;
+      else if(t.type==='redeem') cont.innerHTML+=`<tr><td>${d}</td><td>Resgate</td><td>-${t.points_used} pts</td><td>-</td></tr>`;
     });
     cont.innerHTML+='</table>';
   } catch(e) { console.error('Erro renderAdminTransactions:', e); }
@@ -1371,15 +1379,13 @@ async function renderAdminStats() {
     const { data: users } = await supabaseClient.from('users').select('points, games_played');
     const { data: redeemTx } = await supabaseClient.from('transactions').select('discount').eq('type','redeem');
     const { data: transferTx } = await supabaseClient.from('transactions').select('tax').eq('type','transfer');
-    
+
     const totalPts=(users||[]).reduce((s,u)=>s+(u.points||0),0);
     const totalGames=(users||[]).reduce((s,u)=>s+(u.games_played||0),0);
     const totalRedeem=(redeemTx||[]).reduce((s,t)=>s+(t.discount||0),0);
     const totalTax=(transferTx||[]).reduce((s,t)=>s+(t.tax||0),0);
-    
-    const cont = document.getElementById('adm-content');
-    if (!cont) return;
-    cont.innerHTML=`
+
+    document.getElementById('adm-content').innerHTML=`
       <div class="stats">
         <div class="stat"><div class="stat-val">${totalPts}</div><div class="stat-lbl">Pontos em Circulação</div></div>
         <div class="stat"><div class="stat-val">${totalGames}</div><div class="stat-lbl">Quizes Realizados</div></div>
@@ -1391,7 +1397,7 @@ async function renderAdminStats() {
 }
 
 // ==================== INIT ====================
-window.addEventListener('load', async () => { 
+window.addEventListener('load', async () => {
   showScreen('scr-home');
   await testSupabaseConnection();
 });
