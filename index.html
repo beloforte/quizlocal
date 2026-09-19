@@ -346,12 +346,6 @@ const SUPABASE_URL = 'https://klzjcpogqsasfigyxgxp.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtsempjcG9ncXNhc2ZpZ3l4Z3hwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzMDMxMjYsImV4cCI6MjEwNDg3OTEyNn0.0ENvP05STQtzrwAktvtJwdK8If7zSmamBTPlHcpF-KE'; 
 
 let supabaseClient = null;
-// Logo após a criação do cliente, adicione:
-if (supabaseClient) {
-  console.log("✅ Supabase Client inicializado com sucesso!");
-} else {
-  console.error("❌ Supabase Client NÃO foi inicializado. Verifique as chaves.");
-}
 try {
   if (SUPABASE_URL !== 'SUA_SUPABASE_URL_AQUI' && SUPABASE_KEY !== 'SUA_SUPABASE_ANON_KEY_AQUI') {
     supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -821,93 +815,11 @@ document.addEventListener('visibilitychange', () => {
   }
 });
 
-async function startQuiz() {
-  // 1. Log no Console para saber que a função começou
-  console.log("🎯 Função startQuiz iniciada...");
-  
-  // 2. Mensagem visual na tela (Toast)
-  toast('Carregando perguntas...', 'info');
-  
-  let questionsList = [];
-  
-  // Tenta buscar do Supabase primeiro
-  if (supabaseClient) {
-    try {
-      console.log("📡 Buscando perguntas no Supabase...");
-      const { data, error } = await supabaseClient
-        .from('questions')
-        .select('*')
-        .eq('active', true); 
-      
-      if (error) {
-        console.error("❌ Erro ao buscar perguntas:", error);
-      } else if (data && data.length > 0) {
-        console.log(`✅ ${data.length} perguntas encontradas no banco!`);
-        
-        // Converte o formato do banco para o formato do jogo
-        questionsList = data.map(q => ({
-          q: q.question,
-          o: [q.option_a, q.option_b, q.option_c, q.option_d],
-          a: q.correct_answer,
-          c: q.category,
-          d: q.difficulty
-        }));
-        
-        // Embaralha e pega 10
-        questionsList.sort(() => Math.random() - 0.5).slice(0, 10);
-      } else {
-        console.warn("⚠️ Nenhuma pergunta ativa encontrada.");
-      }
-    } catch(e) {
-      console.error('💥 Erro crítico ao buscar perguntas:', e);
-    }
-  } else {
-    console.warn("⚠️ Cliente Supabase não inicializado. Usando fallback local.");
-  }
-  
-  // Fallback: Se o Supabase falhar ou estiver vazio, usa o array local
-  if (questionsList.length === 0) {
-    console.log("🔄 Usando perguntas locais (array QUESTIONS)...");
-    const shuffled = [...QUESTIONS].sort(() => Math.random() - 0.5).slice(0, 10);
-    questionsList = shuffled;
-  }
-  
-  quiz = { 
-    questions: questionsList, 
-    current: 0, 
-    correct: 0, 
-    wrong: 0, 
-    points: 0, 
-    active: true, 
-    caughtCheating: false 
-  };
-  
+function startQuiz() {
+  const shuffled = [...QUESTIONS].sort(()=>Math.random()-0.5).slice(0,10);
+  quiz = { questions:shuffled, current:0, correct:0, wrong:0, points:0, active:true, caughtCheating:false };
   const qTotal = document.getElementById('q-total');
-  if (qTotal) qTotal.textContent = questionsList.length;
-  
-  showScreen('scr-quiz');
-  renderQuestion();
-}
-  
-  // Fallback: Se o Supabase falhar ou estiver vazio, usa o array local
-  if (questionsList.length === 0) {
-    const shuffled = [...QUESTIONS].sort(() => Math.random() - 0.5).slice(0, 10);
-    questionsList = shuffled;
-  }
-  
-  quiz = { 
-    questions: questionsList, 
-    current: 0, 
-    correct: 0, 
-    wrong: 0, 
-    points: 0, 
-    active: true, 
-    caughtCheating: false 
-  };
-  
-  const qTotal = document.getElementById('q-total');
-  if (qTotal) qTotal.textContent = questionsList.length;
-  
+  if (qTotal) qTotal.textContent = shuffled.length;
   showScreen('scr-quiz');
   renderQuestion();
 }
