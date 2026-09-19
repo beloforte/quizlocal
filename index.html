@@ -5,6 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>QuizLocal - Economia Colaborativa</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  // Fallback CDN: se jsdelivr falhar, tenta unpkg
+  if (typeof window.supabase === 'undefined') {
+    var s = document.createElement('script');
+    s.src = 'https://unpkg.com/@supabase/supabase-js@2';
+    document.head.appendChild(s);
+  }
+</script>
 <style>
   :root { --gold: #ffd700; --dark: #1a0033; --purple: #4a0e7a; --green: #27ae60; --red: #c0392b; }
   * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif; -webkit-tap-highlight-color:transparent; }
@@ -27,6 +35,7 @@
   .card { background:rgba(255,255,255,0.08); backdrop-filter:blur(8px); border:1px solid rgba(255,215,0,0.2); border-radius:12px; padding:20px; margin-bottom:15px; }
   .btn { background:linear-gradient(90deg,var(--gold),#ff8c00); color:var(--dark); border:none; padding:12px 25px; border-radius:25px; font-weight:bold; cursor:pointer; width:100%; margin-top:10px; font-size:1em; transition:0.2s; }
   .btn:active { transform:scale(0.97); }
+  .btn:disabled { opacity:0.6; cursor:not-allowed; }
   .btn-sm { width:auto; padding:8px 18px; font-size:0.9em; }
   .btn-red { background:linear-gradient(90deg,var(--red),#e74c3c); color:#fff; }
   .btn-green { background:linear-gradient(90deg,var(--green),#2ecc71); color:#fff; }
@@ -42,10 +51,12 @@
   .q-text { font-size:1.2em; margin-bottom:20px; line-height:1.4; }
   .opt { background:rgba(255,255,255,0.1); border:2px solid rgba(255,215,0,0.4); padding:14px; border-radius:10px; margin:8px 0; cursor:pointer; text-align:left; transition:0.2s; }
   .opt:active { transform:translateX(3px); }
+  .opt:focus-visible { outline:2px solid var(--gold); outline-offset:2px; }
   .opt.correct { background:var(--green)!important; border-color:#2ecc71; }
   .opt.wrong { background:var(--red)!important; border-color:#e74c3c; }
   .timer-bar { height:6px; background:rgba(255,255,255,0.2); border-radius:3px; overflow:hidden; margin-bottom:15px; }
-  .timer-fill { height:100%; background:var(--gold); transition:width 1s linear; }
+  .timer-fill { height:100%; background:var(--gold); width:100%; }
+  .timer-bar.paused .timer-fill { background:#888; }
   .stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; margin:15px 0; }
   .stat { background:rgba(255,215,0,0.1); padding:15px; border-radius:10px; text-align:center; border:1px solid rgba(255,215,0,0.2); }
   .stat-val { font-size:1.6em; color:var(--gold); font-weight:bold; }
@@ -54,6 +65,11 @@
   .pts-badge { background:linear-gradient(90deg,var(--gold),#ff8c00); color:var(--dark); padding:6px 15px; border-radius:20px; font-weight:bold; font-size:0.9em; }
   .prod-card { background:rgba(255,255,255,0.08); border:1px solid rgba(255,215,0,0.3); border-radius:10px; padding:15px; margin:10px 0; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }
   .prod-card h4 { color:var(--gold); margin-bottom:4px; }
+  .coupon-card { background:rgba(255,255,255,0.08); border:1px solid rgba(255,215,0,0.3); border-radius:10px; padding:15px; margin:10px 0; }
+  .coupon-card .code { font-family:monospace; font-size:1.4em; letter-spacing:2px; color:var(--gold); user-select:text; margin:6px 0; }
+  .badge-status { display:inline-block; padding:3px 10px; border-radius:12px; font-size:0.75em; font-weight:bold; }
+  .badge-pendente { background:#f39c12; color:#fff; }
+  .badge-validado { background:var(--green); color:#fff; }
   .toast { position:fixed; top:15px; right:15px; padding:12px 20px; border-radius:10px; color:#fff; font-weight:bold; z-index:9999; animation:slideIn 0.3s; font-size:0.9em; max-width:90%; }
   .toast.success { background:var(--green); } .toast.error { background:var(--red); } .toast.info { background:#2980b9; }
   @keyframes slideIn { from{transform:translateX(100%)} to{transform:translateX(0)} }
@@ -61,6 +77,8 @@
   .modal.active { display:flex; }
   .modal-box { background:linear-gradient(135deg,#2c0054,var(--purple)); border:2px solid var(--gold); border-radius:15px; padding:25px; max-width:450px; width:100%; text-align:center; }
   .modal-icon { font-size:3em; margin-bottom:10px; }
+  .modal-actions { display:flex; gap:10px; margin-top:15px; }
+  .modal-actions .btn { margin-top:0; }
   table { width:100%; border-collapse:collapse; margin-top:10px; font-size:0.85em; }
   th,td { padding:8px; text-align:left; border-bottom:1px solid rgba(255,215,0,0.15); }
   th { color:var(--gold); background:rgba(255,215,0,0.1); }
@@ -69,6 +87,8 @@
   .auth-toggle a { color:var(--gold); cursor:pointer; text-decoration:underline; }
   .forgot-link { text-align:right; margin-top:-5px; margin-bottom:10px; }
   .forgot-link a { color:var(--gold); cursor:pointer; font-size:0.85em; text-decoration:underline; }
+  .spinner { display:inline-block; width:14px; height:14px; border:2px solid rgba(255,255,255,0.3); border-top-color:#fff; border-radius:50%; animation:spin 0.7s linear infinite; vertical-align:middle; margin-right:6px; }
+  @keyframes spin { to { transform:rotate(360deg); } }
 </style>
 </head>
 <body>
@@ -82,7 +102,7 @@
     </div>
   </div>
 
-  <!-- TELA INICIAL -->
+  <!-- HOME -->
   <div id="scr-home" class="screen active">
     <div class="card" style="text-align:center;">
       <div style="font-size:4em;margin-bottom:15px;">🎯</div>
@@ -101,7 +121,7 @@
     </div>
   </div>
 
-  <!-- TELA DE LOGIN -->
+  <!-- LOGIN -->
   <div id="scr-login" class="screen">
     <button class="back-btn" onclick="showScreen('scr-home')">← Voltar</button>
     <div class="card">
@@ -111,14 +131,14 @@
       <label>Senha:</label>
       <input type="password" id="login-pass" placeholder="Sua senha">
       <div class="forgot-link"><a onclick="showScreen('scr-forgot')">Esqueci minha senha</a></div>
-      <button class="btn" onclick="handleLogin()">Entrar</button>
+      <button class="btn" onclick="handleLogin(this)">Entrar</button>
       <div class="auth-toggle">
         Não tem conta? <a onclick="showScreen('scr-register')">Cadastre-se aqui</a>
       </div>
     </div>
   </div>
 
-  <!-- TELA ESQUECI MINHA SENHA -->
+  <!-- FORGOT -->
   <div id="scr-forgot" class="screen">
     <button class="back-btn" onclick="showScreen('scr-login')">← Voltar ao Login</button>
     <div class="card">
@@ -129,11 +149,11 @@
         2. Um código de verificação será gerado<br>
         3. Digite o código e crie uma nova senha<br>
         <br>
-        <em>⚠️ No modo atual, o código aparece no console do navegador (F12). Em produção, seria enviado por email/SMS.</em>
+        <em>⚠️ DEMO: o código aparece no console (F12). Em produção, seria enviado por email/SMS.</em>
       </div>
       <label>E-mail ou CPF cadastrado:</label>
       <input type="text" id="forgot-id" placeholder="seu@email.com ou 00000000000">
-      <button class="btn btn-purple" onclick="requestPasswordReset()">Enviar Código de Verificação</button>
+      <button class="btn btn-purple" onclick="requestPasswordReset(this)">Enviar Código de Verificação</button>
       
       <div id="forgot-step2" class="hidden" style="margin-top:15px;">
         <label>Código de Verificação (6 dígitos):</label>
@@ -142,12 +162,12 @@
         <input type="password" id="forgot-newpass" placeholder="Crie uma nova senha forte">
         <label>Confirmar Nova Senha:</label>
         <input type="password" id="forgot-confirmpass" placeholder="Repita a nova senha">
-        <button class="btn btn-green" onclick="confirmPasswordReset()">Redefinir Senha</button>
+        <button class="btn btn-green" onclick="confirmPasswordReset(this)">Redefinir Senha</button>
       </div>
     </div>
   </div>
 
-  <!-- TELA DE CADASTRO -->
+  <!-- REGISTER -->
   <div id="scr-register" class="screen">
     <button class="back-btn" onclick="showScreen('scr-home')">← Voltar</button>
     <div class="card">
@@ -170,14 +190,14 @@
         <label>Nome do Estabelecimento:</label>
         <input type="text" id="reg-store" placeholder="Ex: Padaria Central">
       </div>
-      <button class="btn btn-green" onclick="handleRegister()">Cadastrar</button>
+      <button class="btn btn-green" onclick="handleRegister(this)">Cadastrar</button>
       <div class="auth-toggle">
         Já tem conta? <a onclick="showScreen('scr-login')">Faça login aqui</a>
       </div>
     </div>
   </div>
 
-  <!-- DASHBOARD CLIENTE -->
+  <!-- CLIENT DASHBOARD -->
   <div id="scr-client" class="screen">
     <div class="topbar"><span>👤 <strong id="cli-name"></strong></span><span class="pts-badge">⭐ <span id="cli-pts">0</span> pts</span><button class="back-btn" onclick="logout()" style="margin:0;">Sair</button></div>
     <div class="card">
@@ -186,9 +206,10 @@
         <div class="stat"><div class="stat-val" id="cli-games">0</div><div class="stat-lbl">Quizes Jogados</div></div>
         <div class="stat"><div class="stat-val" id="cli-redeemed">R$ 0</div><div class="stat-lbl">Total Resgatado</div></div>
       </div>
-      <button class="btn" onclick="startQuiz()">🎮 JOGAR QUIZ AGORA</button>
+      <button class="btn" onclick="startQuiz(this)">🎮 JOGAR QUIZ AGORA</button>
       <button class="btn btn-green" onclick="showScreen('scr-redeem')">🏷️ Resgatar Desconto</button>
       <button class="btn btn-purple" onclick="showScreen('scr-transfer')">💸 Transferir Pontos</button>
+      <button class="btn btn-sm" onclick="showScreen('scr-coupons')" style="background:rgba(255,255,255,0.15);color:#fff;">🎟️ Meus Cupons</button>
       <button class="btn btn-sm" onclick="showScreen('scr-profile')" style="background:rgba(255,255,255,0.15);color:#fff;">👤 Meu Perfil</button>
     </div>
     <div class="info"><strong>💡 Dica:</strong> Jogue diariamente para manter seus pontos ativos. Transfira pontos para amigos (taxa de 20%). Limite: 5.000/dia e 150.000/mês.</div>
@@ -197,11 +218,11 @@
   <!-- QUIZ -->
   <div id="scr-quiz" class="screen">
     <div class="topbar"><span>Pergunta <span id="q-num">1</span>/<span id="q-total">10</span></span><span class="pts-badge">+<span id="q-round-pts">0</span> pts</span></div>
-    <div class="timer-bar"><div class="timer-fill" id="timer-fill" style="width:100%"></div></div>
+    <div class="timer-bar" id="timer-bar"><div class="timer-fill" id="timer-fill" style="width:100%"></div></div>
     <div class="q-box"><div class="q-text" id="q-text">Carregando...</div><div id="q-options"></div></div>
   </div>
 
-  <!-- RESULTADO -->
+  <!-- RESULT -->
   <div id="scr-result" class="screen">
     <div class="card" style="text-align:center;">
       <div style="font-size:4em;margin-bottom:10px;" id="res-icon"></div>
@@ -213,39 +234,49 @@
         <div class="stat"><div class="stat-val" id="res-earned">0</div><div class="stat-lbl">Pontos Ganhos</div></div>
       </div>
       <button class="btn" onclick="showScreen('scr-client')">Voltar ao Menu</button>
-      <button class="btn btn-green" onclick="startQuiz()">Jogar Novamente</button>
+      <button class="btn btn-green" onclick="startQuiz(this)">Jogar Novamente</button>
     </div>
   </div>
 
-  <!-- RESGATE -->
+  <!-- REDEEM -->
   <div id="scr-redeem" class="screen">
     <button class="back-btn" onclick="showScreen('scr-client')">← Voltar</button>
     <div class="card">
       <h2 style="color:var(--gold);margin-bottom:10px;">🏷️ Resgatar Desconto</h2>
-      <div class="info"><strong>Regras de Resgate:</strong><br>• Desconto máximo: <strong>10% do valor da compra</strong><br>• 1.000 pontos = R$ 1,00 de desconto<br>• <strong>Não aplicável</strong> a taxas de entrega/frete<br>• Informe apenas o valor dos produtos/serviços</div>
+      <div class="info"><strong>Regras:</strong> desconto máximo 10% da compra · 1.000 pts = R$ 1,00 · não aplicável a frete</div>
       <label>Loja Parceira:</label><select id="redeem-store"></select>
       <label>Valor da Compra (sem entrega):</label><input type="number" id="redeem-value" placeholder="Ex: 150.00" step="0.01" min="0">
       <div id="redeem-preview" class="hidden" style="background:rgba(255,215,0,0.1);padding:12px;border-radius:8px;margin:10px 0;font-size:0.9em;"></div>
-      <button class="btn btn-green" onclick="previewRedeem()">Calcular Desconto</button>
-      <button class="btn hidden" id="btn-confirm-redeem" onclick="confirmRedeem()">✅ Confirmar Resgate</button>
+      <button class="btn btn-green" onclick="previewRedeem(this)">Calcular Desconto</button>
+      <button class="btn hidden" id="btn-confirm-redeem" onclick="confirmRedeem(this)">✅ Confirmar Resgate</button>
     </div>
   </div>
 
-  <!-- TRANSFERÊNCIA -->
+  <!-- TRANSFER -->
   <div id="scr-transfer" class="screen">
     <button class="back-btn" onclick="showScreen('scr-client')">← Voltar</button>
     <div class="card">
       <h2 style="color:var(--gold);margin-bottom:10px;">💸 Transferir Pontos</h2>
-      <div class="info"><strong>Regras de Transferência:</strong><br>• Taxa: <strong>20%</strong> (vai para o caixa do projeto)<br>• Limite diário: <strong>5.000 pontos</strong><br>• Limite mensal: <strong>150.000 pontos</strong><br>• O destinatário recebe o valor líquido (após taxa)</div>
+      <div class="info"><strong>Regras:</strong> taxa de 20% · limite diário 5.000 pts · limite mensal 150.000 pts</div>
       <label>CPF do Destinatário:</label><input type="tel" id="tr-cpf" placeholder="00000000000" maxlength="11" inputmode="numeric">
       <label>Quantidade de Pontos:</label><input type="number" id="tr-amount" placeholder="Ex: 5000" min="100">
       <div id="tr-preview" class="hidden" style="background:rgba(255,215,0,0.1);padding:12px;border-radius:8px;margin:10px 0;font-size:0.9em;"></div>
-      <button class="btn btn-purple" onclick="previewTransfer()">Simular Transferência</button>
-      <button class="btn btn-green hidden" id="btn-confirm-tr" onclick="confirmTransfer()">✅ Confirmar Transferência</button>
+      <button class="btn btn-purple" onclick="previewTransfer(this)">Simular Transferência</button>
+      <button class="btn btn-green hidden" id="btn-confirm-tr" onclick="confirmTransfer(this)">✅ Confirmar Transferência</button>
     </div>
   </div>
 
-  <!-- PERFIL -->
+  <!-- COUPONS (NOVO) -->
+  <div id="scr-coupons" class="screen">
+    <button class="back-btn" onclick="showScreen('scr-client')">← Voltar</button>
+    <div class="card">
+      <h2 style="color:var(--gold);margin-bottom:10px;">🎟️ Meus Cupons</h2>
+      <div class="info">Apresente o código ao lojista. Cupons pendentes ainda não foram usados.</div>
+      <div id="coupons-list"></div>
+    </div>
+  </div>
+
+  <!-- PROFILE -->
   <div id="scr-profile" class="screen">
     <button class="back-btn" onclick="showScreen('scr-client')">← Voltar</button>
     <div class="card">
@@ -261,7 +292,7 @@
     </div>
   </div>
 
-  <!-- LOJISTA -->
+  <!-- SHOPKEEPER -->
   <div id="scr-shopkeeper" class="screen">
     <div class="topbar"><span>🏪 <strong id="shop-name"></strong></span><button class="back-btn" onclick="logout()" style="margin:0;">Sair</button></div>
     <div class="card">
@@ -277,19 +308,19 @@
     </div>
   </div>
 
-  <!-- VALIDAR CUPOM -->
+  <!-- VALIDATE -->
   <div id="scr-validate" class="screen">
     <button class="back-btn" onclick="showScreen('scr-shopkeeper')">← Voltar</button>
     <div class="card">
       <h2 style="color:var(--gold);margin-bottom:10px;">✅ Validar Cupom</h2>
       <div class="info">Peça ao cliente o código do cupom e insira abaixo.</div>
       <label>Código do Cupom:</label><input type="text" id="val-code" placeholder="QL-XXXXXX" style="text-transform:uppercase;text-align:center;font-size:1.3em;letter-spacing:3px;">
-      <button class="btn btn-green" onclick="validateCoupon()">Validar</button>
+      <button class="btn btn-green" onclick="validateCoupon(this)">Validar</button>
       <div id="val-result" style="margin-top:15px;"></div>
     </div>
   </div>
 
-  <!-- NOVA OFERTA -->
+  <!-- SHOP ADD -->
   <div id="scr-shop-add" class="screen">
     <button class="back-btn" onclick="showScreen('scr-shopkeeper')">← Voltar</button>
     <div class="card">
@@ -298,11 +329,11 @@
       <label>Descrição:</label><input type="text" id="offer-desc" placeholder="Ex: Café expresso gratuito na compra de qualquer salgado">
       <label>Pontos Necessários (mín. 1000):</label><input type="number" id="offer-pts" placeholder="Ex: 5000" min="1000">
       <label>Estoque Disponível:</label><input type="number" id="offer-stock" placeholder="Ex: 20" min="1">
-      <button class="btn btn-green" onclick="addOffer()">Cadastrar Oferta</button>
+      <button class="btn btn-green" onclick="addOffer(this)">Cadastrar Oferta</button>
     </div>
   </div>
 
-  <!-- MEUS PRODUTOS -->
+  <!-- SHOP PRODUCTS -->
   <div id="scr-shop-products" class="screen">
     <button class="back-btn" onclick="showScreen('scr-shopkeeper')">← Voltar</button>
     <div class="card">
@@ -322,125 +353,93 @@
         <div class="stat"><div class="stat-val" id="adm-fund">R$ 0</div><div class="stat-lbl">Caixa do Projeto</div></div>
         <div class="stat"><div class="stat-val" id="adm-transfers">0</div><div class="stat-lbl">Transferências</div></div>
       </div>
-      <button class="btn" onclick="renderAdminUsers()">👥 Usuários</button>
-      <button class="btn btn-purple" onclick="renderAdminTransactions()">📊 Transações</button>
-      <button class="btn btn-green" onclick="renderAdminStats()">📈 Estatísticas</button>
+      <button class="btn" onclick="renderAdminUsers(this)">👥 Usuários</button>
+      <button class="btn btn-purple" onclick="renderAdminTransactions(this)">📊 Transações</button>
+      <button class="btn btn-green" onclick="renderAdminStats(this)">📈 Estatísticas</button>
       <div id="adm-content" style="margin-top:15px;"></div>
     </div>
   </div>
 </div>
 
-<!-- MODAL -->
+<!-- MODAL INFO -->
 <div id="modal" class="modal">
   <div class="modal-box">
     <div class="modal-icon" id="m-icon"></div>
     <h2 id="m-title" style="color:var(--gold);margin-bottom:10px;"></h2>
-    <p id="m-text" style="margin-bottom:15px;line-height:1.5;"></p>
+    <p id="m-text" style="margin-bottom:15px;line-height:1.5;white-space:pre-line;"></p>
     <button class="btn" onclick="closeModal()">OK</button>
   </div>
 </div>
 
+<!-- MODAL CONFIRM (novo — substitui confirm() nativo) -->
+<div id="modal-confirm" class="modal">
+  <div class="modal-box">
+    <div class="modal-icon" id="mc-icon">⚠️</div>
+    <h2 id="mc-title" style="color:var(--gold);margin-bottom:10px;"></h2>
+    <p id="mc-text" style="margin-bottom:15px;line-height:1.5;white-space:pre-line;"></p>
+    <div class="modal-actions">
+      <button class="btn btn-red" id="mc-no">Cancelar</button>
+      <button class="btn btn-green" id="mc-yes">Confirmar</button>
+    </div>
+  </div>
+</div>
+
 <script>
-// ==================== CONFIGURAÇÃO SUPABASE ====================
+// ==================== CONSTANTES CENTRALIZADAS ====================
+const CFG = {
+  POINTS_PER_REAL: 1000,          // 1.000 pts = R$ 1,00
+  MAX_DISCOUNT_PCT: 0.10,         // desconto máx 10%
+  TRANSFER_TAX_PCT: 0.20,         // taxa 20%
+  TRANSFER_DAILY_LIMIT: 5000,
+  TRANSFER_MONTHLY_LIMIT: 150000,
+  TRANSFER_MIN: 100,
+  OFFER_MIN_POINTS: 1000,
+  QUIZ_QUESTIONS_PER_ROUND: 10,
+  MIN_DB_QUESTIONS: 10,
+  SESSION_TTL_MS: 24 * 3600 * 1000
+};
+
 const SUPABASE_URL = 'https://klzjcpogqsasfigyxgxp.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtsempjcG9ncXNhc2ZpZ3l4Z3hwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzMDMxMjYsImV4cCI6MjEwNDg3OTEyNn0.0ENvP05STQtzrwAktvtJwdK8If7zSmamBTPlHcpF-KE';
 
 let supabaseClient = null;
-// ✅ CORRIGIDO: inicialização sem comparação circular.
 (function initSupabase() {
   try {
     if (typeof window.supabase === 'undefined' || typeof window.supabase.createClient !== 'function') {
-      console.error('❌ Biblioteca do Supabase não foi carregada. Verifique a tag <script> no <head>.');
-      return;
-    }
-    if (!SUPABASE_URL || !SUPABASE_KEY ||
-        SUPABASE_URL.includes('SUA_URL') || SUPABASE_KEY.includes('SUA_CHAVE')) {
-      console.warn('⚠️ Chaves do Supabase não configuradas. Substitua os placeholders.');
+      console.error('❌ Biblioteca do Supabase não carregada.');
       return;
     }
     supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     console.log('✅ Cliente Supabase inicializado.');
-  } catch (e) {
-    console.error('Erro ao iniciar Supabase:', e);
-  }
+  } catch (e) { console.error('Erro ao iniciar Supabase:', e); }
 })();
 
-// SQL de setup exibido no console caso tabelas estejam faltando
+// SQL de setup exibido em caso de tabelas faltando
 const SETUP_SQL = `
--- Execute no SQL Editor do Supabase:
-
-create table if not exists users (
-  id uuid primary key default gen_random_uuid(),
-  type text not null default 'cliente',
-  name text not null,
-  cpf text unique,
-  email text unique,
-  pass text,
-  store text,
-  points int default 0,
-  games_played int default 0,
-  correct_answers int default 0,
-  total_redeemed numeric default 0,
-  verified boolean default true,
-  created_at timestamptz default now()
-);
-
-create table if not exists transactions (
-  id bigserial primary key,
-  type text,
-  user_id uuid,
-  store_id uuid,
-  from_user_id uuid,
-  to_user_id uuid,
-  amount int, tax int, net int,
-  discount numeric, points_used int, purchase_value numeric,
-  code text unique, status text,
-  created_at timestamptz default now()
-);
-
-create table if not exists offers (
-  id bigserial primary key,
-  store_id uuid,
-  name text, description text,
-  points int, stock int,
-  created_at timestamptz default now()
-);
-
--- Tabela de perguntas (caso ainda não exista — o formato real já está definido)
-create table if not exists questions (
-  id bigserial primary key,
-  question text not null,
-  option_a text not null,
-  option_b text not null,
-  option_c text not null,
-  option_d text not null,
-  correct_answer int not null,   -- índice 0-based: 0=A, 1=B, 2=C, 3=D
-  category text default 'Geral',
-  difficulty int default 1,
-  active boolean default true,
-  created_at timestamptz default now()
-);
-
--- Para testes (protótipo). Em produção use RLS + Auth:
+create table if not exists users ( id uuid primary key default gen_random_uuid(), type text not null default 'cliente', name text not null, cpf text unique, email text unique, pass text, store text, points int default 0, games_played int default 0, correct_answers int default 0, total_redeemed numeric default 0, verified boolean default true, created_at timestamptz default now() );
+create table if not exists transactions ( id bigserial primary key, type text, user_id uuid, store_id uuid, from_user_id uuid, to_user_id uuid, amount int, tax int, net int, discount numeric, points_used int, purchase_value numeric, code text unique, status text, created_at timestamptz default now() );
+create table if not exists offers ( id bigserial primary key, store_id uuid, name text, description text, points int, stock int, created_at timestamptz default now() );
+create table if not exists questions ( id bigserial primary key, question text not null, option_a text not null, option_b text not null, option_c text not null, option_d text not null, correct_answer int not null, category text default 'Geral', difficulty int default 1, active boolean default true, created_at timestamptz default now() );
+create table if not exists project_fund ( id int primary key, amount numeric default 0, updated_at timestamptz default now() );
+insert into project_fund (id, amount) values (1,0) on conflict (id) do nothing;
 alter table users disable row level security;
 alter table transactions disable row level security;
 alter table offers disable row level security;
 alter table questions disable row level security;
+alter table project_fund disable row level security;
 `;
 
-let SESSION = { userId: null, resetData: null, transferData: null };
+let SESSION = { userId: null, user: null, resetData: null, transferData: null };
 
 // ==================== SONS ====================
 let actx = null;
 function initAudio() {
   if (!actx) {
-    try { actx = new (window.AudioContext || window.webkitAudioContext)(); }
-    catch(e) { console.log('Audio não suportado'); }
+    try { actx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
   }
 }
 function playTone(freqs, type, durations) {
-  initAudio();
-  if (!actx) return;
+  initAudio(); if (!actx) return;
   try {
     const now = actx.currentTime;
     freqs.forEach((f,i) => {
@@ -458,8 +457,7 @@ function sndCorrect() { playTone([523,659,784,1047],'sine',[[0,0.3,0.2],[0.1,0.3
 function sndWrong() { playTone([300,200],'sawtooth',[[0,0.25,0.3],[0.15,0.25,0.4]]); }
 function sndWin() { playTone([523,659,784,1047,1319],'triangle',[[0,0.3,0.3],[0.12,0.3,0.3],[0.24,0.3,0.3],[0.36,0.3,0.3],[0.48,0.3,0.4]]); }
 function sndClick() {
-  initAudio();
-  if (!actx) return;
+  initAudio(); if (!actx) return;
   try {
     const o=actx.createOscillator(),g=actx.createGain();
     o.frequency.value=800;
@@ -468,6 +466,97 @@ function sndClick() {
     o.connect(g);g.connect(actx.destination);
     o.start();o.stop(actx.currentTime+0.08);
   } catch(e) {}
+}
+
+// ==================== UTILITÁRIOS ====================
+function escapeHtml(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function cleanCPF(cpf) { return cpf ? String(cpf).replace(/\D/g,'') : ''; }
+function isValidCPF(cpf) {
+  cpf = cleanCPF(cpf);
+  if(cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) return false;
+  let sum=0, rest;
+  for(let i=1;i<=9;i++) sum += parseInt(cpf[i-1])*(11-i);
+  rest = (sum*10)%11; if(rest>=10) rest=0;
+  if(rest !== parseInt(cpf[9])) return false;
+  sum=0;
+  for(let i=1;i<=10;i++) sum += parseInt(cpf[i-1])*(12-i);
+  rest = (sum*10)%11; if(rest>=10) rest=0;
+  return rest === parseInt(cpf[10]);
+}
+function genCode(len=6) { return Math.random().toString(36).substr(2,len).toUpperCase(); }
+function fmtMoney(v) { return 'R$ '+Number(v||0).toFixed(2); }
+function todayStr() { return new Date().toISOString().slice(0,10); }
+function monthStr() { return new Date().toISOString().slice(0,7); }
+function isEmail(s) { return /\S+@\S+\.\S+/.test(s); }
+
+// ✅ Melhoria: hash de senha (SHA-256 + salt fixo). Não substitui bcrypt no servidor,
+// mas elimina plaintext no banco. Usuários legados com senha em claro continuam funcionando.
+async function hashPassword(pass) {
+  try {
+    const buf = new TextEncoder().encode('quizlocal:' + pass);
+    const hashBuf = await crypto.subtle.digest('SHA-256', buf);
+    const hex = Array.from(new Uint8Array(hashBuf)).map(b => b.toString(16).padStart(2,'0')).join('');
+    return 'sha256:' + hex;
+  } catch(e) {
+    console.warn('Crypto não disponível, mantendo senha como texto.');
+    return pass;
+  }
+}
+async function verifyPassword(input, stored) {
+  if (!stored) return false;
+  if (stored.startsWith('sha256:')) return (await hashPassword(input)) === stored;
+  return input === stored; // legado
+}
+
+// ✅ Melhoria: loading visual em botões
+function setLoading(btn, isLoading, customText) {
+  if (!btn) return;
+  if (isLoading) {
+    btn.disabled = true;
+    btn.dataset.origText = btn.innerHTML;
+    btn.innerHTML = '<span class="spinner"></span>' + (customText || 'Aguarde...');
+  } else {
+    btn.disabled = false;
+    if (btn.dataset.origText) btn.innerHTML = btn.dataset.origText;
+  }
+}
+
+// ✅ Melhoria: modal de confirmação próprio (substitui confirm() nativo)
+function confirmDialog(title, text) {
+  return new Promise(resolve => {
+    const modal = document.getElementById('modal-confirm');
+    document.getElementById('mc-title').textContent = title;
+    document.getElementById('mc-text').textContent = text;
+    modal.classList.add('active');
+
+    const yes = document.getElementById('mc-yes');
+    const no  = document.getElementById('mc-no');
+    const cleanup = () => {
+      modal.classList.remove('active');
+      yes.removeEventListener('click', onYes);
+      no.removeEventListener('click', onNo);
+    };
+    const onYes = () => { cleanup(); resolve(true); };
+    const onNo  = () => { cleanup(); resolve(false); };
+    yes.addEventListener('click', onYes);
+    no.addEventListener('click', onNo);
+  });
+}
+
+// ==================== SESSÃO PERSISTENTE ====================
+// ✅ Melhoria: mantém sessão no sessionStorage (fecha aba = logout)
+function saveSession() {
+  if (!SESSION.userId) return;
+  try {
+    sessionStorage.setItem('ql_session', JSON.stringify({
+      userId: SESSION.userId, ts: Date.now()
+    }));
+  } catch(e) {}
+}
+function clearSessionStorage() {
+  try { sessionStorage.removeItem('ql_session'); } catch(e) {}
 }
 
 // ==================== NAVEGAÇÃO ====================
@@ -481,6 +570,7 @@ function showScreen(id) {
   if(id==='scr-shopkeeper') refreshShop();
   if(id==='scr-admin') refreshAdmin();
   if(id==='scr-redeem') loadRedeemStores();
+  if(id==='scr-coupons') renderCoupons();
   if(id==='scr-profile') refreshProfile();
   if(id==='scr-shop-products') renderShopProducts();
   if(id==='scr-forgot') {
@@ -508,28 +598,6 @@ function showModal(icon, title, text) {
 }
 function closeModal() { document.getElementById('modal').classList.remove('active'); }
 
-// ==================== UTILITÁRIOS ====================
-function cleanCPF(cpf) { return cpf ? cpf.replace(/\D/g,'') : ''; }
-
-function isValidCPF(cpf) {
-  cpf = cleanCPF(cpf);
-  if(cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) return false;
-  let sum=0, rest;
-  for(let i=1;i<=9;i++) sum += parseInt(cpf[i-1])*(11-i);
-  rest = (sum*10)%11; if(rest>=10) rest=0;
-  if(rest !== parseInt(cpf[9])) return false;
-  sum=0;
-  for(let i=1;i<=10;i++) sum += parseInt(cpf[i-1])*(12-i);
-  rest = (sum*10)%11; if(rest>=10) rest=0;
-  return rest === parseInt(cpf[10]);
-}
-
-function genCode(len=6) { return Math.random().toString(36).substr(2,len).toUpperCase(); }
-function fmtMoney(v) { return 'R$ '+Number(v||0).toFixed(2); }
-function todayStr() { return new Date().toISOString().slice(0,10); }
-function monthStr() { return new Date().toISOString().slice(0,7); }
-function isEmail(s) { return /\S+@\S+\.\S+/.test(s); }
-
 document.addEventListener('DOMContentLoaded', function() {
   const regType = document.getElementById('reg-type');
   if (regType) {
@@ -543,113 +611,86 @@ document.addEventListener('DOMContentLoaded', function() {
 // ==================== DIAGNÓSTICO ====================
 async function runDiagnostics() {
   console.group('🩺 Diagnóstico QuizLocal');
-
-  if (typeof window.supabase === 'undefined') {
-    console.error('❌ Biblioteca Supabase não carregada (CDN falhou?).');
-    toast('❌ Biblioteca Supabase não carregada.', 'error');
-    console.groupEnd(); return;
-  }
   if (!supabaseClient) {
-    console.error('❌ supabaseClient não foi instanciado.');
+    console.error('❌ supabaseClient não inicializado.');
     toast('❌ Cliente Supabase não inicializado.', 'error');
     console.groupEnd(); return;
   }
-
-  const tables = ['users','transactions','offers','questions'];
+  const tables = ['users','transactions','offers','questions','project_fund'];
   const missing = [];
   for (const t of tables) {
     const { error } = await supabaseClient.from(t).select('id').limit(1);
-    if (error) {
-      missing.push(`${t} → ${error.message}`);
-      console.error(`❌ Tabela "${t}": ${error.message}`);
-    } else {
-      console.log(`✅ Tabela "${t}" OK.`);
-    }
+    if (error) { missing.push(`${t} → ${error.message}`); console.error(`❌ ${t}: ${error.message}`); }
+    else console.log(`✅ Tabela "${t}" OK.`);
   }
-
-  // Checa a contagem de perguntas ativas
   if (!missing.includes('questions')) {
-    const { count } = await supabaseClient
-      .from('questions')
-      .select('*', { count: 'exact', head: true })
-      .eq('active', true);
-    console.log(`📚 Perguntas ativas na tabela "questions": ${count || 0}`);
-    if ((count || 0) < 10) {
-      console.warn('⚠️ Menos de 10 perguntas ativas — o quiz usará o banco local como fallback.');
-    }
+    const { count } = await supabaseClient.from('questions').select('*', { count: 'exact', head: true }).eq('active', true);
+    console.log(`📚 Perguntas ativas: ${count || 0}`);
+    if ((count || 0) < CFG.MIN_DB_QUESTIONS) console.warn('⚠️ Menos de 10 perguntas — usará banco local.');
   }
-
   if (missing.length) {
-    console.warn('⚠️ Execute o SQL abaixo no Supabase SQL Editor:');
-    console.log(SETUP_SQL);
+    console.warn('⚠️ Rode o SQL abaixo no Supabase:'); console.log(SETUP_SQL);
     toast('⚠️ Tabelas faltando. Veja o console (F12).', 'error');
   } else {
-    console.log('✅ Banco de dados conectado e tabelas OK!');
-    toast('✅ Banco de dados conectado!', 'success');
+    console.log('✅ Banco OK!'); toast('✅ Banco de dados conectado!', 'success');
   }
   console.groupEnd();
 }
 
 async function testSupabaseConnection() {
-  if (!supabaseClient) {
-    console.warn('⚠️ Supabase não configurado. Edite SUPABASE_URL e SUPABASE_KEY.');
-    return;
-  }
+  if (!supabaseClient) return;
   try {
     const { error } = await supabaseClient.from('users').select('id').limit(1);
-    if (error) {
-      console.warn('⚠️ Não foi possível consultar "users":', error.message);
-      console.warn('Execute este SQL no Supabase:', SETUP_SQL);
-      return;
-    }
+    if (error) { console.warn('⚠️ Não foi possível consultar "users":', error.message); return; }
     console.log('✅ Banco de dados conectado.');
-  } catch (err) {
-    console.error('Erro DB:', err);
-  }
+  } catch (err) { console.error('Erro DB:', err); }
 }
 
 // ==================== LOGIN ====================
-async function handleLogin() {
+async function handleLogin(btn) {
   if (!supabaseClient) { toast('Configure as chaves do Supabase primeiro!', 'error'); return; }
-
   const loginId = document.getElementById('login-id').value.trim().toLowerCase();
   const pass = document.getElementById('login-pass').value;
-
   if(!loginId || !pass) { toast('Preencha email/CPF e senha!','error'); return; }
 
+  setLoading(btn, true, 'Entrando...');
   try {
-    let query = supabaseClient.from('users').select('*');
-    if (isEmail(loginId)) {
-      query = query.eq('email', loginId);
-    } else {
+    let query = supabaseClient.from('users').select('id,type,name,cpf,email,pass,store,points,games_played,correct_answers,total_redeemed,verified');
+    if (isEmail(loginId)) query = query.eq('email', loginId);
+    else {
       const cpf = cleanCPF(loginId);
-      if (cpf.length !== 11) {
-        toast('CPF deve ter 11 dígitos ou informe um e-mail válido.','error');
-        return;
-      }
+      if (cpf.length !== 11) { toast('CPF deve ter 11 dígitos ou informe um e-mail válido.','error'); return; }
       query = query.eq('cpf', cpf);
     }
 
     const { data: user, error } = await query.maybeSingle();
     if (error) { toast('Erro na consulta: ' + error.message, 'error'); return; }
-    if (!user) { toast('Usuário não encontrado! Verifique email/CPF.','error'); sndWrong(); return; }
+    if (!user) { toast('Usuário não encontrado!','error'); sndWrong(); return; }
+    if (!(await verifyPassword(pass, user.pass))) { toast('Senha incorreta!','error'); sndWrong(); return; }
 
-    if(user.pass !== pass) { toast('Senha incorreta!','error'); sndWrong(); return; }
+    // Migração silenciosa de senha legada → hash
+    if (!user.pass.startsWith('sha256:')) {
+      try { await supabaseClient.from('users').update({ pass: await hashPassword(pass) }).eq('id', user.id); }
+      catch(e) {}
+    }
 
     SESSION.userId = user.id;
+    SESSION.user = user;
+    saveSession();
     toast(`Bem-vindo, ${user.name}!`,'success');
     sndCorrect();
     redirectToRole(user.type);
   } catch(e) {
     toast('Erro ao fazer login: ' + e.message, 'error');
     console.error(e);
+  } finally {
+    setLoading(btn, false);
   }
 }
 
 // ==================== CADASTRO ====================
-async function handleRegister() {
+async function handleRegister(btn) {
   if (!supabaseClient) { toast('Configure as chaves do Supabase primeiro!', 'error'); return; }
-
   const name = document.getElementById('reg-name').value.trim();
   const cpf = cleanCPF(document.getElementById('reg-cpf').value);
   const email = document.getElementById('reg-email').value.trim().toLowerCase();
@@ -660,14 +701,17 @@ async function handleRegister() {
   if(!name||!cpf||!email||!pass) { toast('Preencha todos os campos!','error'); return; }
   if(!isValidCPF(cpf)) { toast('CPF inválido!','error'); return; }
   if(type==='lojista' && !store) { toast('Informe o nome do estabelecimento!','error'); return; }
+  if(pass.length < 4) { toast('Senha deve ter ao menos 4 caracteres.','error'); return; }
 
+  setLoading(btn, true, 'Cadastrando...');
   try {
     const { data: byEmail } = await supabaseClient.from('users').select('id').eq('email', email).maybeSingle();
     const { data: byCpf } = await supabaseClient.from('users').select('id').eq('cpf', cpf).maybeSingle();
-    if (byEmail || byCpf) { toast('CPF ou Email já cadastrado! Faça login.','error'); return; }
+    if (byEmail || byCpf) { toast('CPF ou Email já cadastrado!','error'); return; }
 
     const newUser = {
-      type, name, cpf, email, pass,
+      type, name, cpf, email,
+      pass: await hashPassword(pass),
       store: type==='lojista'?store:null,
       points: 0, games_played: 0, correct_answers: 0, total_redeemed: 0,
       verified: true, created_at: new Date().toISOString()
@@ -678,30 +722,29 @@ async function handleRegister() {
 
     toast('Conta criada com sucesso! Faça login.','success');
     sndCorrect();
-
     ['reg-name','reg-cpf','reg-email','reg-pass','reg-store'].forEach(id => {
       const el = document.getElementById(id); if (el) el.value = '';
     });
     document.getElementById('reg-type').value = 'cliente';
     document.getElementById('store-field').classList.add('hidden');
-
     document.getElementById('login-id').value = email;
-    const lp = document.getElementById('login-pass');
-    lp.value = ''; lp.focus();
+    const lp = document.getElementById('login-pass'); lp.value = ''; lp.focus();
     showScreen('scr-login');
   } catch(e) {
     toast('Erro ao cadastrar: ' + e.message, 'error');
     console.error(e);
+  } finally {
+    setLoading(btn, false);
   }
 }
 
 // ==================== RECUPERAÇÃO DE SENHA ====================
-async function requestPasswordReset() {
+async function requestPasswordReset(btn) {
   if (!supabaseClient) { toast('Configure as chaves do Supabase primeiro!', 'error'); return; }
-
   const loginId = document.getElementById('forgot-id').value.trim().toLowerCase();
   if(!loginId) { toast('Informe seu email ou CPF!','error'); return; }
 
+  setLoading(btn, true, 'Gerando...');
   try {
     let query = supabaseClient.from('users').select('id, name, email');
     if (isEmail(loginId)) query = query.eq('email', loginId);
@@ -711,48 +754,51 @@ async function requestPasswordReset() {
       query = query.eq('cpf', cpf);
     }
     const { data: user, error } = await query.maybeSingle();
-    if(error || !user) { toast('Email/CPF não encontrado no sistema!','error'); sndWrong(); return; }
+    if(error || !user) { toast('Email/CPF não encontrado!','error'); sndWrong(); return; }
 
     const code = String(Math.floor(100000 + Math.random() * 900000));
     SESSION.resetData = { userId: user.id, code, email: user.email, expiresAt: Date.now() + 10*60*1000 };
 
+    // DEMO: em produção o código iria por email/SMS
     console.log(`\n🔐 CÓDIGO DE RECUPERAÇÃO PARA ${user.email}: ${code}\n⏰ Válido por 10 minutos\n`);
 
     document.getElementById('forgot-step2').classList.remove('hidden');
     document.getElementById('forgot-code').focus();
-
-    toast('Código enviado! Verifique o console (F12) para ver o código.', 'info');
+    toast('Código gerado! Verifique o console (F12).', 'info');
     sndCorrect();
   } catch(e) {
-    toast('Erro ao solicitar recuperação: ' + e.message, 'error');
-    console.error(e);
+    toast('Erro: ' + e.message, 'error');
+  } finally {
+    setLoading(btn, false);
   }
 }
 
-async function confirmPasswordReset() {
+async function confirmPasswordReset(btn) {
   if (!supabaseClient || !SESSION.resetData) { toast('Solicite um novo código primeiro!','error'); return; }
-
   const code = document.getElementById('forgot-code').value.trim();
   const newPass = document.getElementById('forgot-newpass').value;
   const confirmPass = document.getElementById('forgot-confirmpass').value;
 
   if(code !== SESSION.resetData.code) { toast('Código inválido!','error'); sndWrong(); return; }
-  if(Date.now() > SESSION.resetData.expiresAt) { toast('Código expirado! Solicite novo.','error'); sndWrong(); return; }
-  if(!newPass || newPass.length < 4) { toast('Senha deve ter pelo menos 4 caracteres!','error'); return; }
+  if(Date.now() > SESSION.resetData.expiresAt) { toast('Código expirado!','error'); sndWrong(); return; }
+  if(!newPass || newPass.length < 4) { toast('Senha deve ter ao menos 4 caracteres!','error'); return; }
   if(newPass !== confirmPass) { toast('As senhas não coincidem!','error'); sndWrong(); return; }
 
+  setLoading(btn, true, 'Redefinindo...');
   try {
-    const { error } = await supabaseClient.from('users').update({ pass: newPass }).eq('id', SESSION.resetData.userId);
-    if(error) { toast('Erro ao atualizar senha: ' + error.message, 'error'); return; }
+    const hashed = await hashPassword(newPass);
+    const { error } = await supabaseClient.from('users').update({ pass: hashed }).eq('id', SESSION.resetData.userId);
+    if(error) { toast('Erro: ' + error.message, 'error'); return; }
 
     SESSION.resetData = null;
-    toast('Senha redefinida com sucesso! Faça login.','success');
+    toast('Senha redefinida!','success');
     sndWin();
-    showModal('✅','Senha Atualizada!','Sua senha foi redefinida com sucesso. Agora você pode fazer login com sua nova senha.');
+    showModal('✅','Senha Atualizada!','Sua senha foi redefinida. Faça login com a nova senha.');
     setTimeout(() => { closeModal(); showScreen('scr-login'); }, 2000);
   } catch(e) {
-    toast('Erro ao redefinir senha: ' + e.message, 'error');
-    console.error(e);
+    toast('Erro: ' + e.message, 'error');
+  } finally {
+    setLoading(btn, false);
   }
 }
 
@@ -763,14 +809,15 @@ function redirectToRole(type) {
 }
 
 function logout() {
-  SESSION = { userId:null, resetData:null, transferData:null };
+  SESSION = { userId:null, user:null, resetData:null, transferData:null };
+  clearSessionStorage();
   document.getElementById('login-id').value = '';
   document.getElementById('login-pass').value = '';
   showScreen('scr-home');
   toast('Você saiu do sistema','info');
 }
 
-// ==================== BANCO DE PERGUNTAS LOCAL (FALLBACK) ====================
+// ==================== BANCO LOCAL (FALLBACK) ====================
 const QUESTIONS = [
   {q:"Capital do Brasil?",o:["São Paulo","Rio de Janeiro","Brasília","Salvador"],a:2,c:"Geografia",d:1},
   {q:"Quem pintou a Mona Lisa?",o:["Van Gogh","Da Vinci","Picasso","Michelangelo"],a:1,c:"Arte",d:1},
@@ -854,7 +901,6 @@ const QUESTIONS = [
 ];
 
 // ==================== CARREGAMENTO DE PERGUNTAS DO SUPABASE ====================
-// ✅ Adaptado ao schema real: option_a..option_d + correct_answer (índice 0-based)
 async function loadQuestionsFromDB() {
   if (!supabaseClient) return null;
   try {
@@ -862,37 +908,24 @@ async function loadQuestionsFromDB() {
       .from('questions')
       .select('id, question, option_a, option_b, option_c, option_d, correct_answer, category, difficulty')
       .eq('active', true);
-
     if (error) { console.warn('Erro ao buscar questions:', error.message); return null; }
-
-    if (!data || data.length < 10) {
-      console.warn(`⚠️ Tabela "questions" tem apenas ${data?.length || 0} linhas ativas. Mínimo: 10.`);
+    if (!data || data.length < CFG.MIN_DB_QUESTIONS) {
+      console.warn(`⚠️ Tabela "questions" tem ${data?.length || 0} linhas ativas. Mínimo: ${CFG.MIN_DB_QUESTIONS}.`);
       return null;
     }
-
     const valid = data.map(normalizeQuestion).filter(Boolean);
-    if (valid.length < 10) {
-      console.warn(`⚠️ Apenas ${valid.length} perguntas válidas após normalização.`);
-      return null;
-    }
+    if (valid.length < CFG.MIN_DB_QUESTIONS) { console.warn(`Apenas ${valid.length} válidas.`); return null; }
     console.log(`✅ ${valid.length} perguntas carregadas do Supabase.`);
     return valid;
-  } catch(e) {
-    console.error('Erro loadQuestionsFromDB:', e);
-    return null;
-  }
+  } catch(e) { console.error('Erro loadQuestionsFromDB:', e); return null; }
 }
 
-// Converte uma linha de "questions" no formato interno do quiz: {q, o, a, c, d}
 function normalizeQuestion(row) {
   const opts = [row.option_a, row.option_b, row.option_c, row.option_d];
   if (opts.some(o => o === null || o === undefined || String(o).trim() === '')) return null;
-
   const ans = Number(row.correct_answer);
   if (!Number.isInteger(ans) || ans < 0 || ans > 3) return null;
-
   if (!row.question || String(row.question).trim() === '') return null;
-
   return {
     q: String(row.question),
     o: opts.map(String),
@@ -905,31 +938,37 @@ function normalizeQuestion(row) {
 // ==================== QUIZ ====================
 let quiz = {};
 let timerInterval = null;
+let timerState = { seconds: 0, remaining: 0, paused: false };
 
+// ✅ Melhoria: pausa o timer em vez de anular a pergunta
 document.addEventListener('visibilitychange', () => {
-  if(document.hidden && quiz.active) {
-    clearInterval(timerInterval);
-    quiz.caughtCheating = true;
-    toast('⚠️ Saída detectada! Pergunta anulada.','error');
-    sndWrong();
-    setTimeout(nextQuestion, 1500);
+  if (!quiz.active) return;
+  if (document.hidden) {
+    timerState.paused = true;
+    document.getElementById('timer-bar')?.classList.add('paused');
+    toast('⏸️ Jogo pausado (aba em segundo plano).','info');
+  } else {
+    timerState.paused = false;
+    document.getElementById('timer-bar')?.classList.remove('paused');
   }
 });
 
-// ✅ startQuiz agora é async: tenta Supabase primeiro, cai no local se falhar
-async function startQuiz() {
-  let pool = await loadQuestionsFromDB();
-
-  if (!pool) {
-    console.warn('⚠️ Usando banco local de perguntas (fallback).');
-    pool = [...QUESTIONS];
+async function startQuiz(btn) {
+  setLoading(btn, true, 'Carregando perguntas...');
+  try {
+    let pool = await loadQuestionsFromDB();
+    if (!pool) {
+      console.warn('⚠️ Usando banco local de perguntas (fallback).');
+      pool = [...QUESTIONS];
+    }
+    const shuffled = pool.sort(()=>Math.random()-0.5).slice(0, CFG.QUIZ_QUESTIONS_PER_ROUND);
+    quiz = { questions: shuffled, current:0, correct:0, wrong:0, points:0, active:true, caughtCheating:false };
+    document.getElementById('q-total').textContent = shuffled.length;
+    showScreen('scr-quiz');
+    renderQuestion();
+  } finally {
+    setLoading(btn, false);
   }
-
-  const shuffled = pool.sort(()=>Math.random()-0.5).slice(0,10);
-  quiz = { questions: shuffled, current:0, correct:0, wrong:0, points:0, active:true, caughtCheating:false };
-  document.getElementById('q-total').textContent = shuffled.length;
-  showScreen('scr-quiz');
-  renderQuestion();
 }
 
 function renderQuestion() {
@@ -937,15 +976,18 @@ function renderQuestion() {
   const q = quiz.questions[quiz.current];
   document.getElementById('q-num').textContent = quiz.current+1;
   document.getElementById('q-round-pts').textContent = quiz.points;
-  document.getElementById('q-text').innerHTML = `<small style="color:var(--gold)">[${q.c} • Dif. ${q.d}]</small><br><br>${q.q}`;
+  document.getElementById('q-text').innerHTML = `<small style="color:var(--gold)">[${escapeHtml(q.c)} • Dif. ${escapeHtml(q.d)}]</small><br><br>${escapeHtml(q.q)}`;
 
   const qOptions = document.getElementById('q-options');
   qOptions.innerHTML = '';
   q.o.forEach((o,i) => {
     const d = document.createElement('div');
     d.className = 'opt';
+    d.tabIndex = 0;
+    d.setAttribute('role', 'button');
     d.textContent = `${String.fromCharCode(65+i)}) ${o}`;
     d.onclick = () => answerQ(i, d);
+    d.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); answerQ(i, d); } };
     qOptions.appendChild(d);
   });
 
@@ -955,19 +997,14 @@ function renderQuestion() {
 
 function startTimer(seconds) {
   clearInterval(timerInterval);
-  const fill = document.getElementById('timer-fill');
-  fill.style.transition = 'none';
-  fill.style.width = '100%';
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      fill.style.transition = `width ${seconds}s linear`;
-      fill.style.width = '0%';
-    });
-  });
-  let remaining = seconds;
+  timerState = { seconds, remaining: seconds, paused: false };
+  document.getElementById('timer-bar')?.classList.remove('paused');
+  updateTimerBar();
   timerInterval = setInterval(() => {
-    remaining--;
-    if(remaining <= 0) {
+    if (timerState.paused) return;
+    timerState.remaining--;
+    updateTimerBar();
+    if (timerState.remaining <= 0) {
       clearInterval(timerInterval);
       quiz.wrong++;
       sndWrong();
@@ -977,38 +1014,36 @@ function startTimer(seconds) {
   }, 1000);
 }
 
+function updateTimerBar() {
+  const pct = Math.max(0, (timerState.remaining / timerState.seconds) * 100);
+  const el = document.getElementById('timer-fill');
+  if (el) el.style.width = pct + '%';
+}
+
 function answerQ(idx, el) {
   if(!quiz.active) return;
   clearInterval(timerInterval);
   quiz.active = false;
-
   const q = quiz.questions[quiz.current];
   document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
   const ptsValue = q.d * 100;
 
   if(idx === q.a) {
     el.classList.add('correct');
-    quiz.correct++;
-    quiz.points += ptsValue;
-    sndCorrect();
-    toast(`✅ Correto! +${ptsValue} pts`,'success');
+    quiz.correct++; quiz.points += ptsValue;
+    sndCorrect(); toast(`✅ Correto! +${ptsValue} pts`,'success');
   } else {
     el.classList.add('wrong');
-    const correctOpt = document.querySelectorAll('.opt')[q.a];
-    if (correctOpt) correctOpt.classList.add('correct');
+    document.querySelectorAll('.opt')[q.a]?.classList.add('correct');
     quiz.wrong++;
-    quiz.points -= ptsValue;
-    sndWrong();
-    toast(`❌ Errado! -${ptsValue} pts`,'error');
+    // ✅ Melhoria: pontos nunca ficam abaixo do que já foi conquistado na rodada
+    quiz.points = Math.max(0, quiz.points - ptsValue);
+    sndWrong(); toast(`❌ Errado! -${ptsValue} pts`,'error');
   }
   setTimeout(nextQuestion, 1600);
 }
 
-function nextQuestion() {
-  quiz.active = true;
-  quiz.current++;
-  renderQuestion();
-}
+function nextQuestion() { quiz.active = true; quiz.current++; renderQuestion(); }
 
 async function finishQuiz() {
   quiz.active = false;
@@ -1020,41 +1055,48 @@ async function finishQuiz() {
     return;
   }
 
+  // ✅ Melhoria: pontos não ficam negativos
+  const earnedPoints = Math.max(0, quiz.points);
+
   try {
-    const { data: user, error } = await supabaseClient
+    const { data: user } = await supabaseClient
       .from('users').select('points, games_played, correct_answers')
       .eq('id', SESSION.userId).single();
-
-    if (!error && user) {
+    if (user) {
       await supabaseClient.from('users').update({
-        points: user.points + quiz.points,
+        points: Math.max(0, user.points + earnedPoints),
         games_played: user.games_played + 1,
         correct_answers: user.correct_answers + quiz.correct
       }).eq('id', SESSION.userId);
+      // Invalida cache local
+      SESSION.user = null;
     }
   } catch(e) { console.error('Erro ao salvar quiz:', e); }
 
   document.getElementById('res-correct').textContent = quiz.correct;
   document.getElementById('res-wrong').textContent = quiz.wrong;
-  document.getElementById('res-earned').textContent = quiz.points;
+  document.getElementById('res-earned').textContent = earnedPoints;
 
   const pct = quiz.correct / quiz.questions.length;
   if(pct >= 0.8) { document.getElementById('res-icon').textContent='🏆'; document.getElementById('res-title').textContent='Excelente!'; sndWin(); }
   else if(pct >= 0.5) { document.getElementById('res-icon').textContent='🥈'; document.getElementById('res-title').textContent='Muito Bem!'; sndCorrect(); }
   else { document.getElementById('res-icon').textContent='🎯'; document.getElementById('res-title').textContent='Continue Tentando!'; }
-  document.getElementById('res-msg').textContent = `Você acertou ${quiz.correct}/${quiz.questions.length}. Saldo final da rodada: ${quiz.points} pontos.`;
+  document.getElementById('res-msg').textContent = `Você acertou ${quiz.correct}/${quiz.questions.length}. Pontos da rodada: ${earnedPoints}.`;
   showScreen('scr-result');
 }
 
-// ==================== CLIENTE: REFRESH ====================
+// ==================== CLIENTE ====================
 async function refreshClient() {
   if(!SESSION.userId || !supabaseClient) return;
   try {
-    const { data: u } = await supabaseClient.from('users').select('*').eq('id', SESSION.userId).single();
+    const { data: u } = await supabaseClient
+      .from('users')
+      .select('name, points, games_played, total_redeemed')
+      .eq('id', SESSION.userId).single();
     if(u) {
       document.getElementById('cli-name').textContent = u.name;
       document.getElementById('cli-pts').textContent = u.points;
-      document.getElementById('cli-balance').textContent = fmtMoney(u.points/1000);
+      document.getElementById('cli-balance').textContent = fmtMoney(u.points / CFG.POINTS_PER_REAL);
       document.getElementById('cli-games').textContent = u.games_played;
       document.getElementById('cli-redeemed').textContent = fmtMoney(u.total_redeemed);
     }
@@ -1068,120 +1110,154 @@ async function loadRedeemStores() {
     const sel = document.getElementById('redeem-store');
     const { data: shops } = await supabaseClient.from('users').select('id, store').eq('type', 'lojista');
     sel.innerHTML = '<option value="">Selecione a loja...</option>';
-    if(shops) shops.forEach(s => { sel.innerHTML += `<option value="${s.id}">${s.store}</option>`; });
+    if(shops) shops.forEach(s => { sel.innerHTML += `<option value="${escapeHtml(s.id)}">${escapeHtml(s.store)}</option>`; });
     document.getElementById('redeem-value').value = '';
     document.getElementById('redeem-preview').classList.add('hidden');
     document.getElementById('btn-confirm-redeem').classList.add('hidden');
   } catch(e) { console.error('Erro loadRedeemStores:', e); }
 }
 
-function previewRedeem() {
+async function previewRedeem(btn) {
   const storeId = document.getElementById('redeem-store').value;
   const val = parseFloat(document.getElementById('redeem-value').value);
   if(!storeId || !val || val <= 0) { toast('Preencha corretamente!','error'); return; }
-  const maxDiscount = val * 0.10;
-  const actualPoints = Math.ceil(maxDiscount * 1000);
-  const redeemPreview = document.getElementById('redeem-preview');
-  redeemPreview.classList.remove('hidden');
-  redeemPreview.innerHTML = `<strong>Desconto:</strong> ${fmtMoney(maxDiscount)} | <strong>Pontos:</strong> ${actualPoints}`;
-  document.getElementById('btn-confirm-redeem').classList.remove('hidden');
+
+  setLoading(btn, true, 'Calculando...');
+  try {
+    const maxDiscount = val * CFG.MAX_DISCOUNT_PCT;
+    const actualPoints = Math.ceil(maxDiscount * CFG.POINTS_PER_REAL);
+
+    // ✅ Melhoria: mostra saldo atual e resultante
+    const { data: u } = await supabaseClient.from('users').select('points').eq('id', SESSION.userId).single();
+    const saldoAtual = u?.points || 0;
+    const saldoDepois = saldoAtual - actualPoints;
+
+    const box = document.getElementById('redeem-preview');
+    box.classList.remove('hidden');
+    box.innerHTML = `
+      <strong>Desconto:</strong> ${fmtMoney(maxDiscount)}<br>
+      <strong>Pontos necessários:</strong> ${actualPoints}<br>
+      <strong>Seu saldo hoje:</strong> ${saldoAtual} pts<br>
+      <strong>Saldo após resgate:</strong> <span style="color:${saldoDepois < 0 ? 'var(--red)' : 'var(--gold)'}">${saldoDepois} pts</span>
+    `;
+    if (saldoDepois < 0) {
+      toast('Pontos insuficientes para este resgate!','error');
+      document.getElementById('btn-confirm-redeem').classList.add('hidden');
+    } else {
+      document.getElementById('btn-confirm-redeem').classList.remove('hidden');
+    }
+  } catch(e) {
+    toast('Erro: ' + e.message, 'error');
+  } finally {
+    setLoading(btn, false);
+  }
 }
 
-async function confirmRedeem() {
+async function confirmRedeem(btn) {
   if (!supabaseClient || !SESSION.userId) return;
   const storeId = document.getElementById('redeem-store').value;
   const val = parseFloat(document.getElementById('redeem-value').value);
-  const maxDiscount = val * 0.10;
-  const actualPoints = Math.ceil(maxDiscount * 1000);
+  if (!storeId || !val) { toast('Dados inválidos.','error'); return; }
 
+  const ok = await confirmDialog('Confirmar Resgate',
+    `Você está resgatando ${fmtMoney(val * CFG.MAX_DISCOUNT_PCT)} em desconto.\n\nApós confirmar, um cupom será gerado.`);
+  if (!ok) return;
+
+  setLoading(btn, true, 'Gerando cupom...');
   try {
-    const { data: u } = await supabaseClient.from('users').select('points').eq('id', SESSION.userId).single();
-    if(u.points < actualPoints) { toast('Pontos insuficientes!','error'); return; }
-
-    const code = 'QL-' + genCode(6);
-    await supabaseClient.from('users').update({ points: u.points - actualPoints }).eq('id', SESSION.userId);
-    await supabaseClient.from('transactions').insert([{
-      type: 'redeem', user_id: SESSION.userId, store_id: storeId,
-      discount: maxDiscount, points_used: actualPoints, purchase_value: val,
-      code: code, status: 'pendente', created_at: new Date().toISOString()
-    }]);
+    // ✅ Melhoria: RPC atômica (elimina race condition e atualiza total_redeemed)
+    const { data, error } = await supabaseClient.rpc('redeem_discount', {
+      p_user_id: SESSION.userId,
+      p_store_id: storeId,
+      p_purchase_value: val
+    });
+    if (error) { toast('Erro: ' + error.message, 'error'); return; }
+    if (data?.error) { toast(data.error, 'error'); sndWrong(); return; }
 
     sndWin();
-    showModal('🏷️','Cupom Gerado!',`Código: ${code}\n\nDesconto: ${fmtMoney(maxDiscount)}\nApresente este código no caixa da loja.`);
+    showModal('🏷️','Cupom Gerado!',`Código: ${data.code}\n\nDesconto: ${fmtMoney(data.discount)}\nApresente este código no caixa da loja.`);
     refreshClient();
+    document.getElementById('redeem-preview').classList.add('hidden');
+    document.getElementById('btn-confirm-redeem').classList.add('hidden');
   } catch(e) {
     toast('Erro ao resgatar: ' + e.message, 'error');
     console.error(e);
+  } finally {
+    setLoading(btn, false);
   }
 }
 
 // ==================== TRANSFERÊNCIA ====================
-async function previewTransfer() {
+async function previewTransfer(btn) {
   if (!supabaseClient || !SESSION.userId) return;
   const cpf = cleanCPF(document.getElementById('tr-cpf').value);
   const amount = parseInt(document.getElementById('tr-amount').value);
 
+  if(!cpf || cpf.length!==11) { toast('CPF inválido!','error'); return; }
+  if(!amount || amount < CFG.TRANSFER_MIN) { toast(`Mínimo de ${CFG.TRANSFER_MIN} pontos!`,'error'); return; }
+
+  setLoading(btn, true, 'Simulando...');
   try {
     const { data: u } = await supabaseClient.from('users').select('points').eq('id', SESSION.userId).single();
-
-    if(!cpf || cpf.length!==11) { toast('CPF inválido!','error'); return; }
-    if(!amount || amount < 100) { toast('Mínimo de 100 pontos!','error'); return; }
     if(amount > u.points) { toast('Saldo insuficiente!','error'); return; }
 
     const today = todayStr(), month = monthStr();
     const { data: txs } = await supabaseClient.from('transactions')
       .select('amount, created_at').eq('from_user_id', SESSION.userId).eq('type', 'transfer');
-
     const todaySent = (txs||[]).filter(t=>t.created_at?.startsWith(today)).reduce((s,t)=>s+(t.amount||0),0);
     const monthSent = (txs||[]).filter(t=>t.created_at?.startsWith(month)).reduce((s,t)=>s+(t.amount||0),0);
 
-    if(todaySent + amount > 5000) { toast(`Limite diário excedido! Enviado hoje: ${todaySent}/5.000`,'error'); return; }
-    if(monthSent + amount > 150000) { toast(`Limite mensal excedido! Enviado este mês: ${monthSent}/150.000`,'error'); return; }
+    if(todaySent + amount > CFG.TRANSFER_DAILY_LIMIT) { toast(`Limite diário excedido (${todaySent}/${CFG.TRANSFER_DAILY_LIMIT}).`,'error'); return; }
+    if(monthSent + amount > CFG.TRANSFER_MONTHLY_LIMIT) { toast(`Limite mensal excedido.`,'error'); return; }
 
+    // ✅ Melhoria: valida destinatário ANTES de mostrar preview
     const { data: dest } = await supabaseClient.from('users')
       .select('id, name').eq('cpf', cpf).eq('type', 'cliente').maybeSingle();
     if(!dest) { toast('Destinatário não encontrado!','error'); return; }
     if(dest.id === SESSION.userId) { toast('Não pode transferir para si mesmo!','error'); return; }
 
-    const tax = Math.floor(amount * 0.20);
+    const tax = Math.floor(amount * CFG.TRANSFER_TAX_PCT);
     const net = amount - tax;
 
     document.getElementById('tr-preview').classList.remove('hidden');
     document.getElementById('tr-preview').innerHTML = `
       <strong>💸 Simulação:</strong><br>
-      Destinatário: <strong>${dest.name}</strong><br>
+      Destinatário: <strong>${escapeHtml(dest.name)}</strong><br>
       Pontos enviados: ${amount}<br>
-      Taxa (20%): <strong>-${tax} pts</strong> → Caixa do Projeto<br>
+      Taxa (${(CFG.TRANSFER_TAX_PCT*100)|0}%): <strong>-${tax} pts</strong> → Caixa do Projeto<br>
       <strong style="color:var(--gold);font-size:1.1em;">Destinatário recebe: ${net} pts</strong><br>
       Seu saldo após: ${u.points - amount} pts
     `;
     SESSION.transferData = { destId:dest.id, destName:dest.name, amount, tax, net };
     document.getElementById('btn-confirm-tr').classList.remove('hidden');
   } catch(e) {
-    toast('Erro ao simular transferência: ' + e.message, 'error');
-    console.error(e);
+    toast('Erro: ' + e.message, 'error');
+  } finally {
+    setLoading(btn, false);
   }
 }
 
-async function confirmTransfer() {
+async function confirmTransfer(btn) {
   const d = SESSION.transferData;
   if(!d || !supabaseClient || !SESSION.userId) return;
 
+  const ok = await confirmDialog('Confirmar Transferência',
+    `Enviar ${d.amount} pontos para ${d.destName}?\n\nTaxa: ${d.tax} pts\nRecebimento líquido: ${d.net} pts`);
+  if (!ok) return;
+
+  setLoading(btn, true, 'Transferindo...');
   try {
-    const { data: u } = await supabaseClient.from('users').select('points').eq('id', SESSION.userId).single();
-    if(u.points < d.amount) { toast('Saldo insuficiente!','error'); return; }
-
-    await supabaseClient.from('users').update({ points: u.points - d.amount }).eq('id', SESSION.userId);
-    const { data: dest } = await supabaseClient.from('users').select('points').eq('id', d.destId).single();
-    await supabaseClient.from('users').update({ points: dest.points + d.net }).eq('id', d.destId);
-
-    await supabaseClient.from('transactions').insert([{
-      type: 'transfer', from_user_id: SESSION.userId, to_user_id: d.destId,
-      amount: d.amount, tax: d.tax, net: d.net, created_at: new Date().toISOString()
-    }]);
+    // ✅ Melhoria: RPC atômica
+    const { data, error } = await supabaseClient.rpc('transfer_points', {
+      p_from_user_id: SESSION.userId,
+      p_to_cpf: cleanCPF(document.getElementById('tr-cpf').value),
+      p_amount: d.amount
+    });
+    if (error) { toast('Erro: ' + error.message, 'error'); return; }
+    if (data?.error) { toast(data.error, 'error'); sndWrong(); return; }
 
     sndCorrect();
-    showModal('✅','Transferência Realizada!',`${d.net} pontos enviados para ${d.destName}.\nTaxa de ${d.tax} pts revertida ao caixa do projeto.`);
+    showModal('✅','Transferência Realizada!',`${data.net} pontos enviados para ${d.destName}.\nTaxa de ${data.tax} pts revertida ao caixa do projeto.`);
     document.getElementById('tr-preview').classList.add('hidden');
     document.getElementById('btn-confirm-tr').classList.add('hidden');
     document.getElementById('tr-cpf').value = '';
@@ -1191,6 +1267,56 @@ async function confirmTransfer() {
   } catch(e) {
     toast('Erro ao transferir: ' + e.message, 'error');
     console.error(e);
+  } finally {
+    setLoading(btn, false);
+  }
+}
+
+// ==================== MEUS CUPONS (NOVO) ====================
+async function renderCoupons() {
+  if (!SESSION.userId || !supabaseClient) return;
+  const cont = document.getElementById('coupons-list');
+  cont.innerHTML = '<p style="opacity:0.6;text-align:center;padding:15px;">Carregando...</p>';
+  try {
+    const { data: coupons } = await supabaseClient
+      .from('transactions')
+      .select('code, discount, purchase_value, status, created_at, store_id')
+      .eq('user_id', SESSION.userId)
+      .eq('type', 'redeem')
+      .order('created_at', { ascending: false });
+
+    if (!coupons || !coupons.length) {
+      cont.innerHTML = '<p style="opacity:0.6;text-align:center;padding:15px;">Você ainda não gerou nenhum cupom.</p>';
+      return;
+    }
+
+    // Busca nomes das lojas (em uma única query)
+    const storeIds = [...new Set(coupons.map(c => c.store_id).filter(Boolean))];
+    let storeMap = {};
+    if (storeIds.length) {
+      const { data: stores } = await supabaseClient.from('users').select('id, store').in('id', storeIds);
+      (stores || []).forEach(s => storeMap[s.id] = s.store);
+    }
+
+    cont.innerHTML = '';
+    coupons.forEach(c => {
+      const badge = c.status === 'validado' ? '<span class="badge-status badge-validado">✅ Usado</span>' : '<span class="badge-status badge-pendente">⏳ Pendente</span>';
+      const dt = new Date(c.created_at).toLocaleDateString('pt-BR');
+      cont.innerHTML += `
+        <div class="coupon-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <strong>${escapeHtml(storeMap[c.store_id] || 'Loja')}</strong>
+            ${badge}
+          </div>
+          <div class="code">${escapeHtml(c.code)}</div>
+          <div style="font-size:0.85em;opacity:0.8;">
+            Desconto: ${fmtMoney(c.discount)} · Compra: ${fmtMoney(c.purchase_value)} · ${dt}
+          </div>
+        </div>`;
+    });
+  } catch(e) {
+    console.error('Erro renderCoupons:', e);
+    cont.innerHTML = '<p style="color:var(--red);text-align:center;padding:15px;">Erro ao carregar cupons.</p>';
   }
 }
 
@@ -1198,7 +1324,10 @@ async function confirmTransfer() {
 async function refreshProfile() {
   if(!SESSION.userId || !supabaseClient) return;
   try {
-    const { data: u } = await supabaseClient.from('users').select('*').eq('id', SESSION.userId).single();
+    const { data: u } = await supabaseClient
+      .from('users')
+      .select('points, games_played, correct_answers, total_redeemed')
+      .eq('id', SESSION.userId).single();
     if(!u) return;
 
     document.getElementById('prof-pts').textContent = u.points;
@@ -1207,7 +1336,7 @@ async function refreshProfile() {
     document.getElementById('prof-redeemed').textContent = fmtMoney(u.total_redeemed);
 
     const { data: hist } = await supabaseClient
-      .from('transactions').select('*')
+      .from('transactions').select('type, points_used, amount, net, from_user_id, to_user_id, created_at')
       .or(`user_id.eq.${SESSION.userId},from_user_id.eq.${SESSION.userId},to_user_id.eq.${SESSION.userId}`)
       .order('created_at', { ascending: false }).limit(10);
 
@@ -1223,7 +1352,7 @@ async function refreshProfile() {
       if(t.type==='redeem') detail=`-${t.points_used} pts → Loja`;
       else if(t.type==='transfer' && t.from_user_id===SESSION.userId) detail=`-${t.amount} pts (enviado)`;
       else if(t.type==='transfer' && t.to_user_id===SESSION.userId) detail=`+${t.net} pts (recebido)`;
-      cont.innerHTML+=`<tr><td>${d}</td><td>${t.type}</td><td>${detail}</td></tr>`;
+      cont.innerHTML+=`<tr><td>${escapeHtml(d)}</td><td>${escapeHtml(t.type)}</td><td>${escapeHtml(detail)}</td></tr>`;
     });
     cont.innerHTML+='</table>';
   } catch(e) { console.error('Erro refreshProfile:', e); }
@@ -1248,15 +1377,18 @@ async function refreshShop() {
   } catch(e) { console.error('Erro refreshShop:', e); }
 }
 
-async function validateCoupon() {
+async function validateCoupon(btn) {
   if (!supabaseClient || !SESSION.userId) return;
   const valCode = document.getElementById('val-code');
   const valResult = document.getElementById('val-result');
   const code = valCode.value.trim().toUpperCase();
   if(!code) { toast('Digite o código!','error'); return; }
 
+  setLoading(btn, true, 'Validando...');
   try {
-    const { data: t } = await supabaseClient.from('transactions').select('*').eq('code', code).maybeSingle();
+    const { data: t } = await supabaseClient.from('transactions')
+      .select('id, store_id, discount, purchase_value, status')
+      .eq('code', code).maybeSingle();
     if(!t) { valResult.innerHTML='<div class="toast error" style="position:static;">❌ Cupom não encontrado!</div>'; sndWrong(); return; }
     if(t.store_id!==SESSION.userId) { valResult.innerHTML='<div class="toast error" style="position:static;">⚠️ Cupom de outra loja!</div>'; sndWrong(); return; }
     if(t.status==='validado') { valResult.innerHTML='<div class="toast error" style="position:static;">⚠️ Cupom já utilizado!</div>'; return; }
@@ -1273,12 +1405,13 @@ async function validateCoupon() {
     valCode.value='';
     refreshShop();
   } catch(e) {
-    toast('Erro ao validar cupom: ' + e.message, 'error');
-    console.error(e);
+    toast('Erro ao validar: ' + e.message, 'error');
+  } finally {
+    setLoading(btn, false);
   }
 }
 
-async function addOffer() {
+async function addOffer(btn) {
   if (!supabaseClient || !SESSION.userId) return;
   const name = document.getElementById('offer-name').value.trim();
   const description = document.getElementById('offer-desc').value.trim();
@@ -1286,8 +1419,9 @@ async function addOffer() {
   const stock = parseInt(document.getElementById('offer-stock').value);
 
   if(!name||!description||!pts||!stock) { toast('Preencha tudo!','error'); return; }
-  if(pts<1000) { toast('Mínimo 1000 pontos!','error'); return; }
+  if(pts < CFG.OFFER_MIN_POINTS) { toast(`Mínimo ${CFG.OFFER_MIN_POINTS} pontos!`,'error'); return; }
 
+  setLoading(btn, true, 'Salvando...');
   try {
     await supabaseClient.from('offers').insert([{
       name, description, points:pts, stock, store_id:SESSION.userId, created_at:new Date().toISOString()
@@ -1297,14 +1431,15 @@ async function addOffer() {
     showScreen('scr-shopkeeper');
   } catch(e) {
     toast('Erro ao criar oferta: ' + e.message, 'error');
-    console.error(e);
+  } finally {
+    setLoading(btn, false);
   }
 }
 
 async function renderShopProducts() {
   if (!supabaseClient || !SESSION.userId) return;
   try {
-    const { data: list } = await supabaseClient.from('offers').select('*').eq('store_id', SESSION.userId);
+    const { data: list } = await supabaseClient.from('offers').select('id, name, description, points, stock').eq('store_id', SESSION.userId);
     const cont = document.getElementById('shop-prod-list');
     if(!list || !list.length) {
       cont.innerHTML='<p style="opacity:0.6;text-align:center;padding:15px;">Nenhuma oferta cadastrada.</p>';
@@ -1312,13 +1447,14 @@ async function renderShopProducts() {
     }
     cont.innerHTML='';
     list.forEach(o => {
-      cont.innerHTML+=`<div class="prod-card"><div><h4>${o.name}</h4><p style="font-size:0.85em;opacity:0.8;">${o.description}</p><small>${o.points} pts | Estoque: ${o.stock}</small></div><button class="btn btn-red btn-sm" onclick="deleteOffer(${o.id})">🗑️</button></div>`;
+      cont.innerHTML+=`<div class="prod-card"><div><h4>${escapeHtml(o.name)}</h4><p style="font-size:0.85em;opacity:0.8;">${escapeHtml(o.description)}</p><small>${o.points} pts | Estoque: ${o.stock}</small></div><button class="btn btn-red btn-sm" onclick="deleteOffer(${Number(o.id)})">🗑️</button></div>`;
     });
   } catch(e) { console.error('Erro renderShopProducts:', e); }
 }
 
 async function deleteOffer(id) {
-  if(!confirm('Excluir oferta?')) return;
+  const ok = await confirmDialog('Excluir Oferta', 'Esta ação não pode ser desfeita. Deseja continuar?');
+  if (!ok) return;
   if (!supabaseClient) return;
   try {
     await supabaseClient.from('offers').delete().eq('id', id);
@@ -1333,34 +1469,46 @@ async function refreshAdmin() {
     const { data: u } = await supabaseClient.from('users').select('name').eq('id', SESSION.userId).single();
     if(u) document.getElementById('adm-name').textContent=u.name;
 
-    const { count: usersCount } = await supabaseClient.from('users').select('*', { count: 'exact', head: true }).eq('type', 'cliente');
-    const { count: shopsCount } = await supabaseClient.from('users').select('*', { count: 'exact', head: true }).eq('type', 'lojista');
-    const { count: transfersCount } = await supabaseClient.from('transactions').select('*', { count: 'exact', head: true }).eq('type', 'transfer');
+    const { count: usersCount } = await supabaseClient.from('users').select('id', { count: 'exact', head: true }).eq('type', 'cliente');
+    const { count: shopsCount } = await supabaseClient.from('users').select('id', { count: 'exact', head: true }).eq('type', 'lojista');
+    const { count: transfersCount } = await supabaseClient.from('transactions').select('id', { count: 'exact', head: true }).eq('type', 'transfer');
+
+    // ✅ Melhoria: lê o caixa real da tabela project_fund
+    const { data: fund } = await supabaseClient.from('project_fund').select('amount').eq('id', 1).single();
 
     document.getElementById('adm-users').textContent = usersCount || 0;
     document.getElementById('adm-shops').textContent = shopsCount || 0;
     document.getElementById('adm-transfers').textContent = transfersCount || 0;
-    document.getElementById('adm-fund').textContent = "R$ 0,00";
+    document.getElementById('adm-fund').textContent = fmtMoney(fund?.amount || 0);
   } catch(e) { console.error('Erro refreshAdmin:', e); }
 }
 
-async function renderAdminUsers() {
+async function renderAdminUsers(btn) {
   if (!supabaseClient) return;
+  setLoading(btn, true, 'Carregando...');
   try {
-    const { data: users } = await supabaseClient.from('users').select('*');
+    // ✅ Melhoria: select sem 'pass' + limit
+    const { data: users } = await supabaseClient
+      .from('users')
+      .select('name, type, cpf, points, verified, store')
+      .limit(200);
     const cont = document.getElementById('adm-content');
     cont.innerHTML='<table><tr><th>Nome</th><th>Tipo</th><th>CPF</th><th>Pts</th><th>Verif.</th></tr>';
     (users||[]).forEach(u => {
-      cont.innerHTML+=`<tr><td>${u.name}</td><td>${u.type}${u.store?' ('+u.store+')':''}</td><td>${u.cpf}</td><td>${u.points||0}</td><td>${u.verified?'✅':'❌'}</td></tr>`;
+      cont.innerHTML+=`<tr><td>${escapeHtml(u.name)}</td><td>${escapeHtml(u.type)}${u.store?' ('+escapeHtml(u.store)+')':''}</td><td>${escapeHtml(u.cpf)}</td><td>${u.points||0}</td><td>${u.verified?'✅':'❌'}</td></tr>`;
     });
     cont.innerHTML+='</table>';
-  } catch(e) { console.error('Erro renderAdminUsers:', e); }
+  } catch(e) { console.error(e); }
+  finally { setLoading(btn, false); }
 }
 
-async function renderAdminTransactions() {
+async function renderAdminTransactions(btn) {
   if (!supabaseClient) return;
+  setLoading(btn, true, 'Carregando...');
   try {
-    const { data: txs } = await supabaseClient.from('transactions').select('*').order('created_at', {ascending:false}).limit(50);
+    const { data: txs } = await supabaseClient.from('transactions')
+      .select('type, amount, tax, points_used, created_at')
+      .order('created_at', {ascending:false}).limit(50);
     const cont = document.getElementById('adm-content');
     if(!txs || !txs.length) { cont.innerHTML='<p>Sem transações.</p>'; return; }
     cont.innerHTML='<table><tr><th>Data</th><th>Tipo</th><th>Valor</th><th>Taxa</th></tr>';
@@ -1370,15 +1518,18 @@ async function renderAdminTransactions() {
       else if(t.type==='redeem') cont.innerHTML+=`<tr><td>${d}</td><td>Resgate</td><td>-${t.points_used} pts</td><td>-</td></tr>`;
     });
     cont.innerHTML+='</table>';
-  } catch(e) { console.error('Erro renderAdminTransactions:', e); }
+  } catch(e) { console.error(e); }
+  finally { setLoading(btn, false); }
 }
 
-async function renderAdminStats() {
+async function renderAdminStats(btn) {
   if (!supabaseClient) return;
+  setLoading(btn, true, 'Carregando...');
   try {
     const { data: users } = await supabaseClient.from('users').select('points, games_played');
     const { data: redeemTx } = await supabaseClient.from('transactions').select('discount').eq('type','redeem');
     const { data: transferTx } = await supabaseClient.from('transactions').select('tax').eq('type','transfer');
+    const { data: fund } = await supabaseClient.from('project_fund').select('amount').eq('id', 1).single();
 
     const totalPts=(users||[]).reduce((s,u)=>s+(u.points||0),0);
     const totalGames=(users||[]).reduce((s,u)=>s+(u.games_played||0),0);
@@ -1391,13 +1542,32 @@ async function renderAdminStats() {
         <div class="stat"><div class="stat-val">${totalGames}</div><div class="stat-lbl">Quizes Realizados</div></div>
         <div class="stat"><div class="stat-val">${fmtMoney(totalRedeem)}</div><div class="stat-lbl">Total Resgatado</div></div>
         <div class="stat"><div class="stat-val">${totalTax}</div><div class="stat-lbl">Pontos Taxados</div></div>
-        <div class="stat"><div class="stat-val">R$ 0,00</div><div class="stat-lbl">Caixa do Projeto</div></div>
+        <div class="stat"><div class="stat-val">${fmtMoney(fund?.amount || 0)}</div><div class="stat-lbl">Caixa do Projeto</div></div>
       </div>`;
-  } catch(e) { console.error('Erro renderAdminStats:', e); }
+  } catch(e) { console.error(e); }
+  finally { setLoading(btn, false); }
 }
 
 // ==================== INIT ====================
 window.addEventListener('load', async () => {
+  // ✅ Melhoria: restaura sessão se existir
+  try {
+    const saved = sessionStorage.getItem('ql_session');
+    if (saved && supabaseClient) {
+      const parsed = JSON.parse(saved);
+      if (parsed.userId && Date.now() - parsed.ts < CFG.SESSION_TTL_MS) {
+        const { data: u } = await supabaseClient.from('users').select('id, type').eq('id', parsed.userId).maybeSingle();
+        if (u) {
+          SESSION.userId = u.id;
+          console.log('✅ Sessão restaurada.');
+          redirectToRole(u.type);
+          return;
+        }
+      }
+      clearSessionStorage();
+    }
+  } catch(e) { console.warn('Falha ao restaurar sessão:', e); }
+
   showScreen('scr-home');
   await testSupabaseConnection();
 });
