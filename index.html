@@ -6,7 +6,6 @@
 <title>QuizLocal - Economia Colaborativa</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  // Fallback CDN: se jsdelivr falhar, tenta unpkg
   if (typeof window.supabase === 'undefined') {
     var s = document.createElement('script');
     s.src = 'https://unpkg.com/@supabase/supabase-js@2';
@@ -110,6 +109,7 @@
       <p style="margin-bottom:20px;opacity:0.9;">Responda perguntas, acumule pontos e troque por descontos no comércio local.</p>
       <button class="btn" onclick="showScreen('scr-login')">🔑 Já tenho conta</button>
       <button class="btn btn-outline" onclick="showScreen('scr-register')" style="margin-top:10px;">✨ Criar nova conta</button>
+      <button class="btn btn-sm" onclick="runDiagnostics()" style="background:rgba(255,255,255,0.15);color:#fff;margin-top:15px;">🩺 Testar conexão com o banco</button>
     </div>
     <div class="info">
       <strong>📋 Como funciona:</strong><br>
@@ -349,7 +349,7 @@
       <div class="stats">
         <div class="stat"><div class="stat-val" id="adm-users">0</div><div class="stat-lbl">Usuários</div></div>
         <div class="stat"><div class="stat-val" id="adm-shops">0</div><div class="stat-lbl">Lojistas</div></div>
-        <div class="stat"><div class="stat-val" id="adm-fund">R$ 0</div><div class="stat-lbl">Caixa do Projeto</div></div>
+        <div class="stat"><div class="stat-val" id="adm-fund">0 pts</div><div class="stat-lbl" id="adm-fund-lbl">Caixa do Projeto</div></div>
         <div class="stat"><div class="stat-val" id="adm-transfers">0</div><div class="stat-lbl">Transferências</div></div>
       </div>
       <button class="btn" onclick="renderAdminUsers(this)">👥 Usuários</button>
@@ -384,7 +384,7 @@
 </div>
 
 <script>
-// ==================== CONSTANTES CENTRALIZADAS ====================
+// ==================== CONSTANTES ====================
 const CFG = {
   POINTS_PER_REAL: 1000,
   MAX_DISCOUNT_PCT: 0.10,
@@ -413,9 +413,7 @@ let supabaseClient = null;
   } catch (e) { console.error('Erro ao iniciar Supabase:', e); }
 })();
 
-// ✅ ATUALIZADO: reflete o schema real (bigint + colunas de transfer em transactions)
 const SETUP_SQL = `
--- schema real deste projeto: ids numéricos (bigint) na tabela public.users
 create table if not exists users (
   id bigserial primary key,
   type text not null default 'cliente',
@@ -431,7 +429,6 @@ create table if not exists users (
   verified boolean default true,
   created_at timestamptz default now()
 );
-
 create table if not exists transactions (
   id bigserial primary key,
   type text,
@@ -444,7 +441,6 @@ create table if not exists transactions (
   code text unique, status text,
   created_at timestamptz default now()
 );
-
 create table if not exists offers (
   id bigserial primary key,
   store_id bigint,
@@ -452,7 +448,6 @@ create table if not exists offers (
   points int, stock int,
   created_at timestamptz default now()
 );
-
 create table if not exists questions (
   id bigserial primary key,
   question text not null,
@@ -466,7 +461,6 @@ create table if not exists questions (
   active boolean default true,
   created_at timestamptz default now()
 );
-
 create table if not exists project_fund (
   id int primary key,
   amount numeric default 0,
@@ -537,8 +531,12 @@ function isValidCPF(cpf) {
   rest = (sum*10)%11; if(rest>=10) rest=0;
   return rest === parseInt(cpf[10]);
 }
-function genCode(len=6) { return Math.random().toString(36).substr(2,len).toUpperCase(); }
 function fmtMoney(v) { return 'R$ '+Number(v||0).toFixed(2); }
+// ✅ NOVO: exibe pontos + conversão em reais
+function fmtFund(pts) {
+  const p = Number(pts || 0);
+  return `${p} pts (${fmtMoney(p / CFG.POINTS_PER_REAL)})`;
+}
 function todayStr() { return new Date().toISOString().slice(0,10); }
 function monthStr() { return new Date().toISOString().slice(0,7); }
 function isEmail(s) { return /\S+@\S+\.\S+/.test(s); }
@@ -592,9 +590,7 @@ function confirmDialog(title, text) {
 // ==================== SESSÃO ====================
 function saveSession() {
   if (!SESSION.userId) return;
-  try {
-    sessionStorage.setItem('ql_session', JSON.stringify({ userId: SESSION.userId, ts: Date.now() }));
-  } catch(e) {}
+  try { sessionStorage.setItem('ql_session', JSON.stringify({ userId: SESSION.userId, ts: Date.now() })); } catch(e) {}
 }
 function clearSessionStorage() {
   try { sessionStorage.removeItem('ql_session'); } catch(e) {}
@@ -703,7 +699,6 @@ async function handleLogin(btn) {
       if (cpf.length !== 11) { toast('CPF deve ter 11 dígitos ou informe um e-mail válido.','error'); return; }
       query = query.eq('cpf', cpf);
     }
-
     const { data: user, error } = await query.maybeSingle();
     if (error) { toast('Erro na consulta: ' + error.message, 'error'); return; }
     if (!user) { toast('Usuário não encontrado!','error'); sndWrong(); return; }
@@ -723,9 +718,7 @@ async function handleLogin(btn) {
   } catch(e) {
     toast('Erro ao fazer login: ' + e.message, 'error');
     console.error(e);
-  } finally {
-    setLoading(btn, false);
-  }
+  } finally { setLoading(btn, false); }
 }
 
 // ==================== CADASTRO ====================
@@ -756,7 +749,6 @@ async function handleRegister(btn) {
       points: 0, games_played: 0, correct_answers: 0, total_redeemed: 0,
       verified: true, created_at: new Date().toISOString()
     };
-
     const { error: insertError } = await supabaseClient.from('users').insert([newUser]);
     if(insertError) { toast('Erro ao cadastrar: ' + insertError.message, 'error'); return; }
 
@@ -773,12 +765,10 @@ async function handleRegister(btn) {
   } catch(e) {
     toast('Erro ao cadastrar: ' + e.message, 'error');
     console.error(e);
-  } finally {
-    setLoading(btn, false);
-  }
+  } finally { setLoading(btn, false); }
 }
 
-// ==================== RECUPERAÇÃO DE SENHA ====================
+// ==================== RECUPERAÇÃO ====================
 async function requestPasswordReset(btn) {
   if (!supabaseClient) { toast('Configure as chaves do Supabase primeiro!', 'error'); return; }
   const loginId = document.getElementById('forgot-id').value.trim().toLowerCase();
@@ -798,18 +788,14 @@ async function requestPasswordReset(btn) {
 
     const code = String(Math.floor(100000 + Math.random() * 900000));
     SESSION.resetData = { userId: user.id, code, email: user.email, expiresAt: Date.now() + 10*60*1000 };
-
     console.log(`\n🔐 CÓDIGO DE RECUPERAÇÃO PARA ${user.email}: ${code}\n⏰ Válido por 10 minutos\n`);
 
     document.getElementById('forgot-step2').classList.remove('hidden');
     document.getElementById('forgot-code').focus();
     toast('Código gerado! Verifique o console (F12).', 'info');
     sndCorrect();
-  } catch(e) {
-    toast('Erro: ' + e.message, 'error');
-  } finally {
-    setLoading(btn, false);
-  }
+  } catch(e) { toast('Erro: ' + e.message, 'error'); }
+  finally { setLoading(btn, false); }
 }
 
 async function confirmPasswordReset(btn) {
@@ -828,17 +814,12 @@ async function confirmPasswordReset(btn) {
     const hashed = await hashPassword(newPass);
     const { error } = await supabaseClient.from('users').update({ pass: hashed }).eq('id', SESSION.resetData.userId);
     if(error) { toast('Erro: ' + error.message, 'error'); return; }
-
     SESSION.resetData = null;
-    toast('Senha redefinida!','success');
-    sndWin();
+    toast('Senha redefinida!','success'); sndWin();
     showModal('✅','Senha Atualizada!','Sua senha foi redefinida. Faça login com a nova senha.');
     setTimeout(() => { closeModal(); showScreen('scr-login'); }, 2000);
-  } catch(e) {
-    toast('Erro: ' + e.message, 'error');
-  } finally {
-    setLoading(btn, false);
-  }
+  } catch(e) { toast('Erro: ' + e.message, 'error'); }
+  finally { setLoading(btn, false); }
 }
 
 function redirectToRole(type) {
@@ -1004,9 +985,7 @@ async function startQuiz(btn) {
     document.getElementById('q-total').textContent = shuffled.length;
     showScreen('scr-quiz');
     renderQuestion();
-  } finally {
-    setLoading(btn, false);
-  }
+  } finally { setLoading(btn, false); }
 }
 
 function renderQuestion() {
@@ -1028,7 +1007,6 @@ function renderQuestion() {
     d.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); answerQ(i, d); } };
     qOptions.appendChild(d);
   });
-
   const seconds = q.d === 1 ? 10 : q.d === 2 ? 15 : 20;
   startTimer(seconds);
 }
@@ -1044,8 +1022,7 @@ function startTimer(seconds) {
     updateTimerBar();
     if (timerState.remaining <= 0) {
       clearInterval(timerInterval);
-      quiz.wrong++;
-      sndWrong();
+      quiz.wrong++; sndWrong();
       toast('⏰ Tempo esgotado!','error');
       setTimeout(nextQuestion, 1200);
     }
@@ -1065,7 +1042,6 @@ function answerQ(idx, el) {
   const q = quiz.questions[quiz.current];
   document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
   const ptsValue = q.d * 100;
-
   if(idx === q.a) {
     el.classList.add('correct');
     quiz.correct++; quiz.points += ptsValue;
@@ -1085,15 +1061,11 @@ function nextQuestion() { quiz.active = true; quiz.current++; renderQuestion(); 
 async function finishQuiz() {
   quiz.active = false;
   clearInterval(timerInterval);
-
   if (!SESSION.userId || !supabaseClient) {
     toast('Faça login para salvar pontos!', 'error');
-    showScreen('scr-home');
-    return;
+    showScreen('scr-home'); return;
   }
-
   const earnedPoints = Math.max(0, quiz.points);
-
   try {
     const { data: user } = await supabaseClient
       .from('users').select('points, games_played, correct_answers')
@@ -1111,7 +1083,6 @@ async function finishQuiz() {
   document.getElementById('res-correct').textContent = quiz.correct;
   document.getElementById('res-wrong').textContent = quiz.wrong;
   document.getElementById('res-earned').textContent = earnedPoints;
-
   const pct = quiz.correct / quiz.questions.length;
   if(pct >= 0.8) { document.getElementById('res-icon').textContent='🏆'; document.getElementById('res-title').textContent='Excelente!'; sndWin(); }
   else if(pct >= 0.5) { document.getElementById('res-icon').textContent='🥈'; document.getElementById('res-title').textContent='Muito Bem!'; sndCorrect(); }
@@ -1124,8 +1095,7 @@ async function finishQuiz() {
 async function refreshClient() {
   if(!SESSION.userId || !supabaseClient) return;
   try {
-    const { data: u } = await supabaseClient
-      .from('users')
+    const { data: u } = await supabaseClient.from('users')
       .select('name, points, games_played, total_redeemed')
       .eq('id', SESSION.userId).single();
     if(u) {
@@ -1156,16 +1126,13 @@ async function previewRedeem(btn) {
   const storeId = document.getElementById('redeem-store').value;
   const val = parseFloat(document.getElementById('redeem-value').value);
   if(!storeId || !val || val <= 0) { toast('Preencha corretamente!','error'); return; }
-
   setLoading(btn, true, 'Calculando...');
   try {
     const maxDiscount = val * CFG.MAX_DISCOUNT_PCT;
     const actualPoints = Math.ceil(maxDiscount * CFG.POINTS_PER_REAL);
-
     const { data: u } = await supabaseClient.from('users').select('points').eq('id', SESSION.userId).single();
     const saldoAtual = u?.points || 0;
     const saldoDepois = saldoAtual - actualPoints;
-
     const box = document.getElementById('redeem-preview');
     box.classList.remove('hidden');
     box.innerHTML = `
@@ -1180,11 +1147,8 @@ async function previewRedeem(btn) {
     } else {
       document.getElementById('btn-confirm-redeem').classList.remove('hidden');
     }
-  } catch(e) {
-    toast('Erro: ' + e.message, 'error');
-  } finally {
-    setLoading(btn, false);
-  }
+  } catch(e) { toast('Erro: ' + e.message, 'error'); }
+  finally { setLoading(btn, false); }
 }
 
 async function confirmRedeem(btn) {
@@ -1199,7 +1163,6 @@ async function confirmRedeem(btn) {
 
   setLoading(btn, true, 'Gerando cupom...');
   try {
-    // ✅ AJUSTE 1: força Number nos parâmetros (users.id e store_id são bigint no schema real)
     const { data, error } = await supabaseClient.rpc('redeem_discount', {
       p_user_id: Number(SESSION.userId),
       p_store_id: Number(storeId),
@@ -1213,12 +1176,8 @@ async function confirmRedeem(btn) {
     refreshClient();
     document.getElementById('redeem-preview').classList.add('hidden');
     document.getElementById('btn-confirm-redeem').classList.add('hidden');
-  } catch(e) {
-    toast('Erro ao resgatar: ' + e.message, 'error');
-    console.error(e);
-  } finally {
-    setLoading(btn, false);
-  }
+  } catch(e) { toast('Erro ao resgatar: ' + e.message, 'error'); console.error(e); }
+  finally { setLoading(btn, false); }
 }
 
 // ==================== TRANSFERÊNCIA ====================
@@ -1226,7 +1185,6 @@ async function previewTransfer(btn) {
   if (!supabaseClient || !SESSION.userId) return;
   const cpf = cleanCPF(document.getElementById('tr-cpf').value);
   const amount = parseInt(document.getElementById('tr-amount').value);
-
   if(!cpf || cpf.length!==11) { toast('CPF inválido!','error'); return; }
   if(!amount || amount < CFG.TRANSFER_MIN) { toast(`Mínimo de ${CFG.TRANSFER_MIN} pontos!`,'error'); return; }
 
@@ -1240,7 +1198,6 @@ async function previewTransfer(btn) {
       .select('amount, created_at').eq('from_user_id', SESSION.userId).eq('type', 'transfer');
     const todaySent = (txs||[]).filter(t=>t.created_at?.startsWith(today)).reduce((s,t)=>s+(t.amount||0),0);
     const monthSent = (txs||[]).filter(t=>t.created_at?.startsWith(month)).reduce((s,t)=>s+(t.amount||0),0);
-
     if(todaySent + amount > CFG.TRANSFER_DAILY_LIMIT) { toast(`Limite diário excedido (${todaySent}/${CFG.TRANSFER_DAILY_LIMIT}).`,'error'); return; }
     if(monthSent + amount > CFG.TRANSFER_MONTHLY_LIMIT) { toast(`Limite mensal excedido.`,'error'); return; }
 
@@ -1263,24 +1220,19 @@ async function previewTransfer(btn) {
     `;
     SESSION.transferData = { destId:dest.id, destName:dest.name, amount, tax, net };
     document.getElementById('btn-confirm-tr').classList.remove('hidden');
-  } catch(e) {
-    toast('Erro: ' + e.message, 'error');
-  } finally {
-    setLoading(btn, false);
-  }
+  } catch(e) { toast('Erro: ' + e.message, 'error'); }
+  finally { setLoading(btn, false); }
 }
 
 async function confirmTransfer(btn) {
   const d = SESSION.transferData;
   if(!d || !supabaseClient || !SESSION.userId) return;
-
   const ok = await confirmDialog('Confirmar Transferência',
     `Enviar ${d.amount} pontos para ${d.destName}?\n\nTaxa: ${d.tax} pts\nRecebimento líquido: ${d.net} pts`);
   if (!ok) return;
 
   setLoading(btn, true, 'Transferindo...');
   try {
-    // ✅ AJUSTE 2: força Number nos parâmetros (users.id é bigint no schema real)
     const { data, error } = await supabaseClient.rpc('transfer_points', {
       p_from_user_id: Number(SESSION.userId),
       p_to_cpf: cleanCPF(document.getElementById('tr-cpf').value),
@@ -1297,12 +1249,8 @@ async function confirmTransfer(btn) {
     document.getElementById('tr-amount').value = '';
     SESSION.transferData = null;
     refreshClient();
-  } catch(e) {
-    toast('Erro ao transferir: ' + e.message, 'error');
-    console.error(e);
-  } finally {
-    setLoading(btn, false);
-  }
+  } catch(e) { toast('Erro ao transferir: ' + e.message, 'error'); console.error(e); }
+  finally { setLoading(btn, false); }
 }
 
 // ==================== MEUS CUPONS ====================
@@ -1314,22 +1262,18 @@ async function renderCoupons() {
     const { data: coupons } = await supabaseClient
       .from('transactions')
       .select('code, discount, purchase_value, status, created_at, store_id')
-      .eq('user_id', SESSION.userId)
-      .eq('type', 'redeem')
+      .eq('user_id', SESSION.userId).eq('type', 'redeem')
       .order('created_at', { ascending: false });
-
     if (!coupons || !coupons.length) {
       cont.innerHTML = '<p style="opacity:0.6;text-align:center;padding:15px;">Você ainda não gerou nenhum cupom.</p>';
       return;
     }
-
     const storeIds = [...new Set(coupons.map(c => c.store_id).filter(Boolean))];
     let storeMap = {};
     if (storeIds.length) {
       const { data: stores } = await supabaseClient.from('users').select('id, store').in('id', storeIds);
       (stores || []).forEach(s => storeMap[s.id] = s.store);
     }
-
     cont.innerHTML = '';
     coupons.forEach(c => {
       const badge = c.status === 'validado' ? '<span class="badge-status badge-validado">✅ Usado</span>' : '<span class="badge-status badge-pendente">⏳ Pendente</span>';
@@ -1356,22 +1300,19 @@ async function renderCoupons() {
 async function refreshProfile() {
   if(!SESSION.userId || !supabaseClient) return;
   try {
-    const { data: u } = await supabaseClient
-      .from('users')
+    const { data: u } = await supabaseClient.from('users')
       .select('points, games_played, correct_answers, total_redeemed')
       .eq('id', SESSION.userId).single();
     if(!u) return;
-
     document.getElementById('prof-pts').textContent = u.points;
     document.getElementById('prof-games').textContent = u.games_played;
     document.getElementById('prof-correct').textContent = u.correct_answers;
     document.getElementById('prof-redeemed').textContent = fmtMoney(u.total_redeemed);
 
-    const { data: hist } = await supabaseClient
-      .from('transactions').select('type, points_used, amount, net, from_user_id, to_user_id, created_at')
+    const { data: hist } = await supabaseClient.from('transactions')
+      .select('type, points_used, amount, net, from_user_id, to_user_id, created_at')
       .or(`user_id.eq.${SESSION.userId},from_user_id.eq.${SESSION.userId},to_user_id.eq.${SESSION.userId}`)
       .order('created_at', { ascending: false }).limit(10);
-
     const cont = document.getElementById('prof-history');
     if(!hist || !hist.length) {
       cont.innerHTML='<p style="opacity:0.6;text-align:center;padding:15px;">Sem histórico recente.</p>';
@@ -1397,12 +1338,10 @@ async function refreshShop() {
     const { data: u } = await supabaseClient.from('users').select('store').eq('id', SESSION.userId).single();
     if(!u) return;
     document.getElementById('shop-name').textContent = u.store;
-
     const { data: redeems } = await supabaseClient.from('transactions')
       .select('user_id, discount').eq('store_id', SESSION.userId).eq('type', 'redeem');
     const clients = [...new Set((redeems||[]).map(r=>r.user_id))].length;
     const total = (redeems||[]).reduce((s,t)=>s+(t.discount||0),0);
-
     document.getElementById('shop-redeems').textContent = (redeems||[]).length;
     document.getElementById('shop-clients').textContent = clients;
     document.getElementById('shop-total').textContent = fmtMoney(total);
@@ -1415,7 +1354,6 @@ async function validateCoupon(btn) {
   const valResult = document.getElementById('val-result');
   const code = valCode.value.trim().toUpperCase();
   if(!code) { toast('Digite o código!','error'); return; }
-
   setLoading(btn, true, 'Validando...');
   try {
     const { data: t } = await supabaseClient.from('transactions')
@@ -1424,7 +1362,6 @@ async function validateCoupon(btn) {
     if(!t) { valResult.innerHTML='<div class="toast error" style="position:static;">❌ Cupom não encontrado!</div>'; sndWrong(); return; }
     if(t.store_id!==SESSION.userId) { valResult.innerHTML='<div class="toast error" style="position:static;">⚠️ Cupom de outra loja!</div>'; sndWrong(); return; }
     if(t.status==='validado') { valResult.innerHTML='<div class="toast error" style="position:static;">⚠️ Cupom já utilizado!</div>'; return; }
-
     await supabaseClient.from('transactions').update({ status: 'validado' }).eq('id', t.id);
     sndCorrect();
     valResult.innerHTML=`
@@ -1436,11 +1373,8 @@ async function validateCoupon(btn) {
       </div>`;
     valCode.value='';
     refreshShop();
-  } catch(e) {
-    toast('Erro ao validar: ' + e.message, 'error');
-  } finally {
-    setLoading(btn, false);
-  }
+  } catch(e) { toast('Erro ao validar: ' + e.message, 'error'); }
+  finally { setLoading(btn, false); }
 }
 
 async function addOffer(btn) {
@@ -1449,10 +1383,8 @@ async function addOffer(btn) {
   const description = document.getElementById('offer-desc').value.trim();
   const pts = parseInt(document.getElementById('offer-pts').value);
   const stock = parseInt(document.getElementById('offer-stock').value);
-
   if(!name||!description||!pts||!stock) { toast('Preencha tudo!','error'); return; }
   if(pts < CFG.OFFER_MIN_POINTS) { toast(`Mínimo ${CFG.OFFER_MIN_POINTS} pontos!`,'error'); return; }
-
   setLoading(btn, true, 'Salvando...');
   try {
     await supabaseClient.from('offers').insert([{
@@ -1461,11 +1393,8 @@ async function addOffer(btn) {
     sndCorrect(); toast('Oferta criada!','success');
     ['offer-name','offer-desc','offer-pts','offer-stock'].forEach(id=>document.getElementById(id).value='');
     showScreen('scr-shopkeeper');
-  } catch(e) {
-    toast('Erro ao criar oferta: ' + e.message, 'error');
-  } finally {
-    setLoading(btn, false);
-  }
+  } catch(e) { toast('Erro ao criar oferta: ' + e.message, 'error'); }
+  finally { setLoading(btn, false); }
 }
 
 async function renderShopProducts() {
@@ -1510,7 +1439,11 @@ async function refreshAdmin() {
     document.getElementById('adm-users').textContent = usersCount || 0;
     document.getElementById('adm-shops').textContent = shopsCount || 0;
     document.getElementById('adm-transfers').textContent = transfersCount || 0;
-    document.getElementById('adm-fund').textContent = fmtMoney(fund?.amount || 0);
+
+    // ✅ OPÇÃO A: exibe o valor em pontos + conversão em reais
+    const pts = Number(fund?.amount || 0);
+    document.getElementById('adm-fund').textContent = `${pts} pts`;
+    document.getElementById('adm-fund-lbl').textContent = `Caixa (${fmtMoney(pts / CFG.POINTS_PER_REAL)})`;
   } catch(e) { console.error('Erro refreshAdmin:', e); }
 }
 
@@ -1518,10 +1451,8 @@ async function renderAdminUsers(btn) {
   if (!supabaseClient) return;
   setLoading(btn, true, 'Carregando...');
   try {
-    const { data: users } = await supabaseClient
-      .from('users')
-      .select('name, type, cpf, points, verified, store')
-      .limit(200);
+    const { data: users } = await supabaseClient.from('users')
+      .select('name, type, cpf, points, verified, store').limit(200);
     const cont = document.getElementById('adm-content');
     cont.innerHTML='<table><tr><th>Nome</th><th>Tipo</th><th>CPF</th><th>Pts</th><th>Verif.</th></tr>';
     (users||[]).forEach(u => {
@@ -1565,14 +1496,16 @@ async function renderAdminStats(btn) {
     const totalGames=(users||[]).reduce((s,u)=>s+(u.games_played||0),0);
     const totalRedeem=(redeemTx||[]).reduce((s,t)=>s+(t.discount||0),0);
     const totalTax=(transferTx||[]).reduce((s,t)=>s+(t.tax||0),0);
+    const fundPts = Number(fund?.amount || 0);
 
+    // ✅ OPÇÃO A: caixa exibido em pontos + conversão em reais
     document.getElementById('adm-content').innerHTML=`
       <div class="stats">
         <div class="stat"><div class="stat-val">${totalPts}</div><div class="stat-lbl">Pontos em Circulação</div></div>
         <div class="stat"><div class="stat-val">${totalGames}</div><div class="stat-lbl">Quizes Realizados</div></div>
         <div class="stat"><div class="stat-val">${fmtMoney(totalRedeem)}</div><div class="stat-lbl">Total Resgatado</div></div>
         <div class="stat"><div class="stat-val">${totalTax}</div><div class="stat-lbl">Pontos Taxados</div></div>
-        <div class="stat"><div class="stat-val">${fmtMoney(fund?.amount || 0)}</div><div class="stat-lbl">Caixa do Projeto</div></div>
+        <div class="stat"><div class="stat-val">${fundPts} pts</div><div class="stat-lbl">Caixa (${fmtMoney(fundPts / CFG.POINTS_PER_REAL)})</div></div>
       </div>`;
   } catch(e) { console.error(e); }
   finally { setLoading(btn, false); }
@@ -1596,7 +1529,6 @@ window.addEventListener('load', async () => {
       clearSessionStorage();
     }
   } catch(e) { console.warn('Falha ao restaurar sessão:', e); }
-
   showScreen('scr-home');
   await testSupabaseConnection();
 });
