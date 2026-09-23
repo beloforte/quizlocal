@@ -111,19 +111,8 @@
   .instructions-list .il-icon { font-size:1.4em; flex-shrink:0; }
   .instructions-list .il-text { font-size:0.9em; line-height:1.4; opacity:0.9; }
   .instructions-list .il-text strong { color:var(--gold); display:block; margin-bottom:2px; }
-
-  /* Streak calendar */
   .streak-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin:15px 0; }
-  .streak-cell {
-    background:rgba(255,255,255,0.06);
-    border:1px solid rgba(255,215,0,0.2);
-    border-radius:10px;
-    padding:10px 4px;
-    text-align:center;
-    font-size:0.75em;
-    font-weight:bold;
-    transition:0.2s;
-  }
+  .streak-cell { background:rgba(255,255,255,0.06); border:1px solid rgba(255,215,0,0.2); border-radius:10px; padding:10px 4px; text-align:center; font-size:0.75em; font-weight:bold; transition:0.2s; }
   .streak-cell .sc-day { font-size:0.65em; opacity:0.7; margin-bottom:2px; }
   .streak-cell .sc-val { font-size:0.9em; color:var(--gold); }
   .streak-cell.done { background:rgba(39,174,96,0.25); border-color:var(--green); }
@@ -131,15 +120,7 @@
   .streak-cell.today { background:linear-gradient(135deg,rgba(255,215,0,0.3),rgba(255,140,0,0.15)); border-color:var(--gold); box-shadow:0 0 12px rgba(255,215,0,0.4); }
   .streak-cell.bonus { background:linear-gradient(135deg,rgba(255,140,0,0.25),rgba(255,215,0,0.1)); border-color:#ff8c00; }
   .streak-cell.bonus .sc-val::before { content:'🎁 '; }
-
-  /* Daily offers */
-  .daily-offer {
-    background:rgba(255,255,255,0.06);
-    border:1px solid rgba(255,215,0,0.25);
-    border-radius:12px;
-    padding:15px;
-    margin:10px 0;
-  }
+  .daily-offer { background:rgba(255,255,255,0.06); border:1px solid rgba(255,215,0,0.25); border-radius:12px; padding:15px; margin:10px 0; }
   .daily-offer.featured { border-color:#ff8c00; background:linear-gradient(135deg,rgba(255,140,0,0.12),rgba(255,215,0,0.04)); }
   .daily-offer .do-head { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px; gap:8px; }
   .daily-offer h4 { color:var(--gold); font-size:1em; margin-bottom:4px; }
@@ -153,6 +134,39 @@
   .view-btn:disabled { opacity:0.4; cursor:not-allowed; }
   .view-btn.credited { background:rgba(39,174,96,0.4); color:#fff; }
   .view-timer { font-size:0.75em; opacity:0.7; margin-top:4px; }
+  /* Transações ricas */
+  .tx-header-info { background: linear-gradient(135deg, rgba(52,152,219,0.15), rgba(155,48,255,0.08)); border-left: 3px solid #3498db; padding: 14px; border-radius: 8px; margin-bottom: 15px; font-size: 0.9em; line-height: 1.5; }
+  .tx-summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; margin: 15px 0; }
+  .tx-summary-card { background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03)); border: 1px solid rgba(255,215,0,0.25); border-radius: 12px; padding: 14px 10px; text-align: center; }
+  .tx-summary-card.redeem { border-color: rgba(39,174,96,0.4); }
+  .tx-summary-card.transfer { border-color: rgba(155,48,255,0.4); }
+  .tx-summary-card .tss-icon { font-size: 1.5em; margin-bottom: 4px; }
+  .tx-summary-card .tss-val { font-size: 1.3em; color: var(--gold); font-weight: bold; }
+  .tx-summary-card .tss-lbl { font-size: 0.7em; opacity: 0.85; margin-top: 2px; line-height: 1.2; }
+  .tx-tabs { display: flex; gap: 6px; margin: 15px 0 10px; }
+  .tx-tabs .tab { flex: 1; }
+  .tx-group-label { color: var(--gold); font-size: 0.8em; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; opacity: 0.85; margin: 18px 0 8px; display: flex; align-items: center; gap: 10px; }
+  .tx-group-label::after { content: ''; flex: 1; height: 1px; background: rgba(255,215,0,0.2); }
+  .tx-item { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,215,0,0.15); border-left: 4px solid rgba(255,215,0,0.4); border-radius: 10px; padding: 14px; margin: 8px 0; transition: 0.2s; }
+  .tx-item:hover { background: rgba(255,255,255,0.08); transform: translateX(2px); }
+  .tx-item.redeem { border-left-color: #27ae60; }
+  .tx-item.transfer { border-left-color: #9b30ff; }
+  .tx-item-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 6px; }
+  .tx-type-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 12px; font-size: 0.75em; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
+  .tx-type-badge.redeem { background: rgba(39,174,96,0.25); color: #7dffa8; }
+  .tx-type-badge.transfer { background: rgba(155,48,255,0.25); color: #d4b3ff; }
+  .tx-time { font-size: 0.75em; opacity: 0.65; font-style: italic; }
+  .tx-body { display: grid; gap: 6px; font-size: 0.9em; }
+  .tx-line { display: flex; justify-content: space-between; gap: 10px; padding: 3px 0; }
+  .tx-line .tx-lbl { opacity: 0.75; font-size: 0.9em; }
+  .tx-line .tx-val { font-weight: 600; text-align: right; }
+  .tx-code { font-family: monospace; background: rgba(0,0,0,0.25); padding: 3px 10px; border-radius: 6px; font-size: 0.85em; color: var(--gold); user-select: text; letter-spacing: 1px; }
+  .tx-item-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 8px; border-top: 1px dashed rgba(255,215,0,0.15); }
+  .tx-empty { text-align: center; padding: 30px 15px; opacity: 0.6; }
+  .tx-empty .te-icon { font-size: 2.5em; margin-bottom: 8px; }
+  .tx-export-bar { display: flex; justify-content: flex-end; margin: 8px 0 4px; }
+  .btn-export { background: rgba(39,174,96,0.25); border: 1px solid var(--green); color: #7dffa8; padding: 8px 16px; border-radius: 20px; font-size: 0.85em; font-weight: bold; cursor: pointer; }
+  .btn-export:active { transform: scale(0.97); }
 </style>
 </head>
 <body>
@@ -252,7 +266,6 @@
   <!-- CLIENT DASHBOARD -->
   <div id="scr-client" class="screen">
     <div class="topbar"><span>👤 <strong id="cli-name"></strong></span><span class="pts-badge">⭐ <span id="cli-pts">0</span> pts</span><button class="back-btn" onclick="logout()" style="margin:0;">Sair</button></div>
-
     <div class="card">
       <div class="stats">
         <div class="stat"><div class="stat-val" id="cli-balance">R$ 0</div><div class="stat-lbl">Saldo em Reais</div></div>
@@ -266,14 +279,12 @@
       <button class="btn btn-sm" onclick="showScreen('scr-coupons')" style="background:rgba(255,255,255,0.15);color:#fff;">🎟️ Meus Cupons</button>
       <button class="btn btn-sm" onclick="showScreen('scr-profile')" style="background:rgba(255,255,255,0.15);color:#fff;">👤 Meu Perfil</button>
     </div>
-    <div class="info"><strong>💡 Dica:</strong> Faça check-in todo dia em Ofertas do Dia para bônus de sequência. Transfira pontos para amigos (taxa de 20%).</div>
+    <div class="info"><strong>💡 Dica:</strong> Faça check-in todo dia em Ofertas do Dia para bônus de sequência.</div>
   </div>
 
-  <!-- OFERTAS DO DIA (NOVA — Bloco A) -->
+  <!-- OFERTAS DO DIA -->
   <div id="scr-daily-offers" class="screen">
     <button class="back-btn" onclick="showScreen('scr-client')">← Voltar</button>
-
-    <!-- Check-in -->
     <div class="card" style="text-align:center;">
       <h2 style="color:var(--gold);margin-bottom:5px;">🎁 Check-in Diário</h2>
       <p style="font-size:0.85em;opacity:0.75;margin-bottom:10px;">Volte todo dia e ganhe bônus crescente</p>
@@ -281,8 +292,6 @@
       <button class="btn btn-green" id="btn-checkin" onclick="doCheckin(this)">Fazer Check-in Hoje</button>
       <p style="font-size:0.8em;opacity:0.7;margin-top:8px;" id="checkin-status"></p>
     </div>
-
-    <!-- Ofertas do dia -->
     <div class="card">
       <h2 style="color:var(--gold);margin-bottom:5px;">🔥 Ofertas do Dia</h2>
       <p style="font-size:0.85em;opacity:0.75;margin-bottom:10px;">
@@ -303,10 +312,10 @@
       <p style="text-align:center;opacity:0.8;font-size:0.9em;margin-bottom:15px;">Leia antes de começar. Boa sorte!</p>
       <ul class="instructions-list">
         <li><span class="il-icon">✅</span><div class="il-text"><strong>Acertos valem pontos</strong>Fácil = 100 · média = 200 · difícil = 300 pts.</div></li>
-        <li><span class="il-icon">📊</span><div class="il-text"><strong>Progressão de dificuldade</strong>Começa com 4 fáceis, depois 3 médias, depois 3 difíceis.</div></li>
-        <li><span class="il-icon">⏱️</span><div class="il-text"><strong>Tempo por pergunta</strong>15s · 20s · 30s (conforme dificuldade).</div></li>
+        <li><span class="il-icon">📊</span><div class="il-text"><strong>Progressão de dificuldade</strong>4 fáceis, 3 médias, 3 difíceis.</div></li>
+        <li><span class="il-icon">⏱️</span><div class="il-text"><strong>Tempo por pergunta</strong>15s · 20s · 30s.</div></li>
         <li><span class="il-icon">✂️</span><div class="il-text"><strong>Ajudas (1 uso cada)</strong>50/50 · Pular · Parar.</div></li>
-        <li><span class="il-icon">🏆</span><div class="il-text"><strong>Ao final</strong>Total de acertos, pontos e saldo para resgatar.</div></li>
+        <li><span class="il-icon">🏆</span><div class="il-text"><strong>Ao final</strong>Total de acertos, pontos e saldo.</div></li>
       </ul>
       <button class="btn" onclick="beginQuiz(this)">▶️ Começar Quiz</button>
       <button class="btn btn-outline" onclick="showScreen('scr-client')" style="margin-top:10px;">Agora não</button>
@@ -443,7 +452,7 @@
       <label>Estoque Disponível:</label><input type="number" id="offer-stock" placeholder="Ex: 20" min="1">
       <label style="display:flex;align-items:center;gap:8px;margin-top:15px;cursor:pointer;">
         <input type="checkbox" id="offer-featured" style="width:auto;margin:0;transform:scale(1.3);">
-        <span>🔥 Destacar como Oferta do Dia (aparece em destaque na home)</span>
+        <span>🔥 Destacar como Oferta do Dia</span>
       </label>
       <button class="btn btn-green" onclick="addOffer(this)">Cadastrar Oferta</button>
     </div>
@@ -464,14 +473,12 @@
     <div class="card">
       <h2 style="color:var(--gold);text-align:center;margin-bottom:5px;">Painel Administrativo</h2>
       <p style="text-align:center;opacity:0.7;font-size:0.85em;">Gestão de usuários, transações e impacto</p>
-
       <div class="stats">
         <div class="stat"><div class="stat-val" id="adm-users">0</div><div class="stat-lbl">Clientes</div></div>
         <div class="stat"><div class="stat-val" id="adm-shops">0</div><div class="stat-lbl">Lojistas</div></div>
         <div class="stat"><div class="stat-val" id="adm-fund">0 pts</div><div class="stat-lbl" id="adm-fund-lbl">Caixa do Projeto</div></div>
         <div class="stat"><div class="stat-val" id="adm-transfers">0</div><div class="stat-lbl">Transferências</div></div>
       </div>
-
       <h3 style="color:var(--gold);margin-top:15px;margin-bottom:5px;">👥 Usuários</h3>
       <div class="tab-bar" id="adm-tabs">
         <button class="tab active" data-filter="todos" onclick="filterAdminUsers('todos', this)">Todos</button>
@@ -480,7 +487,6 @@
         <button class="tab" data-filter="admin" onclick="filterAdminUsers('admin', this)">👑 Admins</button>
       </div>
       <div id="adm-users-content"></div>
-
       <h3 style="color:var(--gold);margin-top:20px;margin-bottom:5px;">📊 Gestão & Impacto</h3>
       <button class="btn btn-purple" onclick="renderAdminTransactions(this)">💳 Transações</button>
       <button class="btn btn-green" onclick="renderImpactReport(this)">🌍 Relatório de Impacto Local</button>
@@ -527,13 +533,7 @@ const CFG = {
   SESSION_TTL_MS: 24 * 3600 * 1000,
   DIFFICULTY_DISTRIBUTION: { 1: 4, 2: 3, 3: 3 },
   TIME_BY_DIFFICULTY: { 1: 15, 2: 20, 3: 30 },
-  // Bloco A — recompensas
-  REWARDS: {
-    CHECKIN: 50,
-    FOLLOW: 50,
-    VIEW_OFFER: 10,
-    VIEW_OFFER_DAILY_CAP: 50
-  }
+  REWARDS: { CHECKIN: 50, FOLLOW: 50, VIEW_OFFER: 10, VIEW_OFFER_DAILY_CAP: 50 }
 };
 
 const SUPABASE_URL = 'https://klzjcpogqsasfigyxgxp.supabase.co';
@@ -549,7 +549,7 @@ let supabaseClient = null;
 })();
 
 let SESSION = { userId: null, user: null, resetData: null, transferData: null };
-let DAILY = null; // cache do get_daily_summary
+let DAILY = null;
 
 // ==================== SONS ====================
 let actx = null;
@@ -605,6 +605,10 @@ function fmtMoney(v) { return 'R$ '+Number(v||0).toFixed(2); }
 function todayStr() { return new Date().toISOString().slice(0,10); }
 function monthStr() { return new Date().toISOString().slice(0,7); }
 function isEmail(s) { return /\S+@\S+\.\S+/.test(s); }
+function fmtDateTimeBR(iso) {
+  const d = new Date(iso);
+  return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+}
 
 async function hashPassword(pass) {
   try {
@@ -618,7 +622,6 @@ async function verifyPassword(input, stored) {
   if (stored.startsWith('sha256:')) return (await hashPassword(input)) === stored;
   return input === stored;
 }
-
 function setLoading(btn, isLoading, customText) {
   if (!btn) return;
   if (isLoading) {
@@ -630,7 +633,6 @@ function setLoading(btn, isLoading, customText) {
     if (btn.dataset.origText) btn.innerHTML = btn.dataset.origText;
   }
 }
-
 function confirmDialog(title, text) {
   return new Promise(resolve => {
     const modal = document.getElementById('modal-confirm');
@@ -646,7 +648,6 @@ function confirmDialog(title, text) {
     no.addEventListener('click', onNo);
   });
 }
-
 function saveSession() {
   if (!SESSION.userId) return;
   try { sessionStorage.setItem('ql_session', JSON.stringify({ userId: SESSION.userId, ts: Date.now() })); } catch(e) {}
@@ -678,7 +679,6 @@ function showScreen(id) {
     });
   }
 }
-
 function toast(msg, type='info') {
   const t = document.createElement('div');
   t.className = 'toast '+type;
@@ -686,7 +686,6 @@ function toast(msg, type='info') {
   document.body.appendChild(t);
   setTimeout(() => { if(t.parentNode) t.remove(); }, 3500);
 }
-
 function showModal(icon, title, text) {
   document.getElementById('m-icon').textContent = icon;
   document.getElementById('m-title').textContent = title;
@@ -720,7 +719,6 @@ async function runDiagnostics() {
   else toast('✅ Banco OK!', 'success');
   console.groupEnd();
 }
-
 async function testSupabaseConnection() {
   if (!supabaseClient) return;
   try {
@@ -736,7 +734,6 @@ async function handleLogin(btn) {
   const loginId = document.getElementById('login-id').value.trim().toLowerCase();
   const pass = document.getElementById('login-pass').value;
   if(!loginId || !pass) { toast('Preencha email/CPF e senha!','error'); return; }
-
   setLoading(btn, true, 'Entrando...');
   try {
     let query = supabaseClient.from('users').select('id,type,name,cpf,email,pass,store,points,games_played,correct_answers,total_redeemed,verified');
@@ -750,11 +747,9 @@ async function handleLogin(btn) {
     if (error) { toast('Erro: ' + error.message, 'error'); return; }
     if (!user) { toast('Usuário não encontrado!','error'); sndWrong(); return; }
     if (!(await verifyPassword(pass, user.pass))) { toast('Senha incorreta!','error'); sndWrong(); return; }
-
     if (!user.pass.startsWith('sha256:')) {
       try { await supabaseClient.from('users').update({ pass: await hashPassword(pass) }).eq('id', user.id); } catch(e) {}
     }
-
     SESSION.userId = user.id;
     SESSION.user = user;
     saveSession();
@@ -774,18 +769,15 @@ async function handleRegister(btn) {
   const pass = document.getElementById('reg-pass').value;
   const type = document.getElementById('reg-type').value;
   const store = (document.getElementById('reg-store')?.value || '').trim();
-
   if(!name||!cpf||!email||!pass) { toast('Preencha todos os campos!','error'); return; }
   if(!isValidCPF(cpf)) { toast('CPF inválido!','error'); return; }
   if(type==='lojista' && !store) { toast('Informe o nome do estabelecimento!','error'); return; }
   if(pass.length < 4) { toast('Senha deve ter ao menos 4 caracteres.','error'); return; }
-
   setLoading(btn, true, 'Cadastrando...');
   try {
     const { data: byEmail } = await supabaseClient.from('users').select('id').eq('email', email).maybeSingle();
     const { data: byCpf } = await supabaseClient.from('users').select('id').eq('cpf', cpf).maybeSingle();
     if (byEmail || byCpf) { toast('CPF ou Email já cadastrado!','error'); return; }
-
     const newUser = {
       type, name, cpf, email,
       pass: await hashPassword(pass),
@@ -795,7 +787,6 @@ async function handleRegister(btn) {
     };
     const { error: insertError } = await supabaseClient.from('users').insert([newUser]);
     if(insertError) { toast('Erro: ' + insertError.message, 'error'); return; }
-
     toast('Conta criada! Faça login.','success');
     sndCorrect();
     ['reg-name','reg-cpf','reg-email','reg-pass','reg-store'].forEach(id => {
@@ -832,7 +823,6 @@ async function requestPasswordReset(btn) {
   } catch(e) { toast('Erro: ' + e.message, 'error'); }
   finally { setLoading(btn, false); }
 }
-
 async function confirmPasswordReset(btn) {
   if (!supabaseClient || !SESSION.resetData) { toast('Solicite um novo código!','error'); return; }
   const code = document.getElementById('forgot-code').value.trim();
@@ -854,13 +844,11 @@ async function confirmPasswordReset(btn) {
   } catch(e) { toast('Erro: ' + e.message, 'error'); }
   finally { setLoading(btn, false); }
 }
-
 function redirectToRole(type) {
   if(type==='cliente') showScreen('scr-client');
   else if(type==='lojista') showScreen('scr-shopkeeper');
   else if(type==='admin') showScreen('scr-admin');
 }
-
 function logout() {
   SESSION = { userId:null, user:null, resetData:null, transferData:null };
   DAILY = null;
@@ -961,7 +949,7 @@ async function loadQuestionsFromDB() {
     const { data, error } = await supabaseClient.from('questions')
       .select('id, question, option_a, option_b, option_c, option_d, correct_answer, category, difficulty')
       .eq('active', true);
-    if (error) { console.warn('Erro questions:', error.message); return null; }
+    if (error) return null;
     if (!data || data.length < CFG.MIN_DB_QUESTIONS) return null;
     const valid = data.map(normalizeQuestion).filter(Boolean);
     if (valid.length < CFG.MIN_DB_QUESTIONS) return null;
@@ -1004,7 +992,6 @@ function pickQuestionsByDifficulty(pool, total) {
 let quiz = {};
 let timerInterval = null;
 let timerState = { seconds: 0, remaining: 0, paused: false };
-
 document.addEventListener('visibilitychange', () => {
   if (!quiz.active) return;
   if (document.hidden) {
@@ -1016,12 +1003,11 @@ document.addEventListener('visibilitychange', () => {
     document.getElementById('timer-bar')?.classList.remove('paused');
   }
 });
-
 async function startQuiz(btn) {
   setLoading(btn, true, 'Carregando perguntas...');
   try {
     let pool = await loadQuestionsFromDB();
-    if (!pool) { console.warn('⚠️ Usando banco local (fallback).'); pool = [...QUESTIONS]; }
+    if (!pool) { console.warn('⚠️ Usando banco local.'); pool = [...QUESTIONS]; }
     const selected = pickQuestionsByDifficulty(pool, CFG.QUIZ_QUESTIONS_PER_ROUND);
     quiz = { questions: selected, current:0, correct:0, wrong:0, points:0, active:false, caughtCheating:false,
              helpers: { fifty: true, skip: true, stop: true } };
@@ -1142,7 +1128,6 @@ function answerQ(idx, el) {
   setTimeout(nextQuestion, 1600);
 }
 function nextQuestion() { quiz.active = true; quiz.current++; renderQuestion(); }
-
 async function finishQuiz() {
   quiz.active = false;
   clearInterval(timerInterval);
@@ -1170,7 +1155,7 @@ async function finishQuiz() {
   showScreen('scr-result');
 }
 
-// ==================== OFERTAS DO DIA (Bloco A) ====================
+// ==================== OFERTAS DO DIA ====================
 async function loadDailyOffers() {
   if (!SESSION.userId || !supabaseClient) return;
   const cont = document.getElementById('daily-offers-list');
@@ -1181,7 +1166,6 @@ async function loadDailyOffers() {
     DAILY = data || { checked_today:false, streak:0, views_pts_today:0, views_cap:50, offers:[], followed:[] };
     renderStreakCalendar(DAILY);
     renderDailyOffersList(DAILY);
-    // Estado do botão de check-in
     const btn = document.getElementById('btn-checkin');
     const status = document.getElementById('checkin-status');
     if (DAILY.checked_today) {
@@ -1198,58 +1182,48 @@ async function loadDailyOffers() {
       status.textContent = DAILY.streak > 0 ? `Sequência atual: ${DAILY.streak} dia(s)` : 'Comece sua sequência hoje!';
     }
   } catch(e) {
-    console.error('Erro loadDailyOffers:', e);
+    console.error(e);
     cont.innerHTML = '<p style="color:var(--red);padding:15px;">Erro ao carregar.</p>';
   }
 }
-
 function renderStreakCalendar(daily) {
   const el = document.getElementById('streak-calendar');
   if (!el) return;
-  // Mostra 7 dias: 6 anteriores + hoje
   const today = new Date();
   const cells = [];
   const currentStreak = daily.streak || 0;
-
   for (let i = 6; i >= 0; i--) {
     const d = new Date(today);
     d.setDate(d.getDate() - i);
     const isToday = i === 0;
-    // Dias dentro do streak atual (contando para trás a partir de hoje)
     const isDone = i < currentStreak;
-    const dayNumber = 7 - i; // 1..7
+    const dayNumber = 7 - i;
     const isBonusDay = (dayNumber % 7 === 0) || (dayNumber % 3 === 0);
     const dayLabel = isToday ? 'Hoje' : `Dia ${dayNumber}`;
     let pts = CFG.REWARDS.CHECKIN;
     if (dayNumber % 7 === 0) pts = 200;
     else if (dayNumber % 3 === 0) pts = 100;
-
     let cls = 'streak-cell';
     if (isDone && !isToday) cls += ' done';
     if (isToday) cls += ' today';
     if (isBonusDay) cls += ' bonus';
-
     const val = isDone ? `✓ ${pts}` : `${pts}`;
     cells.push(`<div class="${cls}"><div class="sc-day">${dayLabel}</div><div class="sc-val">${val}</div></div>`);
   }
   el.innerHTML = cells.join('');
 }
-
 function renderDailyOffersList(daily) {
   const cont = document.getElementById('daily-offers-list');
   const ptsInfo = document.getElementById('views-pts-today');
   if (ptsInfo) ptsInfo.textContent = `${daily.views_pts_today || 0}/${daily.views_cap || 50} pts`;
-
   if (!daily.offers || !daily.offers.length) {
     cont.innerHTML = '<p style="opacity:0.6;text-align:center;padding:15px;">Nenhuma oferta em destaque hoje. Volte amanhã!</p>';
     return;
   }
-
   const followedSet = new Set((daily.followed || []).map(Number));
   const cap = daily.views_cap || 50;
   const viewsToday = daily.views_pts_today || 0;
   const capReached = viewsToday >= cap;
-
   cont.innerHTML = daily.offers.map(o => {
     const isFollowing = followedSet.has(Number(o.store_id));
     const followBtn = isFollowing
@@ -1257,7 +1231,7 @@ function renderDailyOffersList(daily) {
       : `<button class="follow-btn" onclick="followStore(${Number(o.store_id)}, this)">+ Seguir loja (+50 pts)</button>`;
     const viewBtn = capReached
       ? `<button class="view-btn" disabled>Limite diário atingido</button>`
-      : `<button class="view-btn" onclick="viewOffer(${Number(o.id)}, this)" data-offer-id="${Number(o.id)}">Ver oferta (+10 pts)</button>`;
+      : `<button class="view-btn" onclick="viewOffer(${Number(o.id)}, this)">Ver oferta (+10 pts)</button>`;
     return `
       <div class="daily-offer featured">
         <div class="do-head">
@@ -1276,7 +1250,6 @@ function renderDailyOffersList(daily) {
       </div>`;
   }).join('');
 }
-
 async function doCheckin(btn) {
   if (!SESSION.userId || !supabaseClient) return;
   setLoading(btn, true, 'Fazendo check-in...');
@@ -1284,29 +1257,24 @@ async function doCheckin(btn) {
     const { data, error } = await supabaseClient.rpc('daily_checkin', { p_user_id: Number(SESSION.userId) });
     if (error) { toast('Erro: ' + error.message, 'error'); return; }
     if (data?.error) { toast(data.error, 'error'); return; }
-
     sndWin();
     const bonusMsg = data.bonus > 0 ? ` (+${data.bonus} pts de bônus! 🎁)` : '';
     showModal('🎁', 'Check-in feito!', `+${data.points} pontos${bonusMsg}\n\nSequência: ${data.streak} dia(s)`);
-    // Recarrega os dados
     await loadDailyOffers();
     refreshClient();
   } catch(e) { toast('Erro: ' + e.message, 'error'); }
   finally { setLoading(btn, false); }
 }
-
 async function followStore(storeId, btn) {
   if (!SESSION.userId || !supabaseClient) return;
   btn.disabled = true;
   btn.textContent = 'Seguindo...';
   try {
     const { data, error } = await supabaseClient.rpc('follow_store', {
-      p_user_id: Number(SESSION.userId),
-      p_store_id: Number(storeId)
+      p_user_id: Number(SESSION.userId), p_store_id: Number(storeId)
     });
     if (error) { toast('Erro: ' + error.message, 'error'); btn.disabled = false; btn.textContent = '+ Seguir loja'; return; }
     if (data?.error) { toast(data.error, 'error'); btn.disabled = false; btn.textContent = '+ Seguir loja'; return; }
-
     sndCorrect();
     toast(`+${data.points} pts por seguir a loja!`, 'success');
     btn.classList.add('following');
@@ -1315,48 +1283,36 @@ async function followStore(storeId, btn) {
     refreshClient();
   } catch(e) { toast('Erro: ' + e.message, 'error'); btn.disabled = false; btn.textContent = '+ Seguir loja'; }
 }
-
 function viewOffer(offerId, btn) {
   if (!SESSION.userId || !supabaseClient) return;
-  // Timer de 3s antes de creditar
   btn.disabled = true;
   const timerEl = document.getElementById(`view-timer-${offerId}`);
   if (timerEl) timerEl.classList.remove('hidden');
-
   let remaining = 3;
-  const update = () => {
-    if (timerEl) timerEl.textContent = `⏳ Aguarde ${remaining}s para confirmar a leitura...`;
-  };
+  const update = () => { if (timerEl) timerEl.textContent = `⏳ Aguarde ${remaining}s para confirmar a leitura...`; };
   update();
-
   const interval = setInterval(() => {
     remaining--;
     if (remaining <= 0) {
       clearInterval(interval);
       if (timerEl) timerEl.textContent = '✓ Pronto!';
       creditViewOffer(offerId, btn, timerEl);
-    } else {
-      update();
-    }
+    } else update();
   }, 1000);
 }
-
 async function creditViewOffer(offerId, btn, timerEl) {
   try {
     const { data, error } = await supabaseClient.rpc('view_offer', {
-      p_user_id: Number(SESSION.userId),
-      p_offer_id: Number(offerId)
+      p_user_id: Number(SESSION.userId), p_offer_id: Number(offerId)
     });
     if (error) { toast('Erro: ' + error.message, 'error'); btn.disabled = false; btn.textContent = 'Ver oferta (+10 pts)'; if (timerEl) timerEl.classList.add('hidden'); return; }
     if (data?.error) { toast(data.error, 'error'); btn.disabled = true; btn.textContent = 'Já vista hoje'; if (timerEl) timerEl.textContent = data.error; return; }
-
     sndCorrect();
     toast(`+${data.points} pts!`, 'success');
     btn.classList.add('credited');
     btn.textContent = `✓ +${data.points} pts`;
     if (timerEl) timerEl.textContent = `✓ Você ganhou ${data.points} pts por visualizar`;
     refreshClient();
-    // Atualiza contador do topo
     if (DAILY) {
       DAILY.views_pts_today = (DAILY.views_pts_today || 0) + data.points;
       const el = document.getElementById('views-pts-today');
@@ -1431,9 +1387,7 @@ async function confirmRedeem(btn) {
   setLoading(btn, true, 'Gerando cupom...');
   try {
     const { data, error } = await supabaseClient.rpc('redeem_discount', {
-      p_user_id: Number(SESSION.userId),
-      p_store_id: Number(storeId),
-      p_purchase_value: Number(val)
+      p_user_id: Number(SESSION.userId), p_store_id: Number(storeId), p_purchase_value: Number(val)
     });
     if (error) { toast('Erro: ' + error.message, 'error'); return; }
     if (data?.error) { toast(data.error, 'error'); return; }
@@ -1539,9 +1493,7 @@ async function renderCoupons() {
             ${badge}
           </div>
           <div class="code">${escapeHtml(c.code)}</div>
-          <div style="font-size:0.85em;opacity:0.8;">
-            Desconto: ${fmtMoney(c.discount)} · Compra: ${fmtMoney(c.purchase_value)} · ${dt}
-          </div>
+          <div style="font-size:0.85em;opacity:0.8;">Desconto: ${fmtMoney(c.discount)} · Compra: ${fmtMoney(c.purchase_value)} · ${dt}</div>
         </div>`;
     });
   } catch(e) { console.error(e); cont.innerHTML = '<p style="color:var(--red);padding:15px;">Erro.</p>'; }
@@ -1624,8 +1576,7 @@ async function addOffer(btn) {
   setLoading(btn, true, 'Salvando...');
   try {
     await supabaseClient.from('offers').insert([{
-      name, description, category, points:pts, stock,
-      is_featured: isFeatured,
+      name, description, category, points:pts, stock, is_featured: isFeatured,
       store_id:SESSION.userId, created_at:new Date().toISOString()
     }]);
     sndCorrect(); toast('Oferta criada!','success');
@@ -1640,8 +1591,7 @@ async function renderShopProducts() {
   if (!supabaseClient || !SESSION.userId) return;
   try {
     const { data: list } = await supabaseClient.from('offers')
-      .select('id, name, description, category, points, stock, is_featured')
-      .eq('store_id', SESSION.userId);
+      .select('id, name, description, category, points, stock, is_featured').eq('store_id', SESSION.userId);
     const cont = document.getElementById('shop-prod-list');
     if(!list || !list.length) { cont.innerHTML='<p style="opacity:0.6;text-align:center;padding:15px;">Nenhuma oferta cadastrada.</p>'; return; }
     const grouped = {};
@@ -1676,7 +1626,6 @@ async function deleteOffer(id) {
 
 // ==================== ADMIN ====================
 let adminUserFilter = 'todos';
-
 async function refreshAdmin() {
   if (!supabaseClient || !SESSION.userId) return;
   try {
@@ -1719,23 +1668,265 @@ async function filterAdminUsers(filter, btnEl, silent = false) {
     cont.innerHTML = html;
   } catch(e) { console.error(e); }
 }
+
+// ==================== TRANSAÇÕES RICAS ====================
+let adminTxFilter = 'todas';
+let adminTxCache = null;
+
 async function renderAdminTransactions(btn) {
   if (!supabaseClient) return;
   setLoading(btn, true, 'Carregando...');
   try {
-    const { data: txs } = await supabaseClient.from('transactions').select('type, amount, tax, points_used, discount, created_at').order('created_at', {ascending:false}).limit(50);
-    const cont = document.getElementById('adm-content');
-    if(!txs || !txs.length) { cont.innerHTML='<p style="padding:15px;">Sem transações.</p>'; return; }
-    cont.innerHTML='<table><tr><th>Data</th><th>Tipo</th><th>Valor</th></tr>';
-    txs.forEach(t => {
-      const d=new Date(t.created_at).toLocaleDateString('pt-BR');
-      if(t.type==='transfer') cont.innerHTML+=`<tr><td>${d}</td><td>💸 Transfer</td><td>${t.amount} pts (taxa ${t.tax})</td></tr>`;
-      else if(t.type==='redeem') cont.innerHTML+=`<tr><td>${d}</td><td>🏷️ Resgate</td><td>-${t.points_used} pts · ${fmtMoney(t.discount)}</td></tr>`;
+    const { data: txs, error } = await supabaseClient
+      .from('transactions')
+      .select('id, type, user_id, store_id, from_user_id, to_user_id, amount, tax, net, discount, points_used, purchase_value, code, status, created_at')
+      .order('created_at', { ascending: false })
+      .limit(200);
+
+    if (error) {
+      document.getElementById('adm-content').innerHTML =
+        `<p style="color:var(--red);padding:15px;">Erro: ${escapeHtml(error.message)}</p>`;
+      return;
+    }
+
+    const allIds = new Set();
+    (txs || []).forEach(t => {
+      [t.user_id, t.store_id, t.from_user_id, t.to_user_id].forEach(id => { if (id) allIds.add(id); });
     });
-    cont.innerHTML+='</table>';
-  } catch(e) { console.error(e); }
-  finally { setLoading(btn, false); }
+
+    let people = {};
+    if (allIds.size > 0) {
+      const { data: ppl } = await supabaseClient
+        .from('users').select('id, name, store, type').in('id', [...allIds]);
+      (ppl || []).forEach(p => { people[p.id] = p; });
+    }
+
+    adminTxCache = { txs: txs || [], people };
+    adminTxFilter = 'todas';
+    renderAdminTxContent();
+  } catch(e) {
+    console.error(e);
+    document.getElementById('adm-content').innerHTML =
+      `<p style="color:var(--red);padding:15px;">Erro: ${escapeHtml(e.message)}</p>`;
+  } finally { setLoading(btn, false); }
 }
+
+function filterAdminTx(filter) {
+  adminTxFilter = filter;
+  sndClick();
+  renderAdminTxContent();
+}
+
+function renderAdminTxContent() {
+  const cont = document.getElementById('adm-content');
+  if (!adminTxCache) { cont.innerHTML = '<p style="padding:15px;">Sem dados.</p>'; return; }
+  const { txs, people } = adminTxCache;
+  const filtered = adminTxFilter === 'todas' ? txs : txs.filter(t => t.type === adminTxFilter);
+
+  const totalRedeems = txs.filter(t => t.type === 'redeem').length;
+  const totalTransfers = txs.filter(t => t.type === 'transfer').length;
+  const totalPoints = txs.reduce((s, t) => {
+    if (t.type === 'redeem') return s + (t.points_used || 0);
+    if (t.type === 'transfer') return s + (t.amount || 0);
+    return s;
+  }, 0);
+  const totalDiscount = txs.filter(t => t.type === 'redeem')
+    .reduce((s, t) => s + Number(t.discount || 0), 0);
+
+  const groups = {};
+  filtered.forEach(t => {
+    const d = new Date(t.created_at);
+    const today = new Date(); today.setHours(0,0,0,0);
+    const yesterday = new Date(today); yesterday.setDate(yesterday.getDate() - 1);
+    const tDay = new Date(d); tDay.setHours(0,0,0,0);
+    let label;
+    if (tDay.getTime() === today.getTime()) label = '📅 Hoje';
+    else if (tDay.getTime() === yesterday.getTime()) label = '📅 Ontem';
+    else label = '📅 ' + d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+    if (!groups[label]) groups[label] = [];
+    groups[label].push(t);
+  });
+
+  let html = `
+    <div class="tx-header-info">
+      <strong style="color:#3498db;">💳 Painel de Transações</strong><br>
+      Acompanhe toda a movimentação da plataforma — resgates de cupons e transferências entre usuários.
+    </div>
+
+    <div class="tx-summary-grid">
+      <div class="tx-summary-card redeem">
+        <div class="tss-icon">🏷️</div>
+        <div class="tss-val">${totalRedeems}</div>
+        <div class="tss-lbl">Resgates</div>
+      </div>
+      <div class="tx-summary-card transfer">
+        <div class="tss-icon">💸</div>
+        <div class="tss-val">${totalTransfers}</div>
+        <div class="tss-lbl">Transferências</div>
+      </div>
+      <div class="tx-summary-card">
+        <div class="tss-icon">⭐</div>
+        <div class="tss-val">${totalPoints.toLocaleString('pt-BR')}</div>
+        <div class="tss-lbl">Pontos movimentados</div>
+      </div>
+      <div class="tx-summary-card">
+        <div class="tss-icon">💰</div>
+        <div class="tss-val">${fmtMoney(totalDiscount)}</div>
+        <div class="tss-lbl">Em descontos</div>
+      </div>
+    </div>
+
+    <div class="tx-tabs tab-bar">
+      <button class="tab ${adminTxFilter === 'todas' ? 'active' : ''}" onclick="filterAdminTx('todas')">📋 Todas (${txs.length})</button>
+      <button class="tab ${adminTxFilter === 'redeem' ? 'active' : ''}" onclick="filterAdminTx('redeem')">🏷️ Resgates (${totalRedeems})</button>
+      <button class="tab ${adminTxFilter === 'transfer' ? 'active' : ''}" onclick="filterAdminTx('transfer')">💸 Transferências (${totalTransfers})</button>
+    </div>
+
+    <div class="tx-export-bar">
+      <button class="btn-export" onclick="exportTransactionsCSV()">📥 Exportar CSV</button>
+    </div>
+  `;
+
+  if (!filtered.length) {
+    html += `
+      <div class="tx-empty">
+        <div class="te-icon">📭</div>
+        <p>Nenhuma transação ${adminTxFilter !== 'todas' ? 'desse tipo ' : ''}registrada ainda.</p>
+      </div>`;
+    cont.innerHTML = html;
+    return;
+  }
+
+  const groupOrder = Object.keys(groups).sort((a, b) => {
+    if (a.includes('Hoje')) return -1;
+    if (b.includes('Hoje')) return 1;
+    if (a.includes('Ontem')) return -1;
+    if (b.includes('Ontem')) return 1;
+    return b.localeCompare(a);
+  });
+
+  groupOrder.forEach(label => {
+    html += `<div class="tx-group-label">${label}</div>`;
+    groups[label].forEach(t => { html += buildTxItem(t, people); });
+  });
+
+  cont.innerHTML = html;
+}
+
+function buildTxItem(t, people) {
+  const dt = new Date(t.created_at);
+  const time = dt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+  if (t.type === 'redeem') {
+    const user = people[t.user_id] || {};
+    const store = people[t.store_id] || {};
+    const statusBadge = t.status === 'validado'
+      ? '<span class="badge-status badge-validado" style="font-size:0.7em;">✅ Validado</span>'
+      : '<span class="badge-status badge-pendente" style="font-size:0.7em;">⏳ Pendente</span>';
+    return `
+      <div class="tx-item redeem">
+        <div class="tx-item-head">
+          <span class="tx-type-badge redeem">🏷️ Resgate</span>
+          <span class="tx-time">🕐 ${time}</span>
+        </div>
+        <div class="tx-body">
+          <div class="tx-line"><span class="tx-lbl">👤 Cliente</span><span class="tx-val">${escapeHtml(user.name || '—')}</span></div>
+          <div class="tx-line"><span class="tx-lbl">🏪 Loja</span><span class="tx-val">${escapeHtml(store.store || store.name || '—')}</span></div>
+          <div class="tx-line"><span class="tx-lbl">💵 Valor da compra</span><span class="tx-val">${fmtMoney(t.purchase_value)}</span></div>
+          <div class="tx-line"><span class="tx-lbl">🎯 Pontos usados</span><span class="tx-val" style="color:#ff8c00;">− ${(t.points_used || 0).toLocaleString('pt-BR')} pts</span></div>
+          <div class="tx-line"><span class="tx-lbl">💰 Desconto aplicado</span><span class="tx-val" style="color:#7dffa8;">${fmtMoney(t.discount)}</span></div>
+        </div>
+        <div class="tx-item-foot">
+          <span class="tx-code">${escapeHtml(t.code || '—')}</span>
+          ${statusBadge}
+        </div>
+      </div>`;
+  }
+
+  if (t.type === 'transfer') {
+    const from = people[t.from_user_id] || {};
+    const to = people[t.to_user_id] || {};
+    return `
+      <div class="tx-item transfer">
+        <div class="tx-item-head">
+          <span class="tx-type-badge transfer">💸 Transferência</span>
+          <span class="tx-time">🕐 ${time}</span>
+        </div>
+        <div class="tx-body">
+          <div class="tx-line"><span class="tx-lbl">👤 De</span><span class="tx-val">${escapeHtml(from.name || '—')}</span></div>
+          <div class="tx-line"><span class="tx-lbl">👤 Para</span><span class="tx-val">${escapeHtml(to.name || '—')}</span></div>
+          <div class="tx-line"><span class="tx-lbl">📤 Enviados</span><span class="tx-val">${(t.amount || 0).toLocaleString('pt-BR')} pts</span></div>
+          <div class="tx-line"><span class="tx-lbl">🏦 Taxa (20%)</span><span class="tx-val" style="color:#d4b3ff;">${(t.tax || 0).toLocaleString('pt-BR')} pts</span></div>
+          <div class="tx-line"><span class="tx-lbl">✅ Recebidos</span><span class="tx-val" style="color:#7dffa8;">${(t.net || 0).toLocaleString('pt-BR')} pts</span></div>
+        </div>
+      </div>`;
+  }
+  return '';
+}
+
+// ==================== EXPORTAR CSV ====================
+function exportTransactionsCSV() {
+  if (!adminTxCache) { toast('Nenhum dado carregado.', 'error'); return; }
+  const { txs, people } = adminTxCache;
+  const filter = adminTxFilter;
+  const list = filter === 'todas' ? txs : txs.filter(t => t.type === filter);
+
+  if (!list.length) { toast('Sem transações para exportar.', 'error'); return; }
+
+  const esc = (v) => {
+    const s = String(v ?? '');
+    if (s.includes(',') || s.includes('"') || s.includes('\n')) return '"' + s.replace(/"/g, '""') + '"';
+    return s;
+  };
+
+  const headers = [
+    'Data', 'Hora', 'Tipo', 'Cliente/De', 'Loja/Para',
+    'Valor Compra', 'Pontos Usados', 'Desconto',
+    'Valor Enviado', 'Taxa', 'Líquido',
+    'Código', 'Status'
+  ];
+
+  const rows = list.map(t => {
+    const d = new Date(t.created_at);
+    const date = d.toLocaleDateString('pt-BR');
+    const time = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+    if (t.type === 'redeem') {
+      const user = people[t.user_id] || {};
+      const store = people[t.store_id] || {};
+      return [
+        date, time, 'Resgate',
+        user.name || '', store.store || store.name || '',
+        t.purchase_value || '', t.points_used || '', t.discount || '',
+        '', '', '',
+        t.code || '', t.status || ''
+      ];
+    }
+    const from = people[t.from_user_id] || {};
+    const to = people[t.to_user_id] || {};
+    return [
+      date, time, 'Transferência',
+      from.name || '', to.name || '',
+      '', '', '',
+      t.amount || '', t.tax || '', t.net || '',
+      '', ''
+    ];
+  });
+
+  const csv = [headers, ...rows].map(r => r.map(esc).join(',')).join('\n');
+  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `quizlocal-transacoes-${filter}-${todayStr()}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('📥 CSV gerado!', 'success');
+}
+
+// ==================== RELATÓRIO DE IMPACTO ====================
 async function renderImpactReport(btn) {
   if (!supabaseClient) return;
   setLoading(btn, true, 'Calculando...');
@@ -1761,8 +1952,6 @@ async function renderImpactReport(btn) {
     const clientesAtivos = new Set((redeems||[]).map(r => r.user_id).filter(Boolean)).size;
     const fundPts = Number(fund?.amount || 0);
     const totalTaxas = (transfers||[]).reduce((s,t)=>s+(t.tax||0),0);
-
-    // Bloco A: métricas de engajamento
     const checkinsTotal = (daily||[]).filter(d => d.action_type === 'checkin').length;
     const followsTotal = (daily||[]).filter(d => d.action_type === 'follow').length;
     const viewsTotal = (daily||[]).filter(d => d.action_type === 'view_offer').length;
@@ -1775,7 +1964,6 @@ async function renderImpactReport(btn) {
         <strong style="color:var(--green);">🌍 Relatório de Impacto Local</strong><br>
         Resumo consolidado do movimento econômico e engajamento.
       </div>
-
       <h4 style="color:var(--gold);margin:15px 0 5px;">💰 Impacto Econômico</h4>
       <div class="impact-grid">
         <div class="impact-card"><div class="ic-icon">💵</div><div class="ic-val">${fmtMoney(totalDesconto)}</div><div class="ic-lbl">Injetados no comércio</div></div>
@@ -1783,7 +1971,6 @@ async function renderImpactReport(btn) {
         <div class="impact-card"><div class="ic-icon">🏪</div><div class="ic-val">${lojasAtivas}</div><div class="ic-lbl">Lojas com resgates</div></div>
         <div class="impact-card"><div class="ic-icon">👥</div><div class="ic-val">${clientesAtivos}</div><div class="ic-lbl">Clientes beneficiados</div></div>
       </div>
-
       <h4 style="color:var(--gold);margin:20px 0 5px;">📊 Movimento</h4>
       <div class="impact-grid">
         <div class="impact-card"><div class="ic-icon">⭐</div><div class="ic-val">${totalPts.toLocaleString('pt-BR')}</div><div class="ic-lbl">Pontos em circulação</div></div>
@@ -1791,15 +1978,13 @@ async function renderImpactReport(btn) {
         <div class="impact-card"><div class="ic-icon">🏷️</div><div class="ic-val">${(redeems||[]).length}</div><div class="ic-lbl">Cupons gerados</div></div>
         <div class="impact-card"><div class="ic-icon">💳</div><div class="ic-val">${totalPontosResgatados.toLocaleString('pt-BR')}</div><div class="ic-lbl">Pontos resgatados</div></div>
       </div>
-
-      <h4 style="color:var(--gold);margin:20px 0 5px;">🎁 Engajamento (Bloco A)</h4>
+      <h4 style="color:var(--gold);margin:20px 0 5px;">🎁 Engajamento</h4>
       <div class="impact-grid">
         <div class="impact-card"><div class="ic-icon">✅</div><div class="ic-val">${checkinsTotal}</div><div class="ic-lbl">Check-ins totais</div></div>
         <div class="impact-card"><div class="ic-icon">❤️</div><div class="ic-val">${followsTotal}</div><div class="ic-lbl">Seguidores de lojas</div></div>
         <div class="impact-card"><div class="ic-icon">👁️</div><div class="ic-val">${viewsTotal}</div><div class="ic-lbl">Ofertas visualizadas</div></div>
         <div class="impact-card"><div class="ic-icon">📈</div><div class="ic-val">${totalQuizes > 0 ? ((totalAcertos / (totalQuizes * 10)) * 100).toFixed(1) : 0}%</div><div class="ic-lbl">Taxa média de acertos</div></div>
       </div>
-
       <h4 style="color:var(--gold);margin:20px 0 5px;">👤 Cadastros</h4>
       <div class="impact-grid">
         <div class="impact-card"><div class="ic-icon">👤</div><div class="ic-val">${clientes.length}</div><div class="ic-lbl">Clientes cadastrados</div></div>
@@ -1807,7 +1992,6 @@ async function renderImpactReport(btn) {
         <div class="impact-card"><div class="ic-icon">💼</div><div class="ic-val">${fmtMoney(fundPts / CFG.POINTS_PER_REAL)}</div><div class="ic-lbl">Caixa (${fundPts} pts)</div></div>
         <div class="impact-card"><div class="ic-icon">💸</div><div class="ic-val">${totalTaxas}</div><div class="ic-lbl">Pontos taxados</div></div>
       </div>
-
       <h4 style="color:var(--gold);margin:20px 0 5px;">🏷️ Ofertas por Categoria</h4>
       <div style="background:rgba(0,0,0,0.2);border-radius:10px;padding:12px;">
         ${Object.keys(categorias).length === 0
