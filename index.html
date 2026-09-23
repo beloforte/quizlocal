@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>QuizLocal - Economia Colaborativa</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script>
   if (typeof window.supabase === 'undefined') {
     var s = document.createElement('script');
@@ -167,6 +169,47 @@
   .tx-export-bar { display: flex; justify-content: flex-end; margin: 8px 0 4px; }
   .btn-export { background: rgba(39,174,96,0.25); border: 1px solid var(--green); color: #7dffa8; padding: 8px 16px; border-radius: 20px; font-size: 0.85em; font-weight: bold; cursor: pointer; }
   .btn-export:active { transform: scale(0.97); }
+
+  /* ============ GRADE DE CUPONS (Bloco B) ============ */
+  .coupon-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 15px 0; }
+  .coupon-item { background: rgba(255,255,255,0.05); border: 2px dashed rgba(255,215,0,0.35); border-radius: 12px; padding: 16px 12px; text-align: center; position: relative; transition: 0.2s; }
+  .coupon-item.available { border-color: var(--green); border-style: solid; background: linear-gradient(135deg, rgba(39,174,96,0.12), rgba(46,204,113,0.04)); }
+  .coupon-item.available:active { transform: scale(0.97); }
+  .coupon-item.locked { opacity: 0.55; }
+  .coupon-item .ci-value { font-size: 1.8em; color: var(--gold); font-weight: bold; line-height: 1; }
+  .coupon-item .ci-value small { font-size: 0.5em; opacity: 0.7; }
+  .coupon-item .ci-min { font-size: 0.72em; opacity: 0.75; margin: 6px 0; }
+  .coupon-item .ci-progress { height: 5px; background: rgba(0,0,0,0.35); border-radius: 3px; overflow: hidden; margin: 10px 0 6px; }
+  .coupon-item .ci-progress-fill { height: 100%; background: linear-gradient(90deg, var(--gold), #ff8c00); transition: width 0.4s; }
+  .coupon-item .ci-progress-fill.full { background: linear-gradient(90deg, var(--green), #2ecc71); }
+  .coupon-item .ci-pts { font-size: 0.72em; opacity: 0.85; font-family: monospace; }
+  .coupon-item .ci-btn { width: 100%; padding: 8px; border-radius: 20px; border: none; font-weight: bold; font-size: 0.82em; margin-top: 10px; cursor: pointer; transition: 0.2s; }
+  .coupon-item .ci-btn.active { background: linear-gradient(90deg, var(--green), #2ecc71); color: #fff; }
+  .coupon-item .ci-btn.active:active { transform: scale(0.97); }
+  .coupon-item .ci-btn.locked { background: rgba(255,255,255,0.08); color: #888; cursor: not-allowed; }
+
+  /* ============ QR CODE (Bloco B) ============ */
+  .qr-container { background: #fff; padding: 16px; border-radius: 12px; display: inline-block; margin: 15px 0; }
+  .qr-container img, .qr-container canvas { display: block; }
+  #qr-reader { width: 100%; min-height: 280px; border-radius: 12px; overflow: hidden; margin: 10px 0; background: #000; }
+  #qr-reader.hidden { display: none; }
+
+  /* ============ CONVITE / INDICAÇÃO ============ */
+  .referral-card { background: linear-gradient(135deg, rgba(155,48,255,0.18), rgba(52,152,219,0.10)); border: 1px solid rgba(155,48,255,0.4); border-radius: 12px; padding: 20px; margin-bottom: 15px; }
+  .referral-card h3 { color: var(--gold); margin-bottom: 8px; font-size: 1.1em; }
+  .referral-card p { font-size: 0.88em; line-height: 1.5; opacity: 0.92; margin-bottom: 12px; }
+  .referral-link-box { background: rgba(0,0,0,0.35); border: 1px solid rgba(255,215,0,0.3); border-radius: 10px; padding: 12px; margin: 10px 0; font-family: monospace; font-size: 0.82em; word-break: break-all; color: #d4b3ff; user-select: text; }
+  .referral-code-badge { display: inline-block; background: linear-gradient(90deg, var(--gold), #ff8c00); color: var(--dark); padding: 6px 14px; border-radius: 12px; font-family: monospace; font-size: 1.1em; font-weight: bold; letter-spacing: 2px; margin: 6px 0; }
+  .referral-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  .referral-actions button { flex: 1; min-width: 140px; padding: 11px 14px; border-radius: 20px; border: none; font-weight: bold; font-size: 0.9em; cursor: pointer; }
+  .referral-actions .btn-copy { background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.3); }
+  .referral-actions .btn-copy:active { background: rgba(255,255,255,0.25); }
+  .referral-actions .btn-wa { background: linear-gradient(90deg, #25D366, #128C7E); color: #fff; }
+  .referral-actions .btn-wa:active { transform: scale(0.97); }
+
+  /* Banner de indicação na tela de login */
+  .ref-banner { background: linear-gradient(90deg, rgba(39,174,96,0.25), rgba(46,204,113,0.15)); border: 1px solid var(--green); border-radius: 10px; padding: 12px; margin-bottom: 15px; font-size: 0.9em; text-align: center; }
+  .ref-banner strong { color: #7dffa8; }
 </style>
 </head>
 <body>
@@ -188,7 +231,7 @@
       <p style="margin-bottom:20px;opacity:0.9;">Responda perguntas, acumule pontos e troque por descontos no comércio local.</p>
       <button class="btn" onclick="showScreen('scr-login')">🔑 Já tenho conta</button>
       <button class="btn btn-outline" onclick="showScreen('scr-register')" style="margin-top:10px;">✨ Criar nova conta</button>
-         </div>
+    </div>
     <div class="info">
       <strong>📋 Como funciona:</strong><br>
       • Responda perguntas e acumule pontos<br>
@@ -201,6 +244,7 @@
   <!-- LOGIN -->
   <div id="scr-login" class="screen">
     <button class="back-btn" onclick="showScreen('scr-home')">← Voltar</button>
+    <div id="ref-banner-login" class="ref-banner hidden"></div>
     <div class="card">
       <h2 style="color:var(--gold);text-align:center;margin-bottom:15px;">🔑 Entrar</h2>
       <label>E-mail ou CPF:</label>
@@ -237,6 +281,7 @@
   <!-- REGISTER -->
   <div id="scr-register" class="screen">
     <button class="back-btn" onclick="showScreen('scr-home')">← Voltar</button>
+    <div id="ref-banner-register" class="ref-banner hidden"></div>
     <div class="card">
       <h2 style="color:var(--gold);text-align:center;margin-bottom:15px;">✨ Criar Conta</h2>
       <label>Nome Completo:</label>
@@ -278,6 +323,21 @@
       <button class="btn btn-sm" onclick="showScreen('scr-coupons')" style="background:rgba(255,255,255,0.15);color:#fff;">🎟️ Meus Cupons</button>
       <button class="btn btn-sm" onclick="showScreen('scr-profile')" style="background:rgba(255,255,255,0.15);color:#fff;">👤 Meu Perfil</button>
     </div>
+
+    <!-- CARD DE INDICAÇÃO -->
+    <div class="referral-card" id="referral-card">
+      <h3>🎁 Convide amigos e ganhe 2.000 pontos</h3>
+      <p>Compartilhe seu link com amigos da cidade. Quando eles se cadastrarem, <strong style="color:var(--gold);">você ganha 2.000 pts</strong> e eles já começam a jogar com você!</p>
+      <div style="font-size:0.78em;opacity:0.75;margin-bottom:6px;">Seu código de indicação:</div>
+      <div class="referral-code-badge" id="ref-code-badge">——————</div>
+      <div class="referral-link-box" id="ref-link-display">Carregando...</div>
+      <div class="referral-actions">
+        <button class="btn-copy" onclick="copyReferralLink()">📋 Copiar link</button>
+        <button class="btn-wa" onclick="shareWhatsApp()">💬 WhatsApp</button>
+      </div>
+      <div style="font-size:0.78em;opacity:0.7;margin-top:10px;text-align:center;">Você já indicou <strong id="ref-count" style="color:var(--gold);">0</strong> pessoa(s)</div>
+    </div>
+
     <div class="info"><strong>💡 Dica:</strong> Faça check-in todo dia em Ofertas do Dia para bônus de sequência.</div>
   </div>
 
@@ -349,17 +409,19 @@
     </div>
   </div>
 
-  <!-- REDEEM -->
+  <!-- REDEEM (com grade de cupons) -->
   <div id="scr-redeem" class="screen">
     <button class="back-btn" onclick="showScreen('scr-client')">← Voltar</button>
     <div class="card">
       <h2 style="color:var(--gold);margin-bottom:10px;">🏷️ Resgatar Desconto</h2>
-      <div class="info"><strong>Regras:</strong> desconto máximo 10% · 1.000 pts = R$ 1,00 · não aplicável a frete</div>
-      <label>Loja Parceira:</label><select id="redeem-store"></select>
-      <label>Valor da Compra (sem entrega):</label><input type="number" id="redeem-value" placeholder="Ex: 150.00" step="0.01" min="0">
-      <div id="redeem-preview" class="hidden" style="background:rgba(255,215,0,0.1);padding:12px;border-radius:8px;margin:10px 0;font-size:0.9em;"></div>
-      <button class="btn btn-green" onclick="previewRedeem(this)">Calcular Desconto</button>
-      <button class="btn hidden" id="btn-confirm-redeem" onclick="confirmRedeem(this)">✅ Confirmar Resgate</button>
+      <div class="info"><strong>Como funciona:</strong> escolha um cupom abaixo. Você precisará gastar o valor mínimo na loja para usar o desconto.</div>
+      <label>1️⃣ Selecione a loja:</label>
+      <select id="redeem-store" onchange="renderCouponGrid()"></select>
+      <div style="margin-top:15px;">
+        <label>2️⃣ Escolha um cupom:</label>
+        <p style="font-size:0.82em;opacity:0.75;margin-top:4px;">Seu saldo: <strong id="grid-balance" style="color:var(--gold);">0 pts</strong></p>
+        <div id="coupon-grid"></div>
+      </div>
     </div>
   </div>
 
@@ -377,12 +439,15 @@
     </div>
   </div>
 
-  <!-- COUPONS -->
+  <!-- COUPONS (com filtro) -->
   <div id="scr-coupons" class="screen">
     <button class="back-btn" onclick="showScreen('scr-client')">← Voltar</button>
     <div class="card">
       <h2 style="color:var(--gold);margin-bottom:10px;">🎟️ Meus Cupons</h2>
-      <div class="info">Apresente o código ao lojista. Cupons pendentes ainda não foram usados.</div>
+      <div class="tab-bar" id="coupons-tabs">
+        <button class="tab active" data-filter="pendente" onclick="filterCoupons('pendente')">⏳ Pendentes</button>
+        <button class="tab" data-filter="validado" onclick="filterCoupons('validado')">✅ Usados</button>
+      </div>
       <div id="coupons-list"></div>
     </div>
   </div>
@@ -419,14 +484,21 @@
     </div>
   </div>
 
-  <!-- VALIDATE -->
+  <!-- VALIDATE (com QR reader) -->
   <div id="scr-validate" class="screen">
     <button class="back-btn" onclick="showScreen('scr-shopkeeper')">← Voltar</button>
     <div class="card">
       <h2 style="color:var(--gold);margin-bottom:10px;">✅ Validar Cupom</h2>
-      <div class="info">Peça ao cliente o código e insira abaixo.</div>
-      <label>Código do Cupom:</label><input type="text" id="val-code" placeholder="QL-XXXXXX" style="text-transform:uppercase;text-align:center;font-size:1.3em;letter-spacing:3px;">
-      <button class="btn btn-green" onclick="validateCoupon(this)">Validar</button>
+      <div class="info">Aponte a câmera para o QR Code do cliente, ou digite o código manualmente.</div>
+
+      <button class="btn btn-purple" id="btn-start-scan" onclick="startQrScan()">📷 Ler QR Code com a Câmera</button>
+      <div id="qr-reader" class="hidden"></div>
+      <button class="btn btn-outline hidden" id="btn-stop-scan" onclick="stopQrScan()">✕ Cancelar leitura</button>
+
+      <div style="margin-top:15px;text-align:center;opacity:0.6;font-size:0.85em;">— ou digite o código —</div>
+      <label>Código do Cupom:</label>
+      <input type="text" id="val-code" placeholder="QL-XXXXXX" style="text-transform:uppercase;text-align:center;font-size:1.3em;letter-spacing:3px;">
+      <button class="btn btn-green" onclick="validateCoupon(this)">Validar Manualmente</button>
       <div id="val-result" style="margin-top:15px;"></div>
     </div>
   </div>
@@ -517,6 +589,19 @@
   </div>
 </div>
 
+<!-- MODAL QR CODE -->
+<div id="modal-qr" class="modal">
+  <div class="modal-box">
+    <div style="font-size:3em;margin-bottom:8px;">🏷️</div>
+    <h2 style="color:var(--gold);margin-bottom:8px;">Cupom Gerado!</h2>
+    <p style="font-size:0.85em;opacity:0.85;">Apresente este QR Code ao lojista</p>
+    <div class="qr-container" id="qr-code-container"></div>
+    <div class="code" id="qr-modal-code" style="font-family:monospace;font-size:1.3em;color:var(--gold);letter-spacing:2px;margin:10px 0;"></div>
+    <p id="qr-modal-info" style="font-size:0.9em;line-height:1.4;margin:10px 0;opacity:0.9;"></p>
+    <button class="btn" onclick="closeQrModal()">OK</button>
+  </div>
+</div>
+
 <script>
 // ==================== CONFIG ====================
 const CFG = {
@@ -532,8 +617,20 @@ const CFG = {
   SESSION_TTL_MS: 24 * 3600 * 1000,
   DIFFICULTY_DISTRIBUTION: { 1: 4, 2: 3, 3: 3 },
   TIME_BY_DIFFICULTY: { 1: 15, 2: 20, 3: 30 },
-  REWARDS: { CHECKIN: 50, FOLLOW: 50, VIEW_OFFER: 10, VIEW_OFFER_DAILY_CAP: 50 }
+  REWARDS: { CHECKIN: 50, FOLLOW: 50, VIEW_OFFER: 10, VIEW_OFFER_DAILY_CAP: 50 },
+  REFERRAL_BONUS: 2000,
+  SITE_URL: 'https://quizlocal.vercel.app'
 };
+
+// Grade de cupons (valor desconto, compra mínima, pontos)
+// A regra é: desconto = 10% da compra mínima, e pontos = desconto × 1000
+const COUPONS = [
+  { value: 3,  minPurchase: 30,  pts: 3000 },
+  { value: 6,  minPurchase: 60,  pts: 6000 },
+  { value: 9,  minPurchase: 90,  pts: 9000 },
+  { value: 14, minPurchase: 140, pts: 14000 },
+  { value: 20, minPurchase: 200, pts: 20000 }
+];
 
 const SUPABASE_URL = 'https://klzjcpogqsasfigyxgxp.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtsempjcG9ncXNhc2ZpZ3l4Z3hwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzMDMxMjYsImV4cCI6MjEwNDg3OTEyNn0.0ENvP05STQtzrwAktvtJwdK8If7zSmamBTPlHcpF-KE';
@@ -549,6 +646,10 @@ let supabaseClient = null;
 
 let SESSION = { userId: null, user: null, resetData: null, transferData: null };
 let DAILY = null;
+let REFERRAL_FROM_URL = null;
+let COUPONS_DATA = [];
+let COUPON_FILTER = 'pendente';
+let qrScannerInstance = null;
 
 // ==================== SONS ====================
 let actx = null;
@@ -600,14 +701,10 @@ function isValidCPF(cpf) {
   rest = (sum*10)%11; if(rest>=10) rest=0;
   return rest === parseInt(cpf[10]);
 }
-function fmtMoney(v) { return 'R$ '+Number(v||0).toFixed(2); }
+function fmtMoney(v) { return 'R$ '+Number(v||0).toFixed(2).replace('.',','); }
 function todayStr() { return new Date().toISOString().slice(0,10); }
 function monthStr() { return new Date().toISOString().slice(0,7); }
 function isEmail(s) { return /\S+@\S+\.\S+/.test(s); }
-function fmtDateTimeBR(iso) {
-  const d = new Date(iso);
-  return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-}
 
 async function hashPassword(pass) {
   try {
@@ -701,30 +798,30 @@ document.addEventListener('DOMContentLoaded', function() {
       if (storeField) storeField.classList.toggle('hidden', e.target.value !== 'lojista');
     });
   }
+  // Captura código de indicação da URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const refFromUrl = urlParams.get('ref');
+  if (refFromUrl) {
+    REFERRAL_FROM_URL = refFromUrl.toUpperCase().trim();
+    try { sessionStorage.setItem('ql_referral_code', REFERRAL_FROM_URL); } catch(e) {}
+    showReferralBanner(REFERRAL_FROM_URL);
+  } else {
+    try {
+      const stored = sessionStorage.getItem('ql_referral_code');
+      if (stored) {
+        REFERRAL_FROM_URL = stored;
+        showReferralBanner(stored);
+      }
+    } catch(e) {}
+  }
 });
 
-// ==================== DIAGNÓSTICO ====================
-async function runDiagnostics() {
-  console.group('🩺 Diagnóstico QuizLocal');
-  if (!supabaseClient) { console.error('❌ supabaseClient não inicializado.'); console.groupEnd(); return; }
-  const tables = ['users','transactions','offers','questions','project_fund','followers','daily_actions'];
-  const missing = [];
-  for (const t of tables) {
-    const { error } = await supabaseClient.from(t).select('id').limit(1);
-    if (error) { missing.push(`${t} → ${error.message}`); console.error(`❌ ${t}: ${error.message}`); }
-    else console.log(`✅ ${t} OK.`);
-  }
-  if (missing.length) toast('⚠️ Tabelas faltando. Veja o console (F12).', 'error');
-  else toast('✅ Banco OK!', 'success');
-  console.groupEnd();
-}
-async function testSupabaseConnection() {
-  if (!supabaseClient) return;
-  try {
-    const { error } = await supabaseClient.from('users').select('id').limit(1);
-    if (error) console.warn('⚠️ users:', error.message);
-    else console.log('✅ Banco de dados conectado.');
-  } catch (err) { console.error('Erro DB:', err); }
+function showReferralBanner(code) {
+  const html = `🎁 <strong>Você foi convidado!</strong> Código <strong style="font-family:monospace;">${escapeHtml(code)}</strong> será aplicado ao se cadastrar.`;
+  const b1 = document.getElementById('ref-banner-login');
+  const b2 = document.getElementById('ref-banner-register');
+  if (b1) { b1.innerHTML = html; b1.classList.remove('hidden'); }
+  if (b2) { b2.innerHTML = html; b2.classList.remove('hidden'); }
 }
 
 // ==================== LOGIN ====================
@@ -735,7 +832,7 @@ async function handleLogin(btn) {
   if(!loginId || !pass) { toast('Preencha email/CPF e senha!','error'); return; }
   setLoading(btn, true, 'Entrando...');
   try {
-    let query = supabaseClient.from('users').select('id,type,name,cpf,email,pass,store,points,games_played,correct_answers,total_redeemed,verified');
+    let query = supabaseClient.from('users').select('id,type,name,cpf,email,pass,store,points,games_played,correct_answers,total_redeemed,verified,referral_code,referred_by');
     if (isEmail(loginId)) query = query.eq('email', loginId);
     else {
       const cpf = cleanCPF(loginId);
@@ -772,11 +869,13 @@ async function handleRegister(btn) {
   if(!isValidCPF(cpf)) { toast('CPF inválido!','error'); return; }
   if(type==='lojista' && !store) { toast('Informe o nome do estabelecimento!','error'); return; }
   if(pass.length < 4) { toast('Senha deve ter ao menos 4 caracteres.','error'); return; }
+
   setLoading(btn, true, 'Cadastrando...');
   try {
     const { data: byEmail } = await supabaseClient.from('users').select('id').eq('email', email).maybeSingle();
     const { data: byCpf } = await supabaseClient.from('users').select('id').eq('cpf', cpf).maybeSingle();
     if (byEmail || byCpf) { toast('CPF ou Email já cadastrado!','error'); return; }
+
     const newUser = {
       type, name, cpf, email,
       pass: await hashPassword(pass),
@@ -784,8 +883,26 @@ async function handleRegister(btn) {
       points: 0, games_played: 0, correct_answers: 0, total_redeemed: 0,
       verified: true, created_at: new Date().toISOString()
     };
-    const { error: insertError } = await supabaseClient.from('users').insert([newUser]);
+    const { data: inserted, error: insertError } = await supabaseClient
+      .from('users').insert([newUser]).select('id').single();
     if(insertError) { toast('Erro: ' + insertError.message, 'error'); return; }
+
+    // Aplica indicação se houver código
+    const refCode = REFERRAL_FROM_URL || sessionStorage.getItem('ql_referral_code');
+    if (refCode && inserted?.id) {
+      try {
+        const { data: refRes } = await supabaseClient.rpc('apply_referral', {
+          p_new_user_id: Number(inserted.id),
+          p_referral_code: String(refCode)
+        });
+        if (refRes?.success) {
+          toast(`🎁 Você foi indicado! +${refRes.points} pts para quem te convidou.`, 'success');
+        }
+      } catch(e) { console.warn('Falha ao aplicar referral:', e); }
+      try { sessionStorage.removeItem('ql_referral_code'); } catch(e) {}
+      REFERRAL_FROM_URL = null;
+    }
+
     toast('Conta criada! Faça login.','success');
     sndCorrect();
     ['reg-name','reg-cpf','reg-email','reg-pass','reg-store'].forEach(id => {
@@ -851,6 +968,7 @@ function redirectToRole(type) {
 function logout() {
   SESSION = { userId:null, user:null, resetData:null, transferData:null };
   DAILY = null;
+  COUPONS_DATA = [];
   clearSessionStorage();
   document.getElementById('login-id').value = '';
   document.getElementById('login-pass').value = '';
@@ -1324,79 +1442,224 @@ async function creditViewOffer(offerId, btn, timerEl) {
 async function refreshClient() {
   if(!SESSION.userId || !supabaseClient) return;
   try {
-    const { data: u } = await supabaseClient.from('users').select('name, points, games_played, total_redeemed').eq('id', SESSION.userId).single();
+    const { data: u } = await supabaseClient.from('users')
+      .select('name, points, games_played, total_redeemed, referral_code, referred_by')
+      .eq('id', SESSION.userId).single();
     if(u) {
       document.getElementById('cli-name').textContent = u.name;
       document.getElementById('cli-pts').textContent = u.points;
       document.getElementById('cli-balance').textContent = fmtMoney(u.points / CFG.POINTS_PER_REAL);
       document.getElementById('cli-games').textContent = u.games_played;
       document.getElementById('cli-redeemed').textContent = fmtMoney(u.total_redeemed);
+      SESSION.user = { ...SESSION.user, ...u };
+
+      // Atualiza card de indicação
+      if (u.referral_code) {
+        const codeEl = document.getElementById('ref-code-badge');
+        const linkEl = document.getElementById('ref-link-display');
+        if (codeEl) codeEl.textContent = u.referral_code;
+        if (linkEl) linkEl.textContent = `${CFG.SITE_URL}/?ref=${u.referral_code}`;
+      }
+
+      // Conta quantas pessoas ele indicou
+      const { count } = await supabaseClient.from('users')
+        .select('id', { count: 'exact', head: true })
+        .eq('referred_by', SESSION.userId);
+      const cnt = document.getElementById('ref-count');
+      if (cnt) cnt.textContent = count || 0;
     }
   } catch(e) { console.error(e); }
 }
 
-// ==================== RESGATE ====================
+// ==================== INDICAÇÃO ====================
+function copyReferralLink() {
+  const code = SESSION.user?.referral_code;
+  if (!code) { toast('Código de indicação indisponível. Recarregue a página.', 'error'); return; }
+  const link = `${CFG.SITE_URL}/?ref=${code}`;
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(link).then(() => {
+      toast('✅ Link copiado! Cole no WhatsApp ou onde quiser.', 'success');
+      sndCorrect();
+    }).catch(() => fallbackCopy(link));
+  } else {
+    fallbackCopy(link);
+  }
+}
+function fallbackCopy(text) {
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    toast('✅ Link copiado!', 'success');
+    sndCorrect();
+  } catch(e) { toast('Não foi possível copiar. Selecione manualmente.', 'error'); }
+}
+function shareWhatsApp() {
+  const code = SESSION.user?.referral_code;
+  const name = SESSION.user?.name?.split(' ')[0] || 'seu amigo';
+  if (!code) { toast('Código de indicação indisponível.', 'error'); return; }
+  const link = `${CFG.SITE_URL}/?ref=${code}`;
+  const text =
+`🎯 *QuizLocal* — Conhecimento que vira desconto!
+
+Oi! Sou ${name} e estou usando o *QuizLocal*, um app da nossa cidade onde você responde quiz de conhecimentos gerais, acumula pontos e troca por descontos nas lojas locais.
+
+🏆 *Como funciona:*
+• Responda 10 perguntas por rodada
+• Acertos valem pontos (100 a 300 por pergunta)
+• 1.000 pontos = R$ 1,00 de desconto
+• Desconto de até 10% em compras parceiras
+
+🎁 *Usando meu link você começa a jogar e a gente acumula pontos juntos!*
+
+👉 ${link}
+
+É grátis, leva 30 segundos para se cadastrar e tem quiz novo todo dia. Vem!`;
+  const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+  window.open(url, '_blank');
+}
+
+// ==================== RESGATE — GRADE DE CUPONS (Bloco B) ====================
 async function loadRedeemStores() {
   if (!supabaseClient) return;
   try {
     const sel = document.getElementById('redeem-store');
-    const { data: shops } = await supabaseClient.from('users').select('id, store').eq('type', 'lojista');
+    const { data: shops } = await supabaseClient.from('users').select('id, store').eq('type', 'lojista').order('store');
     sel.innerHTML = '<option value="">Selecione a loja...</option>';
     if(shops) shops.forEach(s => { sel.innerHTML += `<option value="${escapeHtml(s.id)}">${escapeHtml(s.store)}</option>`; });
-    document.getElementById('redeem-value').value = '';
-    document.getElementById('redeem-preview').classList.add('hidden');
-    document.getElementById('btn-confirm-redeem').classList.add('hidden');
+    await renderCouponGrid();
   } catch(e) { console.error(e); }
 }
-async function previewRedeem(btn) {
-  const storeId = document.getElementById('redeem-store').value;
-  const val = parseFloat(document.getElementById('redeem-value').value);
-  if(!storeId || !val || val <= 0) { toast('Preencha corretamente!','error'); return; }
-  setLoading(btn, true, 'Calculando...');
+async function renderCouponGrid() {
+  if (!SESSION.userId || !supabaseClient) return;
+  const cont = document.getElementById('coupon-grid');
+  if (!cont) return;
+  cont.innerHTML = '<p style="opacity:0.6;text-align:center;padding:15px;">Carregando...</p>';
   try {
-    const maxDiscount = val * CFG.MAX_DISCOUNT_PCT;
-    const actualPoints = Math.ceil(maxDiscount * CFG.POINTS_PER_REAL);
     const { data: u } = await supabaseClient.from('users').select('points').eq('id', SESSION.userId).single();
-    const saldoAtual = u?.points || 0;
-    const saldoDepois = saldoAtual - actualPoints;
-    const box = document.getElementById('redeem-preview');
-    box.classList.remove('hidden');
-    box.innerHTML = `
-      <strong>Desconto:</strong> ${fmtMoney(maxDiscount)}<br>
-      <strong>Pontos necessários:</strong> ${actualPoints}<br>
-      <strong>Seu saldo hoje:</strong> ${saldoAtual} pts<br>
-      <strong>Saldo após resgate:</strong> <span style="color:${saldoDepois < 0 ? 'var(--red)' : 'var(--gold)'}">${saldoDepois} pts</span>
-    `;
-    if (saldoDepois < 0) {
-      toast('Pontos insuficientes!','error');
-      document.getElementById('btn-confirm-redeem').classList.add('hidden');
-    } else {
-      document.getElementById('btn-confirm-redeem').classList.remove('hidden');
-    }
-  } catch(e) { toast('Erro: ' + e.message, 'error'); }
-  finally { setLoading(btn, false); }
+    const saldo = u?.points || 0;
+    const balanceEl = document.getElementById('grid-balance');
+    if (balanceEl) balanceEl.textContent = `${saldo.toLocaleString('pt-BR')} pts`;
+
+    cont.innerHTML = COUPONS.map(c => {
+      const available = saldo >= c.pts;
+      const pct = Math.min(100, (saldo / c.pts) * 100);
+      const cls = available ? 'coupon-item available' : 'coupon-item locked';
+      const btnCls = available ? 'ci-btn active' : 'ci-btn locked';
+      const btnLabel = available ? `Trocar por R$ ${c.value}` : `Faltam ${(c.pts - saldo).toLocaleString('pt-BR')} pts`;
+      const btnAction = available ? `onclick="redeemCoupon(${c.value}, ${c.minPurchase}, ${c.pts})"` : 'disabled';
+      return `
+        <div class="${cls}">
+          <div class="ci-value">R$ ${c.value} <small>OFF</small></div>
+          <div class="ci-min">Compra mínima R$ ${c.minPurchase}</div>
+          <div class="ci-progress"><div class="ci-progress-fill ${available ? 'full' : ''}" style="width:${pct}%"></div></div>
+          <div class="ci-pts">${saldo.toLocaleString('pt-BR')} / ${c.pts.toLocaleString('pt-BR')} pts</div>
+          <button class="${btnCls}" ${btnAction}>${btnLabel}</button>
+        </div>`;
+    }).join('');
+  } catch(e) {
+    console.error(e);
+    cont.innerHTML = '<p style="color:var(--red);padding:15px;">Erro ao carregar cupons.</p>';
+  }
 }
-async function confirmRedeem(btn) {
-  if (!supabaseClient || !SESSION.userId) return;
+async function redeemCoupon(value, minPurchase, points) {
   const storeId = document.getElementById('redeem-store').value;
-  const val = parseFloat(document.getElementById('redeem-value').value);
-  if (!storeId || !val) { toast('Dados inválidos.','error'); return; }
-  const ok = await confirmDialog('Confirmar Resgate', `Você está resgatando ${fmtMoney(val * CFG.MAX_DISCOUNT_PCT)} em desconto.\n\nApós confirmar, um cupom será gerado.`);
+  if (!storeId) { toast('⚠️ Selecione a loja primeiro!', 'error'); return; }
+
+  const ok = await confirmDialog(
+    `Resgatar cupom R$ ${value}`,
+    `Você vai usar ${points.toLocaleString('pt-BR')} pts para gerar um cupom de R$ ${value} de desconto.\n\n⚠️ Necessário gastar pelo menos R$ ${minPurchase} na loja.\n\nConfirmar?`
+  );
   if (!ok) return;
-  setLoading(btn, true, 'Gerando cupom...');
+
   try {
     const { data, error } = await supabaseClient.rpc('redeem_discount', {
-      p_user_id: Number(SESSION.userId), p_store_id: Number(storeId), p_purchase_value: Number(val)
+      p_user_id: Number(SESSION.userId),
+      p_store_id: Number(storeId),
+      p_purchase_value: Number(minPurchase)
     });
     if (error) { toast('Erro: ' + error.message, 'error'); return; }
     if (data?.error) { toast(data.error, 'error'); return; }
+
     sndWin();
-    showModal('🏷️','Cupom Gerado!',`Código: ${data.code}\n\nDesconto: ${fmtMoney(data.discount)}\nApresente no caixa da loja.`);
+    showQrModal(data.code, data.discount);
     refreshClient();
-    document.getElementById('redeem-preview').classList.add('hidden');
-    document.getElementById('btn-confirm-redeem').classList.add('hidden');
+    renderCouponGrid();
   } catch(e) { toast('Erro: ' + e.message, 'error'); }
-  finally { setLoading(btn, false); }
+}
+
+// ==================== QR CODE (Bloco B) ====================
+function showQrModal(code, discount) {
+  const cont = document.getElementById('qr-code-container');
+  const codeEl = document.getElementById('qr-modal-code');
+  const infoEl = document.getElementById('qr-modal-info');
+  if (codeEl) codeEl.textContent = code;
+  if (infoEl) infoEl.textContent = `Desconto: R$ ${Number(discount).toFixed(2).replace('.',',')}\nApresente este QR Code ao lojista para validar.`;
+  if (cont) {
+    cont.innerHTML = '';
+    try {
+      const qr = qrcode(0, 'M');
+      qr.addData(code);
+      qr.make();
+      cont.innerHTML = qr.createImgTag(4, 8);
+    } catch(e) {
+      console.error('Erro ao gerar QR:', e);
+      cont.innerHTML = '<span style="color:#333;font-size:0.8em;">QR indisponível. Use o código abaixo.</span>';
+    }
+  }
+  document.getElementById('modal-qr').classList.add('active');
+}
+function closeQrModal() { document.getElementById('modal-qr').classList.remove('active'); }
+
+async function startQrScan() {
+  const reader = document.getElementById('qr-reader');
+  const btnStart = document.getElementById('btn-start-scan');
+  const btnStop = document.getElementById('btn-stop-scan');
+  reader.classList.remove('hidden');
+  btnStart.classList.add('hidden');
+  btnStop.classList.remove('hidden');
+
+  try {
+    if (!qrScannerInstance) {
+      qrScannerInstance = new Html5Qrcode("qr-reader");
+    }
+    await qrScannerInstance.start(
+      { facingMode: "environment" },
+      { fps: 10, qrbox: { width: 240, height: 240 } },
+      (decodedText) => {
+        sndCorrect();
+        document.getElementById('val-code').value = decodedText.trim();
+        stopQrScan();
+        validateCoupon();
+      },
+      () => { /* scan falhou num frame — ignora */ }
+    );
+  } catch(e) {
+    console.error('Erro ao iniciar câmera:', e);
+    toast('Não foi possível acessar a câmera. Use a digitação manual.', 'error');
+    stopQrScan();
+  }
+}
+async function stopQrScan() {
+  const reader = document.getElementById('qr-reader');
+  const btnStart = document.getElementById('btn-start-scan');
+  const btnStop = document.getElementById('btn-stop-scan');
+  if (qrScannerInstance) {
+    try {
+      const state = qrScannerInstance.getState();
+      if (state === Html5QrcodeScannerState?.SCANNING || state === 2) {
+        await qrScannerInstance.stop();
+      }
+    } catch(e) { /* ignore */ }
+  }
+  if (reader) reader.classList.add('hidden');
+  if (btnStart) btnStart.classList.remove('hidden');
+  if (btnStop) btnStop.classList.add('hidden');
 }
 
 // ==================== TRANSFERÊNCIA ====================
@@ -1461,7 +1724,7 @@ async function confirmTransfer(btn) {
   finally { setLoading(btn, false); }
 }
 
-// ==================== CUPONS ====================
+// ==================== MEUS CUPONS (com filtro) ====================
 async function renderCoupons() {
   if (!SESSION.userId || !supabaseClient) return;
   const cont = document.getElementById('coupons-list');
@@ -1471,31 +1734,58 @@ async function renderCoupons() {
       .select('code, discount, purchase_value, status, created_at, store_id')
       .eq('user_id', SESSION.userId).eq('type', 'redeem')
       .order('created_at', { ascending: false });
-    if (!coupons || !coupons.length) {
-      cont.innerHTML = '<p style="opacity:0.6;text-align:center;padding:15px;">Você ainda não gerou nenhum cupom.</p>';
-      return;
-    }
-    const storeIds = [...new Set(coupons.map(c => c.store_id).filter(Boolean))];
-    let storeMap = {};
-    if (storeIds.length) {
-      const { data: stores } = await supabaseClient.from('users').select('id, store').in('id', storeIds);
-      (stores || []).forEach(s => storeMap[s.id] = s.store);
-    }
-    cont.innerHTML = '';
-    coupons.forEach(c => {
-      const badge = c.status === 'validado' ? '<span class="badge-status badge-validado">✅ Usado</span>' : '<span class="badge-status badge-pendente">⏳ Pendente</span>';
-      const dt = new Date(c.created_at).toLocaleDateString('pt-BR');
-      cont.innerHTML += `
-        <div class="coupon-card">
-          <div style="display:flex;justify-content:space-between;align-items:center;">
-            <strong>${escapeHtml(storeMap[c.store_id] || 'Loja')}</strong>
-            ${badge}
-          </div>
-          <div class="code">${escapeHtml(c.code)}</div>
-          <div style="font-size:0.85em;opacity:0.8;">Desconto: ${fmtMoney(c.discount)} · Compra: ${fmtMoney(c.purchase_value)} · ${dt}</div>
-        </div>`;
-    });
+    COUPONS_DATA = coupons || [];
+    renderCouponsFiltered();
   } catch(e) { console.error(e); cont.innerHTML = '<p style="color:var(--red);padding:15px;">Erro.</p>'; }
+}
+async function filterCoupons(filter) {
+  COUPON_FILTER = filter;
+  document.querySelectorAll('#coupons-tabs .tab').forEach(t => t.classList.toggle('active', t.dataset.filter === filter));
+  sndClick();
+  renderCouponsFiltered();
+}
+async function renderCouponsFiltered() {
+  const cont = document.getElementById('coupons-list');
+  if (!cont) return;
+  const list = COUPONS_DATA.filter(c => {
+    if (COUPON_FILTER === 'pendente') return c.status !== 'validado';
+    return c.status === 'validado';
+  });
+
+  if (!list.length) {
+    const msg = COUPON_FILTER === 'pendente'
+      ? 'Você não tem cupons pendentes. Gere um novo na tela de resgate!'
+      : 'Você ainda não usou nenhum cupom.';
+    cont.innerHTML = `<p style="opacity:0.6;text-align:center;padding:15px;">${msg}</p>`;
+    return;
+  }
+
+  // Busca nomes de lojas
+  const storeIds = [...new Set(list.map(c => c.store_id).filter(Boolean))];
+  let storeMap = {};
+  if (storeIds.length) {
+    const { data: stores } = await supabaseClient.from('users').select('id, store').in('id', storeIds);
+    (stores || []).forEach(s => storeMap[s.id] = s.store);
+  }
+
+  cont.innerHTML = '';
+  list.forEach(c => {
+    const badge = c.status === 'validado'
+      ? '<span class="badge-status badge-validado">✅ Usado</span>'
+      : '<span class="badge-status badge-pendente">⏳ Pendente</span>';
+    const dt = new Date(c.created_at).toLocaleDateString('pt-BR');
+    const qrBtn = c.status === 'validado' ? '' : `<button class="btn btn-sm" style="margin-top:10px;background:rgba(255,255,255,0.15);color:#fff;width:auto;padding:6px 14px;font-size:0.85em;" onclick="showQrModal('${escapeHtml(c.code)}', ${Number(c.discount)})">📷 Ver QR Code</button>`;
+    cont.innerHTML += `
+      <div class="coupon-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <strong>${escapeHtml(storeMap[c.store_id] || 'Loja')}</strong>
+          ${badge}
+        </div>
+        <div class="code">${escapeHtml(c.code)}</div>
+        <div style="font-size:0.85em;opacity:0.8;">Desconto: ${fmtMoney(c.discount)} · Compra mínima: ${fmtMoney(c.purchase_value)} · ${dt}</div>
+        ${qrBtn}
+      </div>`;
+  });
 }
 
 // ==================== PERFIL ====================
@@ -1651,17 +1941,17 @@ async function filterAdminUsers(filter, btnEl, silent = false) {
   if (!cont) return;
   cont.innerHTML = '<p style="opacity:0.6;text-align:center;padding:15px;">Carregando...</p>';
   try {
-    let query = supabaseClient.from('users').select('id, name, type, cpf, email, points, verified, store').order('name').limit(300);
+    let query = supabaseClient.from('users').select('id, name, type, cpf, email, points, verified, store, referral_code').order('name').limit(300);
     if (filter !== 'todos') query = query.eq('type', filter);
     const { data: users, error } = await query;
     if (error) { cont.innerHTML = `<p style="color:var(--red);padding:15px;">Erro: ${escapeHtml(error.message)}</p>`; return; }
     if (!users || !users.length) { cont.innerHTML = '<p style="opacity:0.6;text-align:center;padding:15px;">Nenhum usuário.</p>'; return; }
     let html = `<p style="font-size:0.85em;opacity:0.7;margin:8px 0;">${users.length} usuário(s)</p>`;
-    html += '<table><tr><th>Nome</th><th>Tipo</th><th>CPF</th><th>Pts</th></tr>';
+    html += '<table><tr><th>Nome</th><th>Tipo</th><th>Pts</th></tr>';
     users.forEach(u => {
       const tipo = u.type === 'lojista' ? '🏪' : u.type === 'admin' ? '👑' : '👤';
       const label = u.store ? ` (${escapeHtml(u.store)})` : '';
-      html += `<tr><td>${escapeHtml(u.name)}${label}</td><td>${tipo} ${escapeHtml(u.type)}</td><td>${escapeHtml(u.cpf || '—')}</td><td>${u.points || 0}</td></tr>`;
+      html += `<tr><td>${escapeHtml(u.name)}${label}</td><td>${tipo}</td><td>${u.points || 0}</td></tr>`;
     });
     html += '</table>';
     cont.innerHTML = html;
@@ -1671,7 +1961,6 @@ async function filterAdminUsers(filter, btnEl, silent = false) {
 // ==================== TRANSAÇÕES RICAS ====================
 let adminTxFilter = 'todas';
 let adminTxCache = null;
-
 async function renderAdminTransactions(btn) {
   if (!supabaseClient) return;
   setLoading(btn, true, 'Carregando...');
@@ -1681,56 +1970,31 @@ async function renderAdminTransactions(btn) {
       .select('id, type, user_id, store_id, from_user_id, to_user_id, amount, tax, net, discount, points_used, purchase_value, code, status, created_at')
       .order('created_at', { ascending: false })
       .limit(200);
-
-    if (error) {
-      document.getElementById('adm-content').innerHTML =
-        `<p style="color:var(--red);padding:15px;">Erro: ${escapeHtml(error.message)}</p>`;
-      return;
-    }
+    if (error) { document.getElementById('adm-content').innerHTML = `<p style="color:var(--red);padding:15px;">Erro: ${escapeHtml(error.message)}</p>`; return; }
 
     const allIds = new Set();
-    (txs || []).forEach(t => {
-      [t.user_id, t.store_id, t.from_user_id, t.to_user_id].forEach(id => { if (id) allIds.add(id); });
-    });
-
+    (txs || []).forEach(t => { [t.user_id, t.store_id, t.from_user_id, t.to_user_id].forEach(id => { if (id) allIds.add(id); }); });
     let people = {};
     if (allIds.size > 0) {
-      const { data: ppl } = await supabaseClient
-        .from('users').select('id, name, store, type').in('id', [...allIds]);
+      const { data: ppl } = await supabaseClient.from('users').select('id, name, store, type').in('id', [...allIds]);
       (ppl || []).forEach(p => { people[p.id] = p; });
     }
-
     adminTxCache = { txs: txs || [], people };
     adminTxFilter = 'todas';
     renderAdminTxContent();
-  } catch(e) {
-    console.error(e);
-    document.getElementById('adm-content').innerHTML =
-      `<p style="color:var(--red);padding:15px;">Erro: ${escapeHtml(e.message)}</p>`;
-  } finally { setLoading(btn, false); }
+  } catch(e) { console.error(e); document.getElementById('adm-content').innerHTML = `<p style="color:var(--red);padding:15px;">Erro.</p>`; }
+  finally { setLoading(btn, false); }
 }
-
-function filterAdminTx(filter) {
-  adminTxFilter = filter;
-  sndClick();
-  renderAdminTxContent();
-}
-
+function filterAdminTx(filter) { adminTxFilter = filter; sndClick(); renderAdminTxContent(); }
 function renderAdminTxContent() {
   const cont = document.getElementById('adm-content');
   if (!adminTxCache) { cont.innerHTML = '<p style="padding:15px;">Sem dados.</p>'; return; }
   const { txs, people } = adminTxCache;
   const filtered = adminTxFilter === 'todas' ? txs : txs.filter(t => t.type === adminTxFilter);
-
   const totalRedeems = txs.filter(t => t.type === 'redeem').length;
   const totalTransfers = txs.filter(t => t.type === 'transfer').length;
-  const totalPoints = txs.reduce((s, t) => {
-    if (t.type === 'redeem') return s + (t.points_used || 0);
-    if (t.type === 'transfer') return s + (t.amount || 0);
-    return s;
-  }, 0);
-  const totalDiscount = txs.filter(t => t.type === 'redeem')
-    .reduce((s, t) => s + Number(t.discount || 0), 0);
+  const totalPoints = txs.reduce((s, t) => { if (t.type === 'redeem') return s + (t.points_used || 0); if (t.type === 'transfer') return s + (t.amount || 0); return s; }, 0);
+  const totalDiscount = txs.filter(t => t.type === 'redeem').reduce((s, t) => s + Number(t.discount || 0), 0);
 
   const groups = {};
   filtered.forEach(t => {
@@ -1749,53 +2013,28 @@ function renderAdminTxContent() {
   let html = `
     <div class="tx-header-info">
       <strong style="color:#3498db;">💳 Painel de Transações</strong><br>
-      Acompanhe toda a movimentação da plataforma — resgates de cupons e transferências entre usuários.
+      Acompanhe toda a movimentação da plataforma.
     </div>
-
     <div class="tx-summary-grid">
-      <div class="tx-summary-card redeem">
-        <div class="tss-icon">🏷️</div>
-        <div class="tss-val">${totalRedeems}</div>
-        <div class="tss-lbl">Resgates</div>
-      </div>
-      <div class="tx-summary-card transfer">
-        <div class="tss-icon">💸</div>
-        <div class="tss-val">${totalTransfers}</div>
-        <div class="tss-lbl">Transferências</div>
-      </div>
-      <div class="tx-summary-card">
-        <div class="tss-icon">⭐</div>
-        <div class="tss-val">${totalPoints.toLocaleString('pt-BR')}</div>
-        <div class="tss-lbl">Pontos movimentados</div>
-      </div>
-      <div class="tx-summary-card">
-        <div class="tss-icon">💰</div>
-        <div class="tss-val">${fmtMoney(totalDiscount)}</div>
-        <div class="tss-lbl">Em descontos</div>
-      </div>
+      <div class="tx-summary-card redeem"><div class="tss-icon">🏷️</div><div class="tss-val">${totalRedeems}</div><div class="tss-lbl">Resgates</div></div>
+      <div class="tx-summary-card transfer"><div class="tss-icon">💸</div><div class="tss-val">${totalTransfers}</div><div class="tss-lbl">Transferências</div></div>
+      <div class="tx-summary-card"><div class="tss-icon">⭐</div><div class="tss-val">${totalPoints.toLocaleString('pt-BR')}</div><div class="tss-lbl">Pontos movimentados</div></div>
+      <div class="tx-summary-card"><div class="tss-icon">💰</div><div class="tss-val">${fmtMoney(totalDiscount)}</div><div class="tss-lbl">Em descontos</div></div>
     </div>
-
     <div class="tx-tabs tab-bar">
       <button class="tab ${adminTxFilter === 'todas' ? 'active' : ''}" onclick="filterAdminTx('todas')">📋 Todas (${txs.length})</button>
       <button class="tab ${adminTxFilter === 'redeem' ? 'active' : ''}" onclick="filterAdminTx('redeem')">🏷️ Resgates (${totalRedeems})</button>
       <button class="tab ${adminTxFilter === 'transfer' ? 'active' : ''}" onclick="filterAdminTx('transfer')">💸 Transferências (${totalTransfers})</button>
     </div>
-
     <div class="tx-export-bar">
       <button class="btn-export" onclick="exportTransactionsCSV()">📥 Exportar CSV</button>
-    </div>
-  `;
+    </div>`;
 
   if (!filtered.length) {
-    html += `
-      <div class="tx-empty">
-        <div class="te-icon">📭</div>
-        <p>Nenhuma transação ${adminTxFilter !== 'todas' ? 'desse tipo ' : ''}registrada ainda.</p>
-      </div>`;
+    html += `<div class="tx-empty"><div class="te-icon">📭</div><p>Nenhuma transação ${adminTxFilter !== 'todas' ? 'desse tipo ' : ''}registrada ainda.</p></div>`;
     cont.innerHTML = html;
     return;
   }
-
   const groupOrder = Object.keys(groups).sort((a, b) => {
     if (a.includes('Hoje')) return -1;
     if (b.includes('Hoje')) return 1;
@@ -1803,19 +2042,15 @@ function renderAdminTxContent() {
     if (b.includes('Ontem')) return 1;
     return b.localeCompare(a);
   });
-
   groupOrder.forEach(label => {
     html += `<div class="tx-group-label">${label}</div>`;
     groups[label].forEach(t => { html += buildTxItem(t, people); });
   });
-
   cont.innerHTML = html;
 }
-
 function buildTxItem(t, people) {
   const dt = new Date(t.created_at);
   const time = dt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-
   if (t.type === 'redeem') {
     const user = people[t.user_id] || {};
     const store = people[t.store_id] || {};
@@ -1824,100 +2059,60 @@ function buildTxItem(t, people) {
       : '<span class="badge-status badge-pendente" style="font-size:0.7em;">⏳ Pendente</span>';
     return `
       <div class="tx-item redeem">
-        <div class="tx-item-head">
-          <span class="tx-type-badge redeem">🏷️ Resgate</span>
-          <span class="tx-time">🕐 ${time}</span>
-        </div>
+        <div class="tx-item-head"><span class="tx-type-badge redeem">🏷️ Resgate</span><span class="tx-time">🕐 ${time}</span></div>
         <div class="tx-body">
           <div class="tx-line"><span class="tx-lbl">👤 Cliente</span><span class="tx-val">${escapeHtml(user.name || '—')}</span></div>
           <div class="tx-line"><span class="tx-lbl">🏪 Loja</span><span class="tx-val">${escapeHtml(store.store || store.name || '—')}</span></div>
-          <div class="tx-line"><span class="tx-lbl">💵 Valor da compra</span><span class="tx-val">${fmtMoney(t.purchase_value)}</span></div>
-          <div class="tx-line"><span class="tx-lbl">🎯 Pontos usados</span><span class="tx-val" style="color:#ff8c00;">− ${(t.points_used || 0).toLocaleString('pt-BR')} pts</span></div>
-          <div class="tx-line"><span class="tx-lbl">💰 Desconto aplicado</span><span class="tx-val" style="color:#7dffa8;">${fmtMoney(t.discount)}</span></div>
+          <div class="tx-line"><span class="tx-lbl">💵 Compra</span><span class="tx-val">${fmtMoney(t.purchase_value)}</span></div>
+          <div class="tx-line"><span class="tx-lbl">🎯 Pontos</span><span class="tx-val" style="color:#ff8c00;">− ${(t.points_used || 0).toLocaleString('pt-BR')} pts</span></div>
+          <div class="tx-line"><span class="tx-lbl">💰 Desconto</span><span class="tx-val" style="color:#7dffa8;">${fmtMoney(t.discount)}</span></div>
         </div>
-        <div class="tx-item-foot">
-          <span class="tx-code">${escapeHtml(t.code || '—')}</span>
-          ${statusBadge}
-        </div>
+        <div class="tx-item-foot"><span class="tx-code">${escapeHtml(t.code || '—')}</span>${statusBadge}</div>
       </div>`;
   }
-
   if (t.type === 'transfer') {
     const from = people[t.from_user_id] || {};
     const to = people[t.to_user_id] || {};
     return `
       <div class="tx-item transfer">
-        <div class="tx-item-head">
-          <span class="tx-type-badge transfer">💸 Transferência</span>
-          <span class="tx-time">🕐 ${time}</span>
-        </div>
+        <div class="tx-item-head"><span class="tx-type-badge transfer">💸 Transferência</span><span class="tx-time">🕐 ${time}</span></div>
         <div class="tx-body">
           <div class="tx-line"><span class="tx-lbl">👤 De</span><span class="tx-val">${escapeHtml(from.name || '—')}</span></div>
           <div class="tx-line"><span class="tx-lbl">👤 Para</span><span class="tx-val">${escapeHtml(to.name || '—')}</span></div>
           <div class="tx-line"><span class="tx-lbl">📤 Enviados</span><span class="tx-val">${(t.amount || 0).toLocaleString('pt-BR')} pts</span></div>
-          <div class="tx-line"><span class="tx-lbl">🏦 Taxa (20%)</span><span class="tx-val" style="color:#d4b3ff;">${(t.tax || 0).toLocaleString('pt-BR')} pts</span></div>
+          <div class="tx-line"><span class="tx-lbl">🏦 Taxa</span><span class="tx-val" style="color:#d4b3ff;">${(t.tax || 0).toLocaleString('pt-BR')} pts</span></div>
           <div class="tx-line"><span class="tx-lbl">✅ Recebidos</span><span class="tx-val" style="color:#7dffa8;">${(t.net || 0).toLocaleString('pt-BR')} pts</span></div>
         </div>
       </div>`;
   }
   return '';
 }
-
-// ==================== EXPORTAR CSV ====================
 function exportTransactionsCSV() {
   if (!adminTxCache) { toast('Nenhum dado carregado.', 'error'); return; }
   const { txs, people } = adminTxCache;
-  const filter = adminTxFilter;
-  const list = filter === 'todas' ? txs : txs.filter(t => t.type === filter);
-
+  const list = adminTxFilter === 'todas' ? txs : txs.filter(t => t.type === adminTxFilter);
   if (!list.length) { toast('Sem transações para exportar.', 'error'); return; }
-
-  const esc = (v) => {
-    const s = String(v ?? '');
-    if (s.includes(',') || s.includes('"') || s.includes('\n')) return '"' + s.replace(/"/g, '""') + '"';
-    return s;
-  };
-
-  const headers = [
-    'Data', 'Hora', 'Tipo', 'Cliente/De', 'Loja/Para',
-    'Valor Compra', 'Pontos Usados', 'Desconto',
-    'Valor Enviado', 'Taxa', 'Líquido',
-    'Código', 'Status'
-  ];
-
+  const esc = (v) => { const s = String(v ?? ''); if (s.includes(',') || s.includes('"') || s.includes('\n')) return '"' + s.replace(/"/g, '""') + '"'; return s; };
+  const headers = ['Data','Hora','Tipo','Cliente/De','Loja/Para','Valor Compra','Pontos Usados','Desconto','Valor Enviado','Taxa','Líquido','Código','Status'];
   const rows = list.map(t => {
     const d = new Date(t.created_at);
     const date = d.toLocaleDateString('pt-BR');
     const time = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-
     if (t.type === 'redeem') {
       const user = people[t.user_id] || {};
       const store = people[t.store_id] || {};
-      return [
-        date, time, 'Resgate',
-        user.name || '', store.store || store.name || '',
-        t.purchase_value || '', t.points_used || '', t.discount || '',
-        '', '', '',
-        t.code || '', t.status || ''
-      ];
+      return [date, time, 'Resgate', user.name || '', store.store || store.name || '', t.purchase_value || '', t.points_used || '', t.discount || '', '', '', '', t.code || '', t.status || ''];
     }
     const from = people[t.from_user_id] || {};
     const to = people[t.to_user_id] || {};
-    return [
-      date, time, 'Transferência',
-      from.name || '', to.name || '',
-      '', '', '',
-      t.amount || '', t.tax || '', t.net || '',
-      '', ''
-    ];
+    return [date, time, 'Transferência', from.name || '', to.name || '', '', '', '', t.amount || '', t.tax || '', t.net || '', '', ''];
   });
-
   const csv = [headers, ...rows].map(r => r.map(esc).join(',')).join('\n');
   const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `quizlocal-transacoes-${filter}-${todayStr()}.csv`;
+  a.download = `quizlocal-transacoes-${adminTxFilter}-${todayStr()}.csv`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
@@ -1931,14 +2126,13 @@ async function renderImpactReport(btn) {
   setLoading(btn, true, 'Calculando...');
   try {
     const [{ data: users }, { data: offers }, { data: redeems }, { data: transfers }, { data: fund }, { data: daily }] = await Promise.all([
-      supabaseClient.from('users').select('id, type, points, games_played, correct_answers'),
+      supabaseClient.from('users').select('id, type, points, games_played, correct_answers, referred_by'),
       supabaseClient.from('offers').select('id, category'),
       supabaseClient.from('transactions').select('user_id, store_id, discount, points_used, purchase_value').eq('type','redeem'),
       supabaseClient.from('transactions').select('tax').eq('type','transfer'),
       supabaseClient.from('project_fund').select('amount').eq('id', 1).single(),
       supabaseClient.from('daily_actions').select('action_type, points')
     ]);
-
     const clientes = (users||[]).filter(u => u.type === 'cliente');
     const lojistas = (users||[]).filter(u => u.type === 'lojista');
     const totalPts = (users||[]).reduce((s,u) => s + (u.points||0), 0);
@@ -1954,7 +2148,7 @@ async function renderImpactReport(btn) {
     const checkinsTotal = (daily||[]).filter(d => d.action_type === 'checkin').length;
     const followsTotal = (daily||[]).filter(d => d.action_type === 'follow').length;
     const viewsTotal = (daily||[]).filter(d => d.action_type === 'view_offer').length;
-
+    const indicadosTotal = (users||[]).filter(u => u.referred_by != null).length;
     const categorias = {};
     (offers||[]).forEach(o => { const c = o.category || 'Outros'; categorias[c] = (categorias[c] || 0) + 1; });
 
@@ -1980,25 +2174,23 @@ async function renderImpactReport(btn) {
       <h4 style="color:var(--gold);margin:20px 0 5px;">🎁 Engajamento</h4>
       <div class="impact-grid">
         <div class="impact-card"><div class="ic-icon">✅</div><div class="ic-val">${checkinsTotal}</div><div class="ic-lbl">Check-ins totais</div></div>
-        <div class="impact-card"><div class="ic-icon">❤️</div><div class="ic-val">${followsTotal}</div><div class="ic-lbl">Seguidores de lojas</div></div>
-        <div class="impact-card"><div class="ic-icon">👁️</div><div class="ic-val">${viewsTotal}</div><div class="ic-lbl">Ofertas visualizadas</div></div>
-        <div class="impact-card"><div class="ic-icon">📈</div><div class="ic-val">${totalQuizes > 0 ? ((totalAcertos / (totalQuizes * 10)) * 100).toFixed(1) : 0}%</div><div class="ic-lbl">Taxa média de acertos</div></div>
+        <div class="impact-card"><div class="ic-icon">❤️</div><div class="ic-val">${followsTotal}</div><div class="ic-lbl">Seguidores</div></div>
+        <div class="impact-card"><div class="ic-icon">👁️</div><div class="ic-val">${viewsTotal}</div><div class="ic-lbl">Ofertas vistas</div></div>
+        <div class="impact-card"><div class="ic-icon">🎁</div><div class="ic-val">${indicadosTotal}</div><div class="ic-lbl">Usuários indicados</div></div>
       </div>
       <h4 style="color:var(--gold);margin:20px 0 5px;">👤 Cadastros</h4>
       <div class="impact-grid">
-        <div class="impact-card"><div class="ic-icon">👤</div><div class="ic-val">${clientes.length}</div><div class="ic-lbl">Clientes cadastrados</div></div>
-        <div class="impact-card"><div class="ic-icon">🏪</div><div class="ic-val">${lojistas.length}</div><div class="ic-lbl">Lojistas parceiros</div></div>
+        <div class="impact-card"><div class="ic-icon">👤</div><div class="ic-val">${clientes.length}</div><div class="ic-lbl">Clientes</div></div>
+        <div class="impact-card"><div class="ic-icon">🏪</div><div class="ic-val">${lojistas.length}</div><div class="ic-lbl">Lojistas</div></div>
         <div class="impact-card"><div class="ic-icon">💼</div><div class="ic-val">${fmtMoney(fundPts / CFG.POINTS_PER_REAL)}</div><div class="ic-lbl">Caixa (${fundPts} pts)</div></div>
-        <div class="impact-card"><div class="ic-icon">💸</div><div class="ic-val">${totalTaxas}</div><div class="ic-lbl">Pontos taxados</div></div>
+        <div class="impact-card"><div class="ic-icon">📈</div><div class="ic-val">${totalQuizes > 0 ? ((totalAcertos / (totalQuizes * 10)) * 100).toFixed(1) : 0}%</div><div class="ic-lbl">Taxa de acertos</div></div>
       </div>
       <h4 style="color:var(--gold);margin:20px 0 5px;">🏷️ Ofertas por Categoria</h4>
       <div style="background:rgba(0,0,0,0.2);border-radius:10px;padding:12px;">
         ${Object.keys(categorias).length === 0
           ? '<p style="opacity:0.6;font-size:0.9em;">Nenhuma oferta cadastrada.</p>'
           : Object.entries(categorias).map(([cat, n]) =>
-              `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,215,0,0.1);">
-                <span>${escapeHtml(cat)}</span><strong style="color:var(--gold);">${n}</strong>
-              </div>`).join('')}
+              `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,215,0,0.1);"><span>${escapeHtml(cat)}</span><strong style="color:var(--gold);">${n}</strong></div>`).join('')}
       </div>
     `;
   } catch(e) {
@@ -2027,7 +2219,6 @@ window.addEventListener('load', async () => {
     }
   } catch(e) { console.warn('Falha ao restaurar sessão:', e); }
   showScreen('scr-home');
-  await testSupabaseConnection();
 });
 </script>
 </body>
