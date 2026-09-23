@@ -76,6 +76,7 @@
   .badge-status { display:inline-block; padding:3px 10px; border-radius:12px; font-size:0.75em; font-weight:bold; }
   .badge-pendente { background:#f39c12; color:#fff; }
   .badge-validado { background:var(--green); color:#fff; }
+  .badge-featured { background:linear-gradient(90deg,#ff8c00,#ffd700); color:var(--dark); padding:3px 10px; border-radius:12px; font-size:0.75em; font-weight:bold; }
   .toast { position:fixed; top:15px; right:15px; padding:12px 20px; border-radius:10px; color:#fff; font-weight:bold; z-index:9999; animation:slideIn 0.3s; font-size:0.9em; max-width:90%; }
   .toast.success { background:var(--green); } .toast.error { background:var(--red); } .toast.info { background:#2980b9; }
   @keyframes slideIn { from{transform:translateX(100%)} to{transform:translateX(0)} }
@@ -95,12 +96,10 @@
   .forgot-link a { color:var(--gold); cursor:pointer; font-size:0.85em; text-decoration:underline; }
   .spinner { display:inline-block; width:14px; height:14px; border:2px solid rgba(255,255,255,0.3); border-top-color:#fff; border-radius:50%; animation:spin 0.7s linear infinite; vertical-align:middle; margin-right:6px; }
   @keyframes spin { to { transform:rotate(360deg); } }
-  /* Tabs do admin */
   .tab-bar { display:flex; gap:6px; margin:12px 0; overflow-x:auto; padding-bottom:4px; }
   .tab { flex:1; min-width:max-content; background:rgba(255,255,255,0.08); border:1px solid rgba(255,215,0,0.3); color:#fff; padding:8px 14px; border-radius:20px; font-size:0.85em; font-weight:bold; cursor:pointer; transition:0.2s; }
   .tab.active { background:linear-gradient(90deg,var(--gold),#ff8c00); color:var(--dark); border-color:transparent; }
   .tab:active { transform:scale(0.97); }
-  /* KPI cards ricos (relatório de impacto) */
   .impact-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px; margin:15px 0; }
   .impact-card { background:linear-gradient(135deg,rgba(255,215,0,0.15),rgba(255,140,0,0.05)); border:1px solid rgba(255,215,0,0.35); border-radius:12px; padding:16px; text-align:center; }
   .impact-card .ic-icon { font-size:1.8em; margin-bottom:6px; }
@@ -112,6 +111,48 @@
   .instructions-list .il-icon { font-size:1.4em; flex-shrink:0; }
   .instructions-list .il-text { font-size:0.9em; line-height:1.4; opacity:0.9; }
   .instructions-list .il-text strong { color:var(--gold); display:block; margin-bottom:2px; }
+
+  /* Streak calendar */
+  .streak-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin:15px 0; }
+  .streak-cell {
+    background:rgba(255,255,255,0.06);
+    border:1px solid rgba(255,215,0,0.2);
+    border-radius:10px;
+    padding:10px 4px;
+    text-align:center;
+    font-size:0.75em;
+    font-weight:bold;
+    transition:0.2s;
+  }
+  .streak-cell .sc-day { font-size:0.65em; opacity:0.7; margin-bottom:2px; }
+  .streak-cell .sc-val { font-size:0.9em; color:var(--gold); }
+  .streak-cell.done { background:rgba(39,174,96,0.25); border-color:var(--green); }
+  .streak-cell.done .sc-val { color:#7dffa8; }
+  .streak-cell.today { background:linear-gradient(135deg,rgba(255,215,0,0.3),rgba(255,140,0,0.15)); border-color:var(--gold); box-shadow:0 0 12px rgba(255,215,0,0.4); }
+  .streak-cell.bonus { background:linear-gradient(135deg,rgba(255,140,0,0.25),rgba(255,215,0,0.1)); border-color:#ff8c00; }
+  .streak-cell.bonus .sc-val::before { content:'🎁 '; }
+
+  /* Daily offers */
+  .daily-offer {
+    background:rgba(255,255,255,0.06);
+    border:1px solid rgba(255,215,0,0.25);
+    border-radius:12px;
+    padding:15px;
+    margin:10px 0;
+  }
+  .daily-offer.featured { border-color:#ff8c00; background:linear-gradient(135deg,rgba(255,140,0,0.12),rgba(255,215,0,0.04)); }
+  .daily-offer .do-head { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px; gap:8px; }
+  .daily-offer h4 { color:var(--gold); font-size:1em; margin-bottom:4px; }
+  .daily-offer .do-store { font-size:0.8em; opacity:0.75; }
+  .daily-offer .do-desc { font-size:0.85em; opacity:0.9; line-height:1.4; margin:6px 0; }
+  .daily-offer .do-actions { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .daily-offer .do-actions button { flex:1; min-width:120px; padding:8px; border-radius:20px; border:none; font-weight:bold; cursor:pointer; font-size:0.85em; }
+  .follow-btn { background:linear-gradient(90deg,#6a0dad,#9b30ff); color:#fff; }
+  .follow-btn.following { background:rgba(255,255,255,0.15); color:#ccc; }
+  .view-btn { background:linear-gradient(90deg,var(--gold),#ff8c00); color:var(--dark); }
+  .view-btn:disabled { opacity:0.4; cursor:not-allowed; }
+  .view-btn.credited { background:rgba(39,174,96,0.4); color:#fff; }
+  .view-timer { font-size:0.75em; opacity:0.7; margin-top:4px; }
 </style>
 </head>
 <body>
@@ -164,7 +205,7 @@
     <button class="back-btn" onclick="showScreen('scr-login')">← Voltar ao Login</button>
     <div class="card">
       <h2 style="color:var(--gold);text-align:center;margin-bottom:15px;">🔐 Recuperar Senha</h2>
-      <div class="info"><strong>Como funciona:</strong><br>1. Informe seu email ou CPF cadastrado<br>2. Um código será gerado no console<br>3. Digite o código e crie uma nova senha<br><br><em>⚠️ DEMO: o código aparece no console (F12).</em></div>
+      <div class="info"><strong>Como funciona:</strong><br>1. Informe seu email ou CPF<br>2. Código gerado no console<br>3. Digite e crie nova senha</div>
       <label>E-mail ou CPF cadastrado:</label>
       <input type="text" id="forgot-id" placeholder="seu@email.com ou 00000000000">
       <button class="btn btn-purple" onclick="requestPasswordReset(this)">Enviar Código de Verificação</button>
@@ -211,6 +252,7 @@
   <!-- CLIENT DASHBOARD -->
   <div id="scr-client" class="screen">
     <div class="topbar"><span>👤 <strong id="cli-name"></strong></span><span class="pts-badge">⭐ <span id="cli-pts">0</span> pts</span><button class="back-btn" onclick="logout()" style="margin:0;">Sair</button></div>
+
     <div class="card">
       <div class="stats">
         <div class="stat"><div class="stat-val" id="cli-balance">R$ 0</div><div class="stat-lbl">Saldo em Reais</div></div>
@@ -218,26 +260,53 @@
         <div class="stat"><div class="stat-val" id="cli-redeemed">R$ 0</div><div class="stat-lbl">Total Resgatado</div></div>
       </div>
       <button class="btn" onclick="startQuiz(this)">🎮 JOGAR QUIZ AGORA</button>
+      <button class="btn btn-purple" onclick="showScreen('scr-daily-offers')">🎁 OFERTAS DO DIA</button>
       <button class="btn btn-green" onclick="showScreen('scr-redeem')">🏷️ Resgatar Desconto</button>
-      <button class="btn btn-purple" onclick="showScreen('scr-transfer')">💸 Transferir Pontos</button>
+      <button class="btn btn-sm" onclick="showScreen('scr-transfer')" style="background:rgba(255,255,255,0.15);color:#fff;">💸 Transferir Pontos</button>
       <button class="btn btn-sm" onclick="showScreen('scr-coupons')" style="background:rgba(255,255,255,0.15);color:#fff;">🎟️ Meus Cupons</button>
       <button class="btn btn-sm" onclick="showScreen('scr-profile')" style="background:rgba(255,255,255,0.15);color:#fff;">👤 Meu Perfil</button>
     </div>
-    <div class="info"><strong>💡 Dica:</strong> Jogue diariamente para manter seus pontos ativos. Transfira pontos para amigos (taxa de 20%).</div>
+    <div class="info"><strong>💡 Dica:</strong> Faça check-in todo dia em Ofertas do Dia para bônus de sequência. Transfira pontos para amigos (taxa de 20%).</div>
   </div>
 
-  <!-- QUIZ INTRO (NOVA) -->
+  <!-- OFERTAS DO DIA (NOVA — Bloco A) -->
+  <div id="scr-daily-offers" class="screen">
+    <button class="back-btn" onclick="showScreen('scr-client')">← Voltar</button>
+
+    <!-- Check-in -->
+    <div class="card" style="text-align:center;">
+      <h2 style="color:var(--gold);margin-bottom:5px;">🎁 Check-in Diário</h2>
+      <p style="font-size:0.85em;opacity:0.75;margin-bottom:10px;">Volte todo dia e ganhe bônus crescente</p>
+      <div id="streak-calendar"></div>
+      <button class="btn btn-green" id="btn-checkin" onclick="doCheckin(this)">Fazer Check-in Hoje</button>
+      <p style="font-size:0.8em;opacity:0.7;margin-top:8px;" id="checkin-status"></p>
+    </div>
+
+    <!-- Ofertas do dia -->
+    <div class="card">
+      <h2 style="color:var(--gold);margin-bottom:5px;">🔥 Ofertas do Dia</h2>
+      <p style="font-size:0.85em;opacity:0.75;margin-bottom:10px;">
+        Ganhe <strong style="color:var(--gold);">+10 pts</strong> ao visualizar cada oferta (máx 50 pts/dia)
+        · <span id="views-pts-today">0/50 pts</span>
+      </p>
+      <div id="daily-offers-list">
+        <p style="opacity:0.6;text-align:center;padding:15px;">Carregando ofertas...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUIZ INTRO -->
   <div id="scr-quiz-intro" class="screen">
     <button class="back-btn" onclick="showScreen('scr-client')">← Voltar</button>
     <div class="card">
       <h2 style="color:var(--gold);text-align:center;margin-bottom:5px;">🎮 Como funciona o Quiz</h2>
       <p style="text-align:center;opacity:0.8;font-size:0.9em;margin-bottom:15px;">Leia antes de começar. Boa sorte!</p>
       <ul class="instructions-list">
-        <li><span class="il-icon">✅</span><div class="il-text"><strong>Acertos valem pontos</strong>A dificuldade define o valor: fácil = 100, média = 200, difícil = 300 pts.</div></li>
-        <li><span class="il-icon">📊</span><div class="il-text"><strong>Progressão de dificuldade</strong>Você começa com 4 fáceis, depois 3 médias, depois 3 difíceis. Sempre nessa ordem.</div></li>
-        <li><span class="il-icon">⏱️</span><div class="il-text"><strong>Tempo por pergunta</strong>15s para fáceis · 20s para médias · 30s para difíceis.</div></li>
-        <li><span class="il-icon">✂️</span><div class="il-text"><strong>Ajudas (1 uso cada)</strong>50/50 elimina duas erradas · ⏭️ Pular troca por outra · 🛑 Parar encerra e guarda seus pontos.</div></li>
-        <li><span class="il-icon">🏆</span><div class="il-text"><strong>Ao final</strong>Você vê o total de acertos, pontos e o saldo acumulado para resgatar descontos.</div></li>
+        <li><span class="il-icon">✅</span><div class="il-text"><strong>Acertos valem pontos</strong>Fácil = 100 · média = 200 · difícil = 300 pts.</div></li>
+        <li><span class="il-icon">📊</span><div class="il-text"><strong>Progressão de dificuldade</strong>Começa com 4 fáceis, depois 3 médias, depois 3 difíceis.</div></li>
+        <li><span class="il-icon">⏱️</span><div class="il-text"><strong>Tempo por pergunta</strong>15s · 20s · 30s (conforme dificuldade).</div></li>
+        <li><span class="il-icon">✂️</span><div class="il-text"><strong>Ajudas (1 uso cada)</strong>50/50 · Pular · Parar.</div></li>
+        <li><span class="il-icon">🏆</span><div class="il-text"><strong>Ao final</strong>Total de acertos, pontos e saldo para resgatar.</div></li>
       </ul>
       <button class="btn" onclick="beginQuiz(this)">▶️ Começar Quiz</button>
       <button class="btn btn-outline" onclick="showScreen('scr-client')" style="margin-top:10px;">Agora não</button>
@@ -277,7 +346,7 @@
     <button class="back-btn" onclick="showScreen('scr-client')">← Voltar</button>
     <div class="card">
       <h2 style="color:var(--gold);margin-bottom:10px;">🏷️ Resgatar Desconto</h2>
-      <div class="info"><strong>Regras:</strong> desconto máximo 10% da compra · 1.000 pts = R$ 1,00 · não aplicável a frete</div>
+      <div class="info"><strong>Regras:</strong> desconto máximo 10% · 1.000 pts = R$ 1,00 · não aplicável a frete</div>
       <label>Loja Parceira:</label><select id="redeem-store"></select>
       <label>Valor da Compra (sem entrega):</label><input type="number" id="redeem-value" placeholder="Ex: 150.00" step="0.01" min="0">
       <div id="redeem-preview" class="hidden" style="background:rgba(255,215,0,0.1);padding:12px;border-radius:8px;margin:10px 0;font-size:0.9em;"></div>
@@ -291,7 +360,7 @@
     <button class="back-btn" onclick="showScreen('scr-client')">← Voltar</button>
     <div class="card">
       <h2 style="color:var(--gold);margin-bottom:10px;">💸 Transferir Pontos</h2>
-      <div class="info"><strong>Regras:</strong> taxa de 20% · limite diário 5.000 pts · limite mensal 150.000 pts</div>
+      <div class="info"><strong>Regras:</strong> taxa 20% · limite diário 5.000 pts · mensal 150.000 pts</div>
       <label>CPF do Destinatário:</label><input type="tel" id="tr-cpf" placeholder="00000000000" maxlength="11" inputmode="numeric">
       <label>Quantidade de Pontos:</label><input type="number" id="tr-amount" placeholder="Ex: 5000" min="100">
       <div id="tr-preview" class="hidden" style="background:rgba(255,215,0,0.1);padding:12px;border-radius:8px;margin:10px 0;font-size:0.9em;"></div>
@@ -347,7 +416,7 @@
     <button class="back-btn" onclick="showScreen('scr-shopkeeper')">← Voltar</button>
     <div class="card">
       <h2 style="color:var(--gold);margin-bottom:10px;">✅ Validar Cupom</h2>
-      <div class="info">Peça ao cliente o código do cupom e insira abaixo.</div>
+      <div class="info">Peça ao cliente o código e insira abaixo.</div>
       <label>Código do Cupom:</label><input type="text" id="val-code" placeholder="QL-XXXXXX" style="text-transform:uppercase;text-align:center;font-size:1.3em;letter-spacing:3px;">
       <button class="btn btn-green" onclick="validateCoupon(this)">Validar</button>
       <div id="val-result" style="margin-top:15px;"></div>
@@ -372,6 +441,10 @@
       </select>
       <label>Pontos Necessários (mín. 1000):</label><input type="number" id="offer-pts" placeholder="Ex: 5000" min="1000">
       <label>Estoque Disponível:</label><input type="number" id="offer-stock" placeholder="Ex: 20" min="1">
+      <label style="display:flex;align-items:center;gap:8px;margin-top:15px;cursor:pointer;">
+        <input type="checkbox" id="offer-featured" style="width:auto;margin:0;transform:scale(1.3);">
+        <span>🔥 Destacar como Oferta do Dia (aparece em destaque na home)</span>
+      </label>
       <button class="btn btn-green" onclick="addOffer(this)">Cadastrar Oferta</button>
     </div>
   </div>
@@ -385,7 +458,7 @@
     </div>
   </div>
 
-  <!-- ADMIN (REFORMULADO) -->
+  <!-- ADMIN -->
   <div id="scr-admin" class="screen">
     <div class="topbar"><span>👑 <strong id="adm-name"></strong></span><button class="back-btn" onclick="logout()" style="margin:0;">Sair</button></div>
     <div class="card">
@@ -440,7 +513,7 @@
 </div>
 
 <script>
-// ==================== CONSTANTES ====================
+// ==================== CONFIG ====================
 const CFG = {
   POINTS_PER_REAL: 1000,
   MAX_DISCOUNT_PCT: 0.10,
@@ -453,7 +526,14 @@ const CFG = {
   MIN_DB_QUESTIONS: 10,
   SESSION_TTL_MS: 24 * 3600 * 1000,
   DIFFICULTY_DISTRIBUTION: { 1: 4, 2: 3, 3: 3 },
-  TIME_BY_DIFFICULTY: { 1: 15, 2: 20, 3: 30 }
+  TIME_BY_DIFFICULTY: { 1: 15, 2: 20, 3: 30 },
+  // Bloco A — recompensas
+  REWARDS: {
+    CHECKIN: 50,
+    FOLLOW: 50,
+    VIEW_OFFER: 10,
+    VIEW_OFFER_DAILY_CAP: 50
+  }
 };
 
 const SUPABASE_URL = 'https://klzjcpogqsasfigyxgxp.supabase.co';
@@ -462,30 +542,14 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 let supabaseClient = null;
 (function initSupabase() {
   try {
-    if (typeof window.supabase === 'undefined' || typeof window.supabase.createClient !== 'function') {
-      console.error('❌ Biblioteca do Supabase não carregada.');
-      return;
-    }
+    if (typeof window.supabase === 'undefined') return;
     supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     console.log('✅ Cliente Supabase inicializado.');
   } catch (e) { console.error('Erro ao iniciar Supabase:', e); }
 })();
 
-const SETUP_SQL = `
-create table if not exists users ( id bigserial primary key, type text not null default 'cliente', name text not null, cpf text unique, email text unique, pass text, store text, points int default 0, games_played int default 0, correct_answers int default 0, total_redeemed numeric default 0, verified boolean default true, created_at timestamptz default now() );
-create table if not exists transactions ( id bigserial primary key, type text, user_id bigint, store_id bigint, from_user_id bigint, to_user_id bigint, amount int, tax int, net int, discount numeric, points_used int, purchase_value numeric, code text unique, status text, created_at timestamptz default now() );
-create table if not exists offers ( id bigserial primary key, store_id bigint, name text, description text, category text default 'Outros', points int, stock int, created_at timestamptz default now() );
-create table if not exists questions ( id bigserial primary key, question text not null, option_a text not null, option_b text not null, option_c text not null, option_d text not null, correct_answer int not null, category text default 'Geral', difficulty int default 1, active boolean default true, created_at timestamptz default now() );
-create table if not exists project_fund ( id int primary key, amount numeric default 0, updated_at timestamptz default now() );
-insert into project_fund (id, amount) values (1, 0) on conflict (id) do nothing;
-alter table users disable row level security;
-alter table transactions disable row level security;
-alter table offers disable row level security;
-alter table questions disable row level security;
-alter table project_fund disable row level security;
-`;
-
 let SESSION = { userId: null, user: null, resetData: null, transferData: null };
+let DAILY = null; // cache do get_daily_summary
 
 // ==================== SONS ====================
 let actx = null;
@@ -520,7 +584,7 @@ function sndClick() {
   } catch(e) {}
 }
 
-// ==================== UTILITÁRIOS ====================
+// ==================== UTILS ====================
 function escapeHtml(s) {
   return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
@@ -546,8 +610,7 @@ async function hashPassword(pass) {
   try {
     const buf = new TextEncoder().encode('quizlocal:' + pass);
     const hashBuf = await crypto.subtle.digest('SHA-256', buf);
-    const hex = Array.from(new Uint8Array(hashBuf)).map(b => b.toString(16).padStart(2,'0')).join('');
-    return 'sha256:' + hex;
+    return 'sha256:' + Array.from(new Uint8Array(hashBuf)).map(b => b.toString(16).padStart(2,'0')).join('');
   } catch(e) { return pass; }
 }
 async function verifyPassword(input, stored) {
@@ -576,11 +639,7 @@ function confirmDialog(title, text) {
     modal.classList.add('active');
     const yes = document.getElementById('mc-yes');
     const no  = document.getElementById('mc-no');
-    const cleanup = () => {
-      modal.classList.remove('active');
-      yes.removeEventListener('click', onYes);
-      no.removeEventListener('click', onNo);
-    };
+    const cleanup = () => { modal.classList.remove('active'); yes.removeEventListener('click', onYes); no.removeEventListener('click', onNo); };
     const onYes = () => { cleanup(); resolve(true); };
     const onNo  = () => { cleanup(); resolve(false); };
     yes.addEventListener('click', onYes);
@@ -610,6 +669,7 @@ function showScreen(id) {
   if(id==='scr-coupons') renderCoupons();
   if(id==='scr-profile') refreshProfile();
   if(id==='scr-shop-products') renderShopProducts();
+  if(id==='scr-daily-offers') loadDailyOffers();
   if(id==='scr-forgot') {
     const step2 = document.getElementById('forgot-step2');
     if (step2) step2.classList.add('hidden');
@@ -648,28 +708,16 @@ document.addEventListener('DOMContentLoaded', function() {
 // ==================== DIAGNÓSTICO ====================
 async function runDiagnostics() {
   console.group('🩺 Diagnóstico QuizLocal');
-  if (!supabaseClient) {
-    console.error('❌ supabaseClient não inicializado.');
-    toast('❌ Cliente Supabase não inicializado.', 'error');
-    console.groupEnd(); return;
-  }
-  const tables = ['users','transactions','offers','questions','project_fund'];
+  if (!supabaseClient) { console.error('❌ supabaseClient não inicializado.'); console.groupEnd(); return; }
+  const tables = ['users','transactions','offers','questions','project_fund','followers','daily_actions'];
   const missing = [];
   for (const t of tables) {
     const { error } = await supabaseClient.from(t).select('id').limit(1);
     if (error) { missing.push(`${t} → ${error.message}`); console.error(`❌ ${t}: ${error.message}`); }
-    else console.log(`✅ Tabela "${t}" OK.`);
+    else console.log(`✅ ${t} OK.`);
   }
-  if (!missing.includes('questions')) {
-    const { count } = await supabaseClient.from('questions').select('*', { count: 'exact', head: true }).eq('active', true);
-    console.log(`📚 Perguntas ativas: ${count || 0}`);
-  }
-  if (missing.length) {
-    console.warn('⚠️ Rode o SQL abaixo no Supabase:'); console.log(SETUP_SQL);
-    toast('⚠️ Tabelas faltando. Veja o console (F12).', 'error');
-  } else {
-    console.log('✅ Banco OK!'); toast('✅ Banco de dados conectado!', 'success');
-  }
+  if (missing.length) toast('⚠️ Tabelas faltando. Veja o console (F12).', 'error');
+  else toast('✅ Banco OK!', 'success');
   console.groupEnd();
 }
 
@@ -677,8 +725,8 @@ async function testSupabaseConnection() {
   if (!supabaseClient) return;
   try {
     const { error } = await supabaseClient.from('users').select('id').limit(1);
-    if (error) { console.warn('⚠️ Não foi possível consultar "users":', error.message); return; }
-    console.log('✅ Banco de dados conectado.');
+    if (error) console.warn('⚠️ users:', error.message);
+    else console.log('✅ Banco de dados conectado.');
   } catch (err) { console.error('Erro DB:', err); }
 }
 
@@ -699,13 +747,12 @@ async function handleLogin(btn) {
       query = query.eq('cpf', cpf);
     }
     const { data: user, error } = await query.maybeSingle();
-    if (error) { toast('Erro na consulta: ' + error.message, 'error'); return; }
+    if (error) { toast('Erro: ' + error.message, 'error'); return; }
     if (!user) { toast('Usuário não encontrado!','error'); sndWrong(); return; }
     if (!(await verifyPassword(pass, user.pass))) { toast('Senha incorreta!','error'); sndWrong(); return; }
 
     if (!user.pass.startsWith('sha256:')) {
-      try { await supabaseClient.from('users').update({ pass: await hashPassword(pass) }).eq('id', user.id); }
-      catch(e) {}
+      try { await supabaseClient.from('users').update({ pass: await hashPassword(pass) }).eq('id', user.id); } catch(e) {}
     }
 
     SESSION.userId = user.id;
@@ -714,10 +761,8 @@ async function handleLogin(btn) {
     toast(`Bem-vindo, ${user.name}!`,'success');
     sndCorrect();
     redirectToRole(user.type);
-  } catch(e) {
-    toast('Erro ao fazer login: ' + e.message, 'error');
-    console.error(e);
-  } finally { setLoading(btn, false); }
+  } catch(e) { toast('Erro: ' + e.message, 'error'); console.error(e); }
+  finally { setLoading(btn, false); }
 }
 
 // ==================== CADASTRO ====================
@@ -749,9 +794,9 @@ async function handleRegister(btn) {
       verified: true, created_at: new Date().toISOString()
     };
     const { error: insertError } = await supabaseClient.from('users').insert([newUser]);
-    if(insertError) { toast('Erro ao cadastrar: ' + insertError.message, 'error'); return; }
+    if(insertError) { toast('Erro: ' + insertError.message, 'error'); return; }
 
-    toast('Conta criada com sucesso! Faça login.','success');
+    toast('Conta criada! Faça login.','success');
     sndCorrect();
     ['reg-name','reg-cpf','reg-email','reg-pass','reg-store'].forEach(id => {
       const el = document.getElementById(id); if (el) el.value = '';
@@ -761,53 +806,42 @@ async function handleRegister(btn) {
     document.getElementById('login-id').value = email;
     const lp = document.getElementById('login-pass'); lp.value = ''; lp.focus();
     showScreen('scr-login');
-  } catch(e) {
-    toast('Erro ao cadastrar: ' + e.message, 'error');
-    console.error(e);
-  } finally { setLoading(btn, false); }
+  } catch(e) { toast('Erro: ' + e.message, 'error'); console.error(e); }
+  finally { setLoading(btn, false); }
 }
 
 // ==================== RECUPERAÇÃO ====================
 async function requestPasswordReset(btn) {
-  if (!supabaseClient) { toast('Configure as chaves do Supabase primeiro!', 'error'); return; }
+  if (!supabaseClient) return;
   const loginId = document.getElementById('forgot-id').value.trim().toLowerCase();
   if(!loginId) { toast('Informe seu email ou CPF!','error'); return; }
-
   setLoading(btn, true, 'Gerando...');
   try {
     let query = supabaseClient.from('users').select('id, name, email');
     if (isEmail(loginId)) query = query.eq('email', loginId);
-    else {
-      const cpf = cleanCPF(loginId);
-      if (cpf.length !== 11) { toast('CPF inválido!','error'); return; }
-      query = query.eq('cpf', cpf);
-    }
+    else { const cpf = cleanCPF(loginId); if (cpf.length !== 11) { toast('CPF inválido!','error'); return; } query = query.eq('cpf', cpf); }
     const { data: user, error } = await query.maybeSingle();
     if(error || !user) { toast('Email/CPF não encontrado!','error'); sndWrong(); return; }
-
     const code = String(Math.floor(100000 + Math.random() * 900000));
     SESSION.resetData = { userId: user.id, code, email: user.email, expiresAt: Date.now() + 10*60*1000 };
-    console.log(`\n🔐 CÓDIGO DE RECUPERAÇÃO PARA ${user.email}: ${code}\n⏰ Válido por 10 minutos\n`);
-
+    console.log(`\n🔐 CÓDIGO: ${code}\n`);
     document.getElementById('forgot-step2').classList.remove('hidden');
     document.getElementById('forgot-code').focus();
-    toast('Código gerado! Verifique o console (F12).', 'info');
+    toast('Código gerado! Verifique o console.', 'info');
     sndCorrect();
   } catch(e) { toast('Erro: ' + e.message, 'error'); }
   finally { setLoading(btn, false); }
 }
 
 async function confirmPasswordReset(btn) {
-  if (!supabaseClient || !SESSION.resetData) { toast('Solicite um novo código primeiro!','error'); return; }
+  if (!supabaseClient || !SESSION.resetData) { toast('Solicite um novo código!','error'); return; }
   const code = document.getElementById('forgot-code').value.trim();
   const newPass = document.getElementById('forgot-newpass').value;
   const confirmPass = document.getElementById('forgot-confirmpass').value;
-
   if(code !== SESSION.resetData.code) { toast('Código inválido!','error'); sndWrong(); return; }
-  if(Date.now() > SESSION.resetData.expiresAt) { toast('Código expirado!','error'); sndWrong(); return; }
-  if(!newPass || newPass.length < 4) { toast('Senha deve ter ao menos 4 caracteres!','error'); return; }
-  if(newPass !== confirmPass) { toast('As senhas não coincidem!','error'); sndWrong(); return; }
-
+  if(Date.now() > SESSION.resetData.expiresAt) { toast('Código expirado!','error'); return; }
+  if(!newPass || newPass.length < 4) { toast('Senha deve ter 4+ caracteres!','error'); return; }
+  if(newPass !== confirmPass) { toast('As senhas não coincidem!','error'); return; }
   setLoading(btn, true, 'Redefinindo...');
   try {
     const hashed = await hashPassword(newPass);
@@ -815,7 +849,7 @@ async function confirmPasswordReset(btn) {
     if(error) { toast('Erro: ' + error.message, 'error'); return; }
     SESSION.resetData = null;
     toast('Senha redefinida!','success'); sndWin();
-    showModal('✅','Senha Atualizada!','Sua senha foi redefinida. Faça login com a nova senha.');
+    showModal('✅','Senha Atualizada!','Faça login com a nova senha.');
     setTimeout(() => { closeModal(); showScreen('scr-login'); }, 2000);
   } catch(e) { toast('Erro: ' + e.message, 'error'); }
   finally { setLoading(btn, false); }
@@ -829,6 +863,7 @@ function redirectToRole(type) {
 
 function logout() {
   SESSION = { userId:null, user:null, resetData:null, transferData:null };
+  DAILY = null;
   clearSessionStorage();
   document.getElementById('login-id').value = '';
   document.getElementById('login-pass').value = '';
@@ -919,53 +954,36 @@ const QUESTIONS = [
   {q:"Em que ano caiu o Império Romano do Ocidente?",o:["476","500","450","410"],a:0,c:"História",d:3}
 ];
 
-// ==================== CARREGAMENTO DE PERGUNTAS ====================
+// ==================== PERGUNTAS ====================
 async function loadQuestionsFromDB() {
   if (!supabaseClient) return null;
   try {
-    const { data, error } = await supabaseClient
-      .from('questions')
+    const { data, error } = await supabaseClient.from('questions')
       .select('id, question, option_a, option_b, option_c, option_d, correct_answer, category, difficulty')
       .eq('active', true);
-    if (error) { console.warn('Erro ao buscar questions:', error.message); return null; }
-    if (!data || data.length < CFG.MIN_DB_QUESTIONS) {
-      console.warn(`⚠️ Tabela "questions" tem ${data?.length || 0} linhas ativas.`);
-      return null;
-    }
+    if (error) { console.warn('Erro questions:', error.message); return null; }
+    if (!data || data.length < CFG.MIN_DB_QUESTIONS) return null;
     const valid = data.map(normalizeQuestion).filter(Boolean);
-    if (valid.length < CFG.MIN_DB_QUESTIONS) { console.warn(`Apenas ${valid.length} válidas.`); return null; }
-    console.log(`✅ ${valid.length} perguntas carregadas do Supabase.`);
+    if (valid.length < CFG.MIN_DB_QUESTIONS) return null;
+    console.log(`✅ ${valid.length} perguntas carregadas.`);
     return valid;
-  } catch(e) { console.error('Erro loadQuestionsFromDB:', e); return null; }
+  } catch(e) { return null; }
 }
-
 function normalizeQuestion(row) {
   const opts = [row.option_a, row.option_b, row.option_c, row.option_d];
   if (opts.some(o => o === null || o === undefined || String(o).trim() === '')) return null;
   const ans = Number(row.correct_answer);
   if (!Number.isInteger(ans) || ans < 0 || ans > 3) return null;
   if (!row.question || String(row.question).trim() === '') return null;
-  return {
-    q: String(row.question),
-    o: opts.map(String),
-    a: ans,
-    c: row.category || 'Geral',
-    d: Math.min(3, Math.max(1, Number(row.difficulty) || 1))
-  };
+  return { q: String(row.question), o: opts.map(String), a: ans, c: row.category || 'Geral', d: Math.min(3, Math.max(1, Number(row.difficulty) || 1)) };
 }
-
 function pickQuestionsByDifficulty(pool, total) {
   const byDiff = { 1: [], 2: [], 3: [] };
-  pool.forEach(q => {
-    const d = Math.min(3, Math.max(1, Number(q.d) || 1));
-    byDiff[d].push(q);
-  });
+  pool.forEach(q => { const d = Math.min(3, Math.max(1, Number(q.d) || 1)); byDiff[d].push(q); });
   Object.keys(byDiff).forEach(k => { byDiff[k] = byDiff[k].sort(() => Math.random() - 0.5); });
-
   const dist = CFG.DIFFICULTY_DISTRIBUTION;
   const picked = [];
   const used = { 1: 0, 2: 0, 3: 0 };
-
   for (const d of [1, 2, 3]) {
     const take = Math.min(dist[d], byDiff[d].length);
     picked.push(...byDiff[d].slice(0, take));
@@ -992,22 +1010,18 @@ document.addEventListener('visibilitychange', () => {
   if (document.hidden) {
     timerState.paused = true;
     document.getElementById('timer-bar')?.classList.add('paused');
-    toast('⏸️ Jogo pausado (aba em segundo plano).','info');
+    toast('⏸️ Jogo pausado.','info');
   } else {
     timerState.paused = false;
     document.getElementById('timer-bar')?.classList.remove('paused');
   }
 });
 
-// ✅ startQuiz agora mostra a TELA DE INSTRUÇÕES
 async function startQuiz(btn) {
   setLoading(btn, true, 'Carregando perguntas...');
   try {
     let pool = await loadQuestionsFromDB();
-    if (!pool) {
-      console.warn('⚠️ Usando banco local de perguntas (fallback).');
-      pool = [...QUESTIONS];
-    }
+    if (!pool) { console.warn('⚠️ Usando banco local (fallback).'); pool = [...QUESTIONS]; }
     const selected = pickQuestionsByDifficulty(pool, CFG.QUIZ_QUESTIONS_PER_ROUND);
     quiz = { questions: selected, current:0, correct:0, wrong:0, points:0, active:false, caughtCheating:false,
              helpers: { fifty: true, skip: true, stop: true } };
@@ -1015,8 +1029,6 @@ async function startQuiz(btn) {
     showScreen('scr-quiz-intro');
   } finally { setLoading(btn, false); }
 }
-
-// ✅ beginQuiz: usuário confirmou que leu as instruções
 function beginQuiz(btn) {
   if (!quiz.questions || !quiz.questions.length) { toast('Nenhuma pergunta carregada.','error'); return; }
   quiz.active = true;
@@ -1024,14 +1036,12 @@ function beginQuiz(btn) {
   showScreen('scr-quiz');
   renderQuestion();
 }
-
 function renderQuestion() {
   if(quiz.current >= quiz.questions.length) { finishQuiz(); return; }
   const q = quiz.questions[quiz.current];
   document.getElementById('q-num').textContent = quiz.current+1;
   document.getElementById('q-round-pts').textContent = quiz.points;
   document.getElementById('q-text').innerHTML = `<small style="color:var(--gold)">[${escapeHtml(q.c)} • Dif. ${escapeHtml(q.d)}]</small><br><br>${escapeHtml(q.q)}`;
-
   const qOptions = document.getElementById('q-options');
   qOptions.innerHTML = '';
   q.o.forEach((o,i) => {
@@ -1039,7 +1049,6 @@ function renderQuestion() {
     d.className = 'opt';
     d.tabIndex = 0;
     d.setAttribute('role', 'button');
-    d.dataset.index = i;
     d.textContent = `${String.fromCharCode(65+i)}) ${o}`;
     d.onclick = () => answerQ(i, d);
     d.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); answerQ(i, d); } };
@@ -1049,41 +1058,29 @@ function renderQuestion() {
   const seconds = CFG.TIME_BY_DIFFICULTY[q.d] || 15;
   startTimer(seconds);
 }
-
 function updateHelpersUI() {
   const map = { fifty: 'help-5050', skip: 'help-skip', stop: 'help-stop' };
   for (const [key, id] of Object.entries(map)) {
     const btn = document.getElementById(id);
     if (!btn) continue;
-    if (quiz.helpers && quiz.helpers[key]) {
-      btn.disabled = false;
-      btn.classList.remove('used');
-    } else {
-      btn.disabled = true;
-      btn.classList.add('used');
-    }
+    if (quiz.helpers && quiz.helpers[key]) { btn.disabled = false; btn.classList.remove('used'); }
+    else { btn.disabled = true; btn.classList.add('used'); }
   }
 }
-
-// ✅ AJUDA: 50/50 — elimina 2 erradas
-function useFiftyFifty(btn) {
+function useFiftyFifty() {
   if (!quiz.active || !quiz.helpers.fifty) return;
   const q = quiz.questions[quiz.current];
   const wrong = [];
   q.o.forEach((_, i) => { if (i !== q.a) wrong.push(i); });
   wrong.sort(() => Math.random() - 0.5);
   const toRemove = wrong.slice(0, 2);
-  document.querySelectorAll('.opt').forEach((el, i) => {
-    if (toRemove.includes(i)) el.classList.add('eliminated');
-  });
+  document.querySelectorAll('.opt').forEach((el, i) => { if (toRemove.includes(i)) el.classList.add('eliminated'); });
   quiz.helpers.fifty = false;
   updateHelpersUI();
   sndClick();
   toast('✂️ 50/50 usada!','info');
 }
-
-// ✅ AJUDA: Pular — passa para a próxima pergunta sem penalidade
-function useSkip(btn) {
+function useSkip() {
   if (!quiz.active || !quiz.helpers.skip) return;
   quiz.helpers.skip = false;
   clearInterval(timerInterval);
@@ -1092,19 +1089,16 @@ function useSkip(btn) {
   toast('⏭️ Pergunta pulada.','info');
   setTimeout(() => { quiz.current++; quiz.active = true; renderQuestion(); }, 400);
 }
-
-// ✅ AJUDA: Parar — encerra o quiz e guarda os pontos acumulados
-async function useStop(btn) {
+async function useStop() {
   if (!quiz.active || !quiz.helpers.stop) return;
   const ok = await confirmDialog('Parar o Quiz?', `Você vai encerrar agora com ${quiz.points} pontos.\n\nTem certeza?`);
   if (!ok) return;
   quiz.helpers.stop = false;
   clearInterval(timerInterval);
   quiz.active = false;
-  toast('🛑 Quiz encerrado por opção.','info');
+  toast('🛑 Quiz encerrado.','info');
   finishQuiz();
 }
-
 function startTimer(seconds) {
   clearInterval(timerInterval);
   timerState = { seconds, remaining: seconds, paused: false };
@@ -1122,13 +1116,11 @@ function startTimer(seconds) {
     }
   }, 1000);
 }
-
 function updateTimerBar() {
   const pct = Math.max(0, (timerState.remaining / timerState.seconds) * 100);
   const el = document.getElementById('timer-fill');
   if (el) el.style.width = pct + '%';
 }
-
 function answerQ(idx, el) {
   if(!quiz.active) return;
   clearInterval(timerInterval);
@@ -1149,21 +1141,15 @@ function answerQ(idx, el) {
   }
   setTimeout(nextQuestion, 1600);
 }
-
 function nextQuestion() { quiz.active = true; quiz.current++; renderQuestion(); }
 
 async function finishQuiz() {
   quiz.active = false;
   clearInterval(timerInterval);
-  if (!SESSION.userId || !supabaseClient) {
-    toast('Faça login para salvar pontos!', 'error');
-    showScreen('scr-home'); return;
-  }
+  if (!SESSION.userId || !supabaseClient) { toast('Faça login para salvar!','error'); showScreen('scr-home'); return; }
   const earnedPoints = Math.max(0, quiz.points);
   try {
-    const { data: user } = await supabaseClient
-      .from('users').select('points, games_played, correct_answers')
-      .eq('id', SESSION.userId).single();
+    const { data: user } = await supabaseClient.from('users').select('points, games_played, correct_answers').eq('id', SESSION.userId).single();
     if (user) {
       await supabaseClient.from('users').update({
         points: Math.max(0, user.points + earnedPoints),
@@ -1172,8 +1158,7 @@ async function finishQuiz() {
       }).eq('id', SESSION.userId);
       SESSION.user = null;
     }
-  } catch(e) { console.error('Erro ao salvar quiz:', e); }
-
+  } catch(e) { console.error(e); }
   document.getElementById('res-correct').textContent = quiz.correct;
   document.getElementById('res-wrong').textContent = quiz.wrong;
   document.getElementById('res-earned').textContent = earnedPoints;
@@ -1181,17 +1166,210 @@ async function finishQuiz() {
   if(pct >= 0.8) { document.getElementById('res-icon').textContent='🏆'; document.getElementById('res-title').textContent='Excelente!'; sndWin(); }
   else if(pct >= 0.5) { document.getElementById('res-icon').textContent='🥈'; document.getElementById('res-title').textContent='Muito Bem!'; sndCorrect(); }
   else { document.getElementById('res-icon').textContent='🎯'; document.getElementById('res-title').textContent='Continue Tentando!'; }
-  document.getElementById('res-msg').textContent = `Você acertou ${quiz.correct}/${quiz.questions.length}. Pontos da rodada: ${earnedPoints}.`;
+  document.getElementById('res-msg').textContent = `Você acertou ${quiz.correct}/${quiz.questions.length}. Pontos: ${earnedPoints}.`;
   showScreen('scr-result');
+}
+
+// ==================== OFERTAS DO DIA (Bloco A) ====================
+async function loadDailyOffers() {
+  if (!SESSION.userId || !supabaseClient) return;
+  const cont = document.getElementById('daily-offers-list');
+  cont.innerHTML = '<p style="opacity:0.6;text-align:center;padding:15px;">Carregando...</p>';
+  try {
+    const { data, error } = await supabaseClient.rpc('get_daily_summary', { p_user_id: Number(SESSION.userId) });
+    if (error) { cont.innerHTML = `<p style="color:var(--red);padding:15px;">Erro: ${escapeHtml(error.message)}</p>`; return; }
+    DAILY = data || { checked_today:false, streak:0, views_pts_today:0, views_cap:50, offers:[], followed:[] };
+    renderStreakCalendar(DAILY);
+    renderDailyOffersList(DAILY);
+    // Estado do botão de check-in
+    const btn = document.getElementById('btn-checkin');
+    const status = document.getElementById('checkin-status');
+    if (DAILY.checked_today) {
+      btn.disabled = true;
+      btn.classList.remove('btn-green');
+      btn.style.background = 'rgba(255,255,255,0.15)';
+      btn.textContent = '✓ Check-in feito hoje';
+      status.textContent = `🔥 Sequência de ${DAILY.streak} dia(s). Volte amanhã!`;
+    } else {
+      btn.disabled = false;
+      btn.classList.add('btn-green');
+      btn.style.background = '';
+      btn.textContent = '🎁 Fazer Check-in Hoje (+50 pts)';
+      status.textContent = DAILY.streak > 0 ? `Sequência atual: ${DAILY.streak} dia(s)` : 'Comece sua sequência hoje!';
+    }
+  } catch(e) {
+    console.error('Erro loadDailyOffers:', e);
+    cont.innerHTML = '<p style="color:var(--red);padding:15px;">Erro ao carregar.</p>';
+  }
+}
+
+function renderStreakCalendar(daily) {
+  const el = document.getElementById('streak-calendar');
+  if (!el) return;
+  // Mostra 7 dias: 6 anteriores + hoje
+  const today = new Date();
+  const cells = [];
+  const currentStreak = daily.streak || 0;
+
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    const isToday = i === 0;
+    // Dias dentro do streak atual (contando para trás a partir de hoje)
+    const isDone = i < currentStreak;
+    const dayNumber = 7 - i; // 1..7
+    const isBonusDay = (dayNumber % 7 === 0) || (dayNumber % 3 === 0);
+    const dayLabel = isToday ? 'Hoje' : `Dia ${dayNumber}`;
+    let pts = CFG.REWARDS.CHECKIN;
+    if (dayNumber % 7 === 0) pts = 200;
+    else if (dayNumber % 3 === 0) pts = 100;
+
+    let cls = 'streak-cell';
+    if (isDone && !isToday) cls += ' done';
+    if (isToday) cls += ' today';
+    if (isBonusDay) cls += ' bonus';
+
+    const val = isDone ? `✓ ${pts}` : `${pts}`;
+    cells.push(`<div class="${cls}"><div class="sc-day">${dayLabel}</div><div class="sc-val">${val}</div></div>`);
+  }
+  el.innerHTML = cells.join('');
+}
+
+function renderDailyOffersList(daily) {
+  const cont = document.getElementById('daily-offers-list');
+  const ptsInfo = document.getElementById('views-pts-today');
+  if (ptsInfo) ptsInfo.textContent = `${daily.views_pts_today || 0}/${daily.views_cap || 50} pts`;
+
+  if (!daily.offers || !daily.offers.length) {
+    cont.innerHTML = '<p style="opacity:0.6;text-align:center;padding:15px;">Nenhuma oferta em destaque hoje. Volte amanhã!</p>';
+    return;
+  }
+
+  const followedSet = new Set((daily.followed || []).map(Number));
+  const cap = daily.views_cap || 50;
+  const viewsToday = daily.views_pts_today || 0;
+  const capReached = viewsToday >= cap;
+
+  cont.innerHTML = daily.offers.map(o => {
+    const isFollowing = followedSet.has(Number(o.store_id));
+    const followBtn = isFollowing
+      ? `<button class="follow-btn following" disabled>✓ Seguindo</button>`
+      : `<button class="follow-btn" onclick="followStore(${Number(o.store_id)}, this)">+ Seguir loja (+50 pts)</button>`;
+    const viewBtn = capReached
+      ? `<button class="view-btn" disabled>Limite diário atingido</button>`
+      : `<button class="view-btn" onclick="viewOffer(${Number(o.id)}, this)" data-offer-id="${Number(o.id)}">Ver oferta (+10 pts)</button>`;
+    return `
+      <div class="daily-offer featured">
+        <div class="do-head">
+          <div>
+            <h4>🔥 ${escapeHtml(o.name)} <span class="cat-badge">${escapeHtml(o.category || 'Outros')}</span></h4>
+            <div class="do-store">🏪 ${escapeHtml(o.store_name || 'Loja')}</div>
+          </div>
+        </div>
+        <div class="do-desc">${escapeHtml(o.description || '')}</div>
+        <div style="font-size:0.8em;opacity:0.75;">${o.points} pts · Estoque: ${o.stock}</div>
+        <div class="do-actions">
+          ${viewBtn}
+          ${followBtn}
+        </div>
+        <div class="view-timer hidden" id="view-timer-${Number(o.id)}"></div>
+      </div>`;
+  }).join('');
+}
+
+async function doCheckin(btn) {
+  if (!SESSION.userId || !supabaseClient) return;
+  setLoading(btn, true, 'Fazendo check-in...');
+  try {
+    const { data, error } = await supabaseClient.rpc('daily_checkin', { p_user_id: Number(SESSION.userId) });
+    if (error) { toast('Erro: ' + error.message, 'error'); return; }
+    if (data?.error) { toast(data.error, 'error'); return; }
+
+    sndWin();
+    const bonusMsg = data.bonus > 0 ? ` (+${data.bonus} pts de bônus! 🎁)` : '';
+    showModal('🎁', 'Check-in feito!', `+${data.points} pontos${bonusMsg}\n\nSequência: ${data.streak} dia(s)`);
+    // Recarrega os dados
+    await loadDailyOffers();
+    refreshClient();
+  } catch(e) { toast('Erro: ' + e.message, 'error'); }
+  finally { setLoading(btn, false); }
+}
+
+async function followStore(storeId, btn) {
+  if (!SESSION.userId || !supabaseClient) return;
+  btn.disabled = true;
+  btn.textContent = 'Seguindo...';
+  try {
+    const { data, error } = await supabaseClient.rpc('follow_store', {
+      p_user_id: Number(SESSION.userId),
+      p_store_id: Number(storeId)
+    });
+    if (error) { toast('Erro: ' + error.message, 'error'); btn.disabled = false; btn.textContent = '+ Seguir loja'; return; }
+    if (data?.error) { toast(data.error, 'error'); btn.disabled = false; btn.textContent = '+ Seguir loja'; return; }
+
+    sndCorrect();
+    toast(`+${data.points} pts por seguir a loja!`, 'success');
+    btn.classList.add('following');
+    btn.textContent = '✓ Seguindo';
+    btn.disabled = true;
+    refreshClient();
+  } catch(e) { toast('Erro: ' + e.message, 'error'); btn.disabled = false; btn.textContent = '+ Seguir loja'; }
+}
+
+function viewOffer(offerId, btn) {
+  if (!SESSION.userId || !supabaseClient) return;
+  // Timer de 3s antes de creditar
+  btn.disabled = true;
+  const timerEl = document.getElementById(`view-timer-${offerId}`);
+  if (timerEl) timerEl.classList.remove('hidden');
+
+  let remaining = 3;
+  const update = () => {
+    if (timerEl) timerEl.textContent = `⏳ Aguarde ${remaining}s para confirmar a leitura...`;
+  };
+  update();
+
+  const interval = setInterval(() => {
+    remaining--;
+    if (remaining <= 0) {
+      clearInterval(interval);
+      if (timerEl) timerEl.textContent = '✓ Pronto!';
+      creditViewOffer(offerId, btn, timerEl);
+    } else {
+      update();
+    }
+  }, 1000);
+}
+
+async function creditViewOffer(offerId, btn, timerEl) {
+  try {
+    const { data, error } = await supabaseClient.rpc('view_offer', {
+      p_user_id: Number(SESSION.userId),
+      p_offer_id: Number(offerId)
+    });
+    if (error) { toast('Erro: ' + error.message, 'error'); btn.disabled = false; btn.textContent = 'Ver oferta (+10 pts)'; if (timerEl) timerEl.classList.add('hidden'); return; }
+    if (data?.error) { toast(data.error, 'error'); btn.disabled = true; btn.textContent = 'Já vista hoje'; if (timerEl) timerEl.textContent = data.error; return; }
+
+    sndCorrect();
+    toast(`+${data.points} pts!`, 'success');
+    btn.classList.add('credited');
+    btn.textContent = `✓ +${data.points} pts`;
+    if (timerEl) timerEl.textContent = `✓ Você ganhou ${data.points} pts por visualizar`;
+    refreshClient();
+    // Atualiza contador do topo
+    if (DAILY) {
+      DAILY.views_pts_today = (DAILY.views_pts_today || 0) + data.points;
+      const el = document.getElementById('views-pts-today');
+      if (el) el.textContent = `${DAILY.views_pts_today}/${DAILY.views_cap} pts`;
+    }
+  } catch(e) { toast('Erro: ' + e.message, 'error'); }
 }
 
 // ==================== CLIENTE ====================
 async function refreshClient() {
   if(!SESSION.userId || !supabaseClient) return;
   try {
-    const { data: u } = await supabaseClient.from('users')
-      .select('name, points, games_played, total_redeemed')
-      .eq('id', SESSION.userId).single();
+    const { data: u } = await supabaseClient.from('users').select('name, points, games_played, total_redeemed').eq('id', SESSION.userId).single();
     if(u) {
       document.getElementById('cli-name').textContent = u.name;
       document.getElementById('cli-pts').textContent = u.points;
@@ -1199,7 +1377,7 @@ async function refreshClient() {
       document.getElementById('cli-games').textContent = u.games_played;
       document.getElementById('cli-redeemed').textContent = fmtMoney(u.total_redeemed);
     }
-  } catch(e) { console.error('Erro refreshClient:', e); }
+  } catch(e) { console.error(e); }
 }
 
 // ==================== RESGATE ====================
@@ -1213,9 +1391,8 @@ async function loadRedeemStores() {
     document.getElementById('redeem-value').value = '';
     document.getElementById('redeem-preview').classList.add('hidden');
     document.getElementById('btn-confirm-redeem').classList.add('hidden');
-  } catch(e) { console.error('Erro loadRedeemStores:', e); }
+  } catch(e) { console.error(e); }
 }
-
 async function previewRedeem(btn) {
   const storeId = document.getElementById('redeem-store').value;
   const val = parseFloat(document.getElementById('redeem-value').value);
@@ -1236,7 +1413,7 @@ async function previewRedeem(btn) {
       <strong>Saldo após resgate:</strong> <span style="color:${saldoDepois < 0 ? 'var(--red)' : 'var(--gold)'}">${saldoDepois} pts</span>
     `;
     if (saldoDepois < 0) {
-      toast('Pontos insuficientes para este resgate!','error');
+      toast('Pontos insuficientes!','error');
       document.getElementById('btn-confirm-redeem').classList.add('hidden');
     } else {
       document.getElementById('btn-confirm-redeem').classList.remove('hidden');
@@ -1244,17 +1421,13 @@ async function previewRedeem(btn) {
   } catch(e) { toast('Erro: ' + e.message, 'error'); }
   finally { setLoading(btn, false); }
 }
-
 async function confirmRedeem(btn) {
   if (!supabaseClient || !SESSION.userId) return;
   const storeId = document.getElementById('redeem-store').value;
   const val = parseFloat(document.getElementById('redeem-value').value);
   if (!storeId || !val) { toast('Dados inválidos.','error'); return; }
-
-  const ok = await confirmDialog('Confirmar Resgate',
-    `Você está resgatando ${fmtMoney(val * CFG.MAX_DISCOUNT_PCT)} em desconto.\n\nApós confirmar, um cupom será gerado.`);
+  const ok = await confirmDialog('Confirmar Resgate', `Você está resgatando ${fmtMoney(val * CFG.MAX_DISCOUNT_PCT)} em desconto.\n\nApós confirmar, um cupom será gerado.`);
   if (!ok) return;
-
   setLoading(btn, true, 'Gerando cupom...');
   try {
     const { data, error } = await supabaseClient.rpc('redeem_discount', {
@@ -1263,14 +1436,13 @@ async function confirmRedeem(btn) {
       p_purchase_value: Number(val)
     });
     if (error) { toast('Erro: ' + error.message, 'error'); return; }
-    if (data?.error) { toast(data.error, 'error'); sndWrong(); return; }
-
+    if (data?.error) { toast(data.error, 'error'); return; }
     sndWin();
-    showModal('🏷️','Cupom Gerado!',`Código: ${data.code}\n\nDesconto: ${fmtMoney(data.discount)}\nApresente este código no caixa da loja.`);
+    showModal('🏷️','Cupom Gerado!',`Código: ${data.code}\n\nDesconto: ${fmtMoney(data.discount)}\nApresente no caixa da loja.`);
     refreshClient();
     document.getElementById('redeem-preview').classList.add('hidden');
     document.getElementById('btn-confirm-redeem').classList.add('hidden');
-  } catch(e) { toast('Erro ao resgatar: ' + e.message, 'error'); console.error(e); }
+  } catch(e) { toast('Erro: ' + e.message, 'error'); }
   finally { setLoading(btn, false); }
 }
 
@@ -1280,36 +1452,29 @@ async function previewTransfer(btn) {
   const cpf = cleanCPF(document.getElementById('tr-cpf').value);
   const amount = parseInt(document.getElementById('tr-amount').value);
   if(!cpf || cpf.length!==11) { toast('CPF inválido!','error'); return; }
-  if(!amount || amount < CFG.TRANSFER_MIN) { toast(`Mínimo de ${CFG.TRANSFER_MIN} pontos!`,'error'); return; }
-
+  if(!amount || amount < CFG.TRANSFER_MIN) { toast(`Mínimo ${CFG.TRANSFER_MIN} pts!`,'error'); return; }
   setLoading(btn, true, 'Simulando...');
   try {
     const { data: u } = await supabaseClient.from('users').select('points').eq('id', SESSION.userId).single();
     if(amount > u.points) { toast('Saldo insuficiente!','error'); return; }
-
     const today = todayStr(), month = monthStr();
-    const { data: txs } = await supabaseClient.from('transactions')
-      .select('amount, created_at').eq('from_user_id', SESSION.userId).eq('type', 'transfer');
+    const { data: txs } = await supabaseClient.from('transactions').select('amount, created_at').eq('from_user_id', SESSION.userId).eq('type', 'transfer');
     const todaySent = (txs||[]).filter(t=>t.created_at?.startsWith(today)).reduce((s,t)=>s+(t.amount||0),0);
     const monthSent = (txs||[]).filter(t=>t.created_at?.startsWith(month)).reduce((s,t)=>s+(t.amount||0),0);
-    if(todaySent + amount > CFG.TRANSFER_DAILY_LIMIT) { toast(`Limite diário excedido.`,'error'); return; }
-    if(monthSent + amount > CFG.TRANSFER_MONTHLY_LIMIT) { toast(`Limite mensal excedido.`,'error'); return; }
-
-    const { data: dest } = await supabaseClient.from('users')
-      .select('id, name').eq('cpf', cpf).eq('type', 'cliente').maybeSingle();
+    if(todaySent + amount > CFG.TRANSFER_DAILY_LIMIT) { toast('Limite diário excedido.','error'); return; }
+    if(monthSent + amount > CFG.TRANSFER_MONTHLY_LIMIT) { toast('Limite mensal excedido.','error'); return; }
+    const { data: dest } = await supabaseClient.from('users').select('id, name').eq('cpf', cpf).eq('type', 'cliente').maybeSingle();
     if(!dest) { toast('Destinatário não encontrado!','error'); return; }
-    if(dest.id === SESSION.userId) { toast('Não pode transferir para si mesmo!','error'); return; }
-
+    if(dest.id === SESSION.userId) { toast('Não pode transferir para si.','error'); return; }
     const tax = Math.floor(amount * CFG.TRANSFER_TAX_PCT);
     const net = amount - tax;
-
     document.getElementById('tr-preview').classList.remove('hidden');
     document.getElementById('tr-preview').innerHTML = `
       <strong>💸 Simulação:</strong><br>
       Destinatário: <strong>${escapeHtml(dest.name)}</strong><br>
-      Pontos enviados: ${amount}<br>
-      Taxa (${(CFG.TRANSFER_TAX_PCT*100)|0}%): <strong>-${tax} pts</strong> → Caixa do Projeto<br>
-      <strong style="color:var(--gold);font-size:1.1em;">Destinatário recebe: ${net} pts</strong><br>
+      Enviados: ${amount}<br>
+      Taxa (20%): <strong>-${tax} pts</strong> → Caixa<br>
+      <strong style="color:var(--gold);">Destinatário recebe: ${net} pts</strong><br>
       Seu saldo após: ${u.points - amount} pts
     `;
     SESSION.transferData = { destId:dest.id, destName:dest.name, amount, tax, net };
@@ -1317,14 +1482,11 @@ async function previewTransfer(btn) {
   } catch(e) { toast('Erro: ' + e.message, 'error'); }
   finally { setLoading(btn, false); }
 }
-
 async function confirmTransfer(btn) {
   const d = SESSION.transferData;
   if(!d || !supabaseClient || !SESSION.userId) return;
-  const ok = await confirmDialog('Confirmar Transferência',
-    `Enviar ${d.amount} pontos para ${d.destName}?\n\nTaxa: ${d.tax} pts\nRecebimento líquido: ${d.net} pts`);
+  const ok = await confirmDialog('Confirmar Transferência', `Enviar ${d.amount} pts para ${d.destName}?\n\nTaxa: ${d.tax} pts · Recebe: ${d.net} pts`);
   if (!ok) return;
-
   setLoading(btn, true, 'Transferindo...');
   try {
     const { data, error } = await supabaseClient.rpc('transfer_points', {
@@ -1333,28 +1495,26 @@ async function confirmTransfer(btn) {
       p_amount: Number(d.amount)
     });
     if (error) { toast('Erro: ' + error.message, 'error'); return; }
-    if (data?.error) { toast(data.error, 'error'); sndWrong(); return; }
-
+    if (data?.error) { toast(data.error, 'error'); return; }
     sndCorrect();
-    showModal('✅','Transferência Realizada!',`${data.net} pontos enviados para ${d.destName}.\nTaxa de ${data.tax} pts revertida ao caixa do projeto.`);
+    showModal('✅','Transferência Realizada!',`${data.net} pts enviados para ${d.destName}.\nTaxa de ${data.tax} pts ao caixa.`);
     document.getElementById('tr-preview').classList.add('hidden');
     document.getElementById('btn-confirm-tr').classList.add('hidden');
     document.getElementById('tr-cpf').value = '';
     document.getElementById('tr-amount').value = '';
     SESSION.transferData = null;
     refreshClient();
-  } catch(e) { toast('Erro ao transferir: ' + e.message, 'error'); console.error(e); }
+  } catch(e) { toast('Erro: ' + e.message, 'error'); }
   finally { setLoading(btn, false); }
 }
 
-// ==================== MEUS CUPONS ====================
+// ==================== CUPONS ====================
 async function renderCoupons() {
   if (!SESSION.userId || !supabaseClient) return;
   const cont = document.getElementById('coupons-list');
   cont.innerHTML = '<p style="opacity:0.6;text-align:center;padding:15px;">Carregando...</p>';
   try {
-    const { data: coupons } = await supabaseClient
-      .from('transactions')
+    const { data: coupons } = await supabaseClient.from('transactions')
       .select('code, discount, purchase_value, status, created_at, store_id')
       .eq('user_id', SESSION.userId).eq('type', 'redeem')
       .order('created_at', { ascending: false });
@@ -1384,34 +1544,25 @@ async function renderCoupons() {
           </div>
         </div>`;
     });
-  } catch(e) {
-    console.error('Erro renderCoupons:', e);
-    cont.innerHTML = '<p style="color:var(--red);text-align:center;padding:15px;">Erro ao carregar cupons.</p>';
-  }
+  } catch(e) { console.error(e); cont.innerHTML = '<p style="color:var(--red);padding:15px;">Erro.</p>'; }
 }
 
 // ==================== PERFIL ====================
 async function refreshProfile() {
   if(!SESSION.userId || !supabaseClient) return;
   try {
-    const { data: u } = await supabaseClient.from('users')
-      .select('points, games_played, correct_answers, total_redeemed')
-      .eq('id', SESSION.userId).single();
+    const { data: u } = await supabaseClient.from('users').select('points, games_played, correct_answers, total_redeemed').eq('id', SESSION.userId).single();
     if(!u) return;
     document.getElementById('prof-pts').textContent = u.points;
     document.getElementById('prof-games').textContent = u.games_played;
     document.getElementById('prof-correct').textContent = u.correct_answers;
     document.getElementById('prof-redeemed').textContent = fmtMoney(u.total_redeemed);
-
     const { data: hist } = await supabaseClient.from('transactions')
       .select('type, points_used, amount, net, from_user_id, to_user_id, created_at')
       .or(`user_id.eq.${SESSION.userId},from_user_id.eq.${SESSION.userId},to_user_id.eq.${SESSION.userId}`)
       .order('created_at', { ascending: false }).limit(10);
     const cont = document.getElementById('prof-history');
-    if(!hist || !hist.length) {
-      cont.innerHTML='<p style="opacity:0.6;text-align:center;padding:15px;">Sem histórico recente.</p>';
-      return;
-    }
+    if(!hist || !hist.length) { cont.innerHTML='<p style="opacity:0.6;text-align:center;padding:15px;">Sem histórico.</p>'; return; }
     cont.innerHTML='<table><tr><th>Data</th><th>Tipo</th><th>Detalhe</th></tr>';
     hist.forEach(t => {
       const d = new Date(t.created_at).toLocaleDateString('pt-BR');
@@ -1422,7 +1573,7 @@ async function refreshProfile() {
       cont.innerHTML+=`<tr><td>${escapeHtml(d)}</td><td>${escapeHtml(t.type)}</td><td>${escapeHtml(detail)}</td></tr>`;
     });
     cont.innerHTML+='</table>';
-  } catch(e) { console.error('Erro refreshProfile:', e); }
+  } catch(e) { console.error(e); }
 }
 
 // ==================== LOJISTA ====================
@@ -1432,16 +1583,14 @@ async function refreshShop() {
     const { data: u } = await supabaseClient.from('users').select('store').eq('id', SESSION.userId).single();
     if(!u) return;
     document.getElementById('shop-name').textContent = u.store;
-    const { data: redeems } = await supabaseClient.from('transactions')
-      .select('user_id, discount').eq('store_id', SESSION.userId).eq('type', 'redeem');
+    const { data: redeems } = await supabaseClient.from('transactions').select('user_id, discount').eq('store_id', SESSION.userId).eq('type', 'redeem');
     const clients = [...new Set((redeems||[]).map(r=>r.user_id))].length;
     const total = (redeems||[]).reduce((s,t)=>s+(t.discount||0),0);
     document.getElementById('shop-redeems').textContent = (redeems||[]).length;
     document.getElementById('shop-clients').textContent = clients;
     document.getElementById('shop-total').textContent = fmtMoney(total);
-  } catch(e) { console.error('Erro refreshShop:', e); }
+  } catch(e) { console.error(e); }
 }
-
 async function validateCoupon(btn) {
   if (!supabaseClient || !SESSION.userId) return;
   const valCode = document.getElementById('val-code');
@@ -1450,27 +1599,18 @@ async function validateCoupon(btn) {
   if(!code) { toast('Digite o código!','error'); return; }
   setLoading(btn, true, 'Validando...');
   try {
-    const { data: t } = await supabaseClient.from('transactions')
-      .select('id, store_id, discount, purchase_value, status')
-      .eq('code', code).maybeSingle();
+    const { data: t } = await supabaseClient.from('transactions').select('id, store_id, discount, purchase_value, status').eq('code', code).maybeSingle();
     if(!t) { valResult.innerHTML='<div class="toast error" style="position:static;">❌ Cupom não encontrado!</div>'; sndWrong(); return; }
     if(t.store_id!==SESSION.userId) { valResult.innerHTML='<div class="toast error" style="position:static;">⚠️ Cupom de outra loja!</div>'; sndWrong(); return; }
     if(t.status==='validado') { valResult.innerHTML='<div class="toast error" style="position:static;">⚠️ Cupom já utilizado!</div>'; return; }
     await supabaseClient.from('transactions').update({ status: 'validado' }).eq('id', t.id);
     sndCorrect();
-    valResult.innerHTML=`
-      <div class="card" style="background:rgba(39,174,96,0.2);border-color:var(--green);">
-        <h3 style="color:var(--green);">✅ Cupom Válido!</h3>
-        <p><strong>Desconto:</strong> ${fmtMoney(t.discount)}</p>
-        <p><strong>Compra:</strong> ${fmtMoney(t.purchase_value)}</p>
-        <p>Aplique o desconto e entregue o produto.</p>
-      </div>`;
+    valResult.innerHTML=`<div class="card" style="background:rgba(39,174,96,0.2);border-color:var(--green);"><h3 style="color:var(--green);">✅ Cupom Válido!</h3><p><strong>Desconto:</strong> ${fmtMoney(t.discount)}</p><p><strong>Compra:</strong> ${fmtMoney(t.purchase_value)}</p></div>`;
     valCode.value='';
     refreshShop();
-  } catch(e) { toast('Erro ao validar: ' + e.message, 'error'); }
+  } catch(e) { toast('Erro: ' + e.message, 'error'); }
   finally { setLoading(btn, false); }
 }
-
 async function addOffer(btn) {
   if (!supabaseClient || !SESSION.userId) return;
   const name = document.getElementById('offer-name').value.trim();
@@ -1478,48 +1618,43 @@ async function addOffer(btn) {
   const category = document.getElementById('offer-category').value;
   const pts = parseInt(document.getElementById('offer-pts').value);
   const stock = parseInt(document.getElementById('offer-stock').value);
+  const isFeatured = document.getElementById('offer-featured').checked;
   if(!name||!description||!pts||!stock) { toast('Preencha tudo!','error'); return; }
-  if(pts < CFG.OFFER_MIN_POINTS) { toast(`Mínimo ${CFG.OFFER_MIN_POINTS} pontos!`,'error'); return; }
+  if(pts < CFG.OFFER_MIN_POINTS) { toast(`Mínimo ${CFG.OFFER_MIN_POINTS} pts!`,'error'); return; }
   setLoading(btn, true, 'Salvando...');
   try {
     await supabaseClient.from('offers').insert([{
       name, description, category, points:pts, stock,
+      is_featured: isFeatured,
       store_id:SESSION.userId, created_at:new Date().toISOString()
     }]);
     sndCorrect(); toast('Oferta criada!','success');
     ['offer-name','offer-desc','offer-pts','offer-stock'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('offer-category').value = 'Alimentação';
+    document.getElementById('offer-featured').checked = false;
     showScreen('scr-shopkeeper');
-  } catch(e) { toast('Erro ao criar oferta: ' + e.message, 'error'); }
+  } catch(e) { toast('Erro: ' + e.message, 'error'); }
   finally { setLoading(btn, false); }
 }
-
 async function renderShopProducts() {
   if (!supabaseClient || !SESSION.userId) return;
   try {
     const { data: list } = await supabaseClient.from('offers')
-      .select('id, name, description, category, points, stock')
+      .select('id, name, description, category, points, stock, is_featured')
       .eq('store_id', SESSION.userId);
     const cont = document.getElementById('shop-prod-list');
-    if(!list || !list.length) {
-      cont.innerHTML='<p style="opacity:0.6;text-align:center;padding:15px;">Nenhuma oferta cadastrada.</p>';
-      return;
-    }
-    // Agrupa por categoria
+    if(!list || !list.length) { cont.innerHTML='<p style="opacity:0.6;text-align:center;padding:15px;">Nenhuma oferta cadastrada.</p>'; return; }
     const grouped = {};
-    list.forEach(o => {
-      const c = o.category || 'Outros';
-      if (!grouped[c]) grouped[c] = [];
-      grouped[c].push(o);
-    });
+    list.forEach(o => { const c = o.category || 'Outros'; if (!grouped[c]) grouped[c] = []; grouped[c].push(o); });
     cont.innerHTML = '';
     Object.keys(grouped).sort().forEach(cat => {
       cont.innerHTML += `<h3 style="color:var(--gold);margin-top:15px;margin-bottom:5px;">${escapeHtml(cat)}</h3>`;
       grouped[cat].forEach(o => {
+        const feat = o.is_featured ? ' <span class="badge-featured">🔥 DESTAQUE</span>' : '';
         cont.innerHTML += `
           <div class="prod-card">
             <div>
-              <h4>${escapeHtml(o.name)} <span class="cat-badge">${escapeHtml(o.category || 'Outros')}</span></h4>
+              <h4>${escapeHtml(o.name)} <span class="cat-badge">${escapeHtml(o.category || 'Outros')}</span>${feat}</h4>
               <p style="font-size:0.85em;opacity:0.8;">${escapeHtml(o.description)}</p>
               <small>${o.points} pts | Estoque: ${o.stock}</small>
             </div>
@@ -1527,9 +1662,8 @@ async function renderShopProducts() {
           </div>`;
       });
     });
-  } catch(e) { console.error('Erro renderShopProducts:', e); }
+  } catch(e) { console.error(e); }
 }
-
 async function deleteOffer(id) {
   const ok = await confirmDialog('Excluir Oferta', 'Esta ação não pode ser desfeita. Deseja continuar?');
   if (!ok) return;
@@ -1537,7 +1671,7 @@ async function deleteOffer(id) {
   try {
     await supabaseClient.from('offers').delete().eq('id', id);
     renderShopProducts(); toast('Oferta excluída','info');
-  } catch(e) { toast('Erro ao excluir: ' + e.message, 'error'); }
+  } catch(e) { toast('Erro: ' + e.message, 'error'); }
 }
 
 // ==================== ADMIN ====================
@@ -1548,241 +1682,145 @@ async function refreshAdmin() {
   try {
     const { data: u } = await supabaseClient.from('users').select('name').eq('id', SESSION.userId).single();
     if(u) document.getElementById('adm-name').textContent=u.name;
-
     const { count: usersCount } = await supabaseClient.from('users').select('id', { count: 'exact', head: true }).eq('type', 'cliente');
     const { count: shopsCount } = await supabaseClient.from('users').select('id', { count: 'exact', head: true }).eq('type', 'lojista');
     const { count: transfersCount } = await supabaseClient.from('transactions').select('id', { count: 'exact', head: true }).eq('type', 'transfer');
-
     const { data: fund } = await supabaseClient.from('project_fund').select('amount').eq('id', 1).single();
-
     document.getElementById('adm-users').textContent = usersCount || 0;
     document.getElementById('adm-shops').textContent = shopsCount || 0;
     document.getElementById('adm-transfers').textContent = transfersCount || 0;
-
     const pts = Number(fund?.amount || 0);
     document.getElementById('adm-fund').textContent = `${pts} pts`;
     document.getElementById('adm-fund-lbl').textContent = `Caixa (${fmtMoney(pts / CFG.POINTS_PER_REAL)})`;
-
-    // ✅ Carrega a lista de usuários filtrada
     filterAdminUsers(adminUserFilter, null, true);
-  } catch(e) { console.error('Erro refreshAdmin:', e); }
+  } catch(e) { console.error(e); }
 }
-
-// ✅ Filtro de usuários por tipo
 async function filterAdminUsers(filter, btnEl, silent = false) {
   adminUserFilter = filter;
-  // Atualiza UI dos tabs
   document.querySelectorAll('#adm-tabs .tab').forEach(t => t.classList.toggle('active', t.dataset.filter === filter));
   if (!silent) sndClick();
-
   const cont = document.getElementById('adm-users-content');
   if (!cont) return;
   cont.innerHTML = '<p style="opacity:0.6;text-align:center;padding:15px;">Carregando...</p>';
-
   try {
     let query = supabaseClient.from('users').select('id, name, type, cpf, email, points, verified, store').order('name').limit(300);
     if (filter !== 'todos') query = query.eq('type', filter);
-
     const { data: users, error } = await query;
     if (error) { cont.innerHTML = `<p style="color:var(--red);padding:15px;">Erro: ${escapeHtml(error.message)}</p>`; return; }
-
-    if (!users || !users.length) {
-      cont.innerHTML = '<p style="opacity:0.6;text-align:center;padding:15px;">Nenhum usuário nessa categoria.</p>';
-      return;
-    }
-
+    if (!users || !users.length) { cont.innerHTML = '<p style="opacity:0.6;text-align:center;padding:15px;">Nenhum usuário.</p>'; return; }
     let html = `<p style="font-size:0.85em;opacity:0.7;margin:8px 0;">${users.length} usuário(s)</p>`;
-    html += '<table><tr><th>Nome</th><th>Tipo</th><th>CPF</th><th>Pts</th><th>Verif.</th></tr>';
+    html += '<table><tr><th>Nome</th><th>Tipo</th><th>CPF</th><th>Pts</th></tr>';
     users.forEach(u => {
       const tipo = u.type === 'lojista' ? '🏪' : u.type === 'admin' ? '👑' : '👤';
       const label = u.store ? ` (${escapeHtml(u.store)})` : '';
-      html += `<tr>
-        <td>${escapeHtml(u.name)}${label}</td>
-        <td>${tipo} ${escapeHtml(u.type)}</td>
-        <td>${escapeHtml(u.cpf || '—')}</td>
-        <td>${u.points || 0}</td>
-        <td>${u.verified ? '✅' : '❌'}</td>
-      </tr>`;
+      html += `<tr><td>${escapeHtml(u.name)}${label}</td><td>${tipo} ${escapeHtml(u.type)}</td><td>${escapeHtml(u.cpf || '—')}</td><td>${u.points || 0}</td></tr>`;
     });
     html += '</table>';
     cont.innerHTML = html;
-  } catch(e) {
-    console.error(e);
-    cont.innerHTML = `<p style="color:var(--red);padding:15px;">Erro ao carregar usuários.</p>`;
-  }
+  } catch(e) { console.error(e); }
 }
-
 async function renderAdminTransactions(btn) {
   if (!supabaseClient) return;
   setLoading(btn, true, 'Carregando...');
   try {
-    const { data: txs } = await supabaseClient.from('transactions')
-      .select('type, amount, tax, points_used, discount, purchase_value, created_at')
-      .order('created_at', {ascending:false}).limit(50);
+    const { data: txs } = await supabaseClient.from('transactions').select('type, amount, tax, points_used, discount, created_at').order('created_at', {ascending:false}).limit(50);
     const cont = document.getElementById('adm-content');
     if(!txs || !txs.length) { cont.innerHTML='<p style="padding:15px;">Sem transações.</p>'; return; }
-    cont.innerHTML='<table><tr><th>Data</th><th>Tipo</th><th>Valor</th><th>Taxa/Desconto</th></tr>';
+    cont.innerHTML='<table><tr><th>Data</th><th>Tipo</th><th>Valor</th></tr>';
     txs.forEach(t => {
       const d=new Date(t.created_at).toLocaleDateString('pt-BR');
-      if(t.type==='transfer') cont.innerHTML+=`<tr><td>${d}</td><td>💸 Transfer</td><td>${t.amount} pts</td><td>${t.tax} pts</td></tr>`;
-      else if(t.type==='redeem') cont.innerHTML+=`<tr><td>${d}</td><td>🏷️ Resgate</td><td>-${t.points_used} pts</td><td>${fmtMoney(t.discount)}</td></tr>`;
+      if(t.type==='transfer') cont.innerHTML+=`<tr><td>${d}</td><td>💸 Transfer</td><td>${t.amount} pts (taxa ${t.tax})</td></tr>`;
+      else if(t.type==='redeem') cont.innerHTML+=`<tr><td>${d}</td><td>🏷️ Resgate</td><td>-${t.points_used} pts · ${fmtMoney(t.discount)}</td></tr>`;
     });
     cont.innerHTML+='</table>';
   } catch(e) { console.error(e); }
   finally { setLoading(btn, false); }
 }
-
-// ✅ RELATÓRIO DE IMPACTO LOCAL (novo)
 async function renderImpactReport(btn) {
   if (!supabaseClient) return;
-  setLoading(btn, true, 'Calculando impacto...');
+  setLoading(btn, true, 'Calculando...');
   try {
-    // Consultas paralelas
-    const [
-      { data: users },
-      { data: offers },
-      { data: redeems },
-      { data: transfers },
-      { data: fund }
-    ] = await Promise.all([
-      supabaseClient.from('users').select('id, type, points, games_played, correct_answers, total_redeemed'),
-      supabaseClient.from('offers').select('id, store_id, category'),
+    const [{ data: users }, { data: offers }, { data: redeems }, { data: transfers }, { data: fund }, { data: daily }] = await Promise.all([
+      supabaseClient.from('users').select('id, type, points, games_played, correct_answers'),
+      supabaseClient.from('offers').select('id, category'),
       supabaseClient.from('transactions').select('user_id, store_id, discount, points_used, purchase_value').eq('type','redeem'),
-      supabaseClient.from('transactions').select('amount, tax, net').eq('type','transfer'),
-      supabaseClient.from('project_fund').select('amount').eq('id', 1).single()
+      supabaseClient.from('transactions').select('tax').eq('type','transfer'),
+      supabaseClient.from('project_fund').select('amount').eq('id', 1).single(),
+      supabaseClient.from('daily_actions').select('action_type, points')
     ]);
 
     const clientes = (users||[]).filter(u => u.type === 'cliente');
     const lojistas = (users||[]).filter(u => u.type === 'lojista');
-
-    const totalPontosGerados = (users||[]).reduce((s,u) => s + (u.points||0), 0);
+    const totalPts = (users||[]).reduce((s,u) => s + (u.points||0), 0);
     const totalQuizes = (users||[]).reduce((s,u) => s + (u.games_played||0), 0);
     const totalAcertos = (users||[]).reduce((s,u) => s + (u.correct_answers||0), 0);
-
-    const totalRedeems = (redeems||[]).length;
     const totalDesconto = (redeems||[]).reduce((s,t) => s + Number(t.discount||0), 0);
     const totalPontosResgatados = (redeems||[]).reduce((s,t) => s + (t.points_used||0), 0);
-    const ticketMedio = totalRedeems > 0 ? (redeems||[]).reduce((s,t)=>s+Number(t.purchase_value||0),0) / totalRedeems : 0;
-
-    // Lojas com pelo menos 1 resgate
+    const ticketMedio = redeems?.length ? (redeems||[]).reduce((s,t)=>s+Number(t.purchase_value||0),0) / redeems.length : 0;
     const lojasAtivas = new Set((redeems||[]).map(r => r.store_id).filter(Boolean)).size;
-
-    // Clientes que já resgataram
     const clientesAtivos = new Set((redeems||[]).map(r => r.user_id).filter(Boolean)).size;
-
-    // Categorias mais usadas
-    const categorias = {};
-    (offers||[]).forEach(o => {
-      const c = o.category || 'Outros';
-      categorias[c] = (categorias[c] || 0) + 1;
-    });
-
     const fundPts = Number(fund?.amount || 0);
     const totalTaxas = (transfers||[]).reduce((s,t)=>s+(t.tax||0),0);
 
-    const cont = document.getElementById('adm-content');
-    cont.innerHTML = `
+    // Bloco A: métricas de engajamento
+    const checkinsTotal = (daily||[]).filter(d => d.action_type === 'checkin').length;
+    const followsTotal = (daily||[]).filter(d => d.action_type === 'follow').length;
+    const viewsTotal = (daily||[]).filter(d => d.action_type === 'view_offer').length;
+
+    const categorias = {};
+    (offers||[]).forEach(o => { const c = o.category || 'Outros'; categorias[c] = (categorias[c] || 0) + 1; });
+
+    document.getElementById('adm-content').innerHTML = `
       <div class="info" style="background:rgba(39,174,96,0.15);border-left-color:var(--green);">
         <strong style="color:var(--green);">🌍 Relatório de Impacto Local</strong><br>
-        Resumo consolidado do movimento econômico gerado pela plataforma.
+        Resumo consolidado do movimento econômico e engajamento.
       </div>
 
       <h4 style="color:var(--gold);margin:15px 0 5px;">💰 Impacto Econômico</h4>
       <div class="impact-grid">
-        <div class="impact-card">
-          <div class="ic-icon">💵</div>
-          <div class="ic-val">${fmtMoney(totalDesconto)}</div>
-          <div class="ic-lbl">Injetados no comércio<br>(total de descontos aplicados)</div>
-        </div>
-        <div class="impact-card">
-          <div class="ic-icon">🎯</div>
-          <div class="ic-val">${fmtMoney(ticketMedio)}</div>
-          <div class="ic-lbl">Ticket médio por compra</div>
-        </div>
-        <div class="impact-card">
-          <div class="ic-icon">🏪</div>
-          <div class="ic-val">${lojasAtivas}</div>
-          <div class="ic-lbl">Lojas com resgates</div>
-        </div>
-        <div class="impact-card">
-          <div class="ic-icon">👥</div>
-          <div class="ic-val">${clientesAtivos}</div>
-          <div class="ic-lbl">Clientes beneficiados</div>
-        </div>
+        <div class="impact-card"><div class="ic-icon">💵</div><div class="ic-val">${fmtMoney(totalDesconto)}</div><div class="ic-lbl">Injetados no comércio</div></div>
+        <div class="impact-card"><div class="ic-icon">🎯</div><div class="ic-val">${fmtMoney(ticketMedio)}</div><div class="ic-lbl">Ticket médio</div></div>
+        <div class="impact-card"><div class="ic-icon">🏪</div><div class="ic-val">${lojasAtivas}</div><div class="ic-lbl">Lojas com resgates</div></div>
+        <div class="impact-card"><div class="ic-icon">👥</div><div class="ic-val">${clientesAtivos}</div><div class="ic-lbl">Clientes beneficiados</div></div>
       </div>
 
-      <h4 style="color:var(--gold);margin:20px 0 5px;">📊 Movimento da Plataforma</h4>
+      <h4 style="color:var(--gold);margin:20px 0 5px;">📊 Movimento</h4>
       <div class="impact-grid">
-        <div class="impact-card">
-          <div class="ic-icon">⭐</div>
-          <div class="ic-val">${totalPontosGerados.toLocaleString('pt-BR')}</div>
-          <div class="ic-lbl">Pontos em circulação</div>
-        </div>
-        <div class="impact-card">
-          <div class="ic-icon">🎮</div>
-          <div class="ic-val">${totalQuizes}</div>
-          <div class="ic-lbl">Quizes realizados</div>
-        </div>
-        <div class="impact-card">
-          <div class="ic-icon">🏷️</div>
-          <div class="ic-val">${totalRedeems}</div>
-          <div class="ic-lbl">Cupons gerados</div>
-        </div>
-        <div class="impact-card">
-          <div class="ic-icon">💳</div>
-          <div class="ic-val">${totalPontosResgatados.toLocaleString('pt-BR')}</div>
-          <div class="ic-lbl">Pontos resgatados</div>
-        </div>
+        <div class="impact-card"><div class="ic-icon">⭐</div><div class="ic-val">${totalPts.toLocaleString('pt-BR')}</div><div class="ic-lbl">Pontos em circulação</div></div>
+        <div class="impact-card"><div class="ic-icon">🎮</div><div class="ic-val">${totalQuizes}</div><div class="ic-lbl">Quizes realizados</div></div>
+        <div class="impact-card"><div class="ic-icon">🏷️</div><div class="ic-val">${(redeems||[]).length}</div><div class="ic-lbl">Cupons gerados</div></div>
+        <div class="impact-card"><div class="ic-icon">💳</div><div class="ic-val">${totalPontosResgatados.toLocaleString('pt-BR')}</div><div class="ic-lbl">Pontos resgatados</div></div>
       </div>
 
-      <h4 style="color:var(--gold);margin:20px 0 5px;">📈 Engajamento</h4>
+      <h4 style="color:var(--gold);margin:20px 0 5px;">🎁 Engajamento (Bloco A)</h4>
       <div class="impact-grid">
-        <div class="impact-card">
-          <div class="ic-icon">👤</div>
-          <div class="ic-val">${clientes.length}</div>
-          <div class="ic-lbl">Clientes cadastrados</div>
-        </div>
-        <div class="impact-card">
-          <div class="ic-icon">🏪</div>
-          <div class="ic-val">${lojistas.length}</div>
-          <div class="ic-lbl">Lojistas parceiros</div>
-        </div>
-        <div class="impact-card">
-          <div class="ic-icon">🎯</div>
-          <div class="ic-val">${totalQuizes > 0 ? ((totalAcertos / (totalQuizes * 10)) * 100).toFixed(1) : 0}%</div>
-          <div class="ic-lbl">Taxa média de acertos</div>
-        </div>
-        <div class="impact-card">
-          <div class="ic-icon">💼</div>
-          <div class="ic-val">${fmtMoney(fundPts / CFG.POINTS_PER_REAL)}</div>
-          <div class="ic-lbl">Caixa do projeto<br>(${fundPts} pts taxados)</div>
-        </div>
+        <div class="impact-card"><div class="ic-icon">✅</div><div class="ic-val">${checkinsTotal}</div><div class="ic-lbl">Check-ins totais</div></div>
+        <div class="impact-card"><div class="ic-icon">❤️</div><div class="ic-val">${followsTotal}</div><div class="ic-lbl">Seguidores de lojas</div></div>
+        <div class="impact-card"><div class="ic-icon">👁️</div><div class="ic-val">${viewsTotal}</div><div class="ic-lbl">Ofertas visualizadas</div></div>
+        <div class="impact-card"><div class="ic-icon">📈</div><div class="ic-val">${totalQuizes > 0 ? ((totalAcertos / (totalQuizes * 10)) * 100).toFixed(1) : 0}%</div><div class="ic-lbl">Taxa média de acertos</div></div>
+      </div>
+
+      <h4 style="color:var(--gold);margin:20px 0 5px;">👤 Cadastros</h4>
+      <div class="impact-grid">
+        <div class="impact-card"><div class="ic-icon">👤</div><div class="ic-val">${clientes.length}</div><div class="ic-lbl">Clientes cadastrados</div></div>
+        <div class="impact-card"><div class="ic-icon">🏪</div><div class="ic-val">${lojistas.length}</div><div class="ic-lbl">Lojistas parceiros</div></div>
+        <div class="impact-card"><div class="ic-icon">💼</div><div class="ic-val">${fmtMoney(fundPts / CFG.POINTS_PER_REAL)}</div><div class="ic-lbl">Caixa (${fundPts} pts)</div></div>
+        <div class="impact-card"><div class="ic-icon">💸</div><div class="ic-val">${totalTaxas}</div><div class="ic-lbl">Pontos taxados</div></div>
       </div>
 
       <h4 style="color:var(--gold);margin:20px 0 5px;">🏷️ Ofertas por Categoria</h4>
       <div style="background:rgba(0,0,0,0.2);border-radius:10px;padding:12px;">
         ${Object.keys(categorias).length === 0
-          ? '<p style="opacity:0.6;font-size:0.9em;">Nenhuma oferta cadastrada ainda.</p>'
+          ? '<p style="opacity:0.6;font-size:0.9em;">Nenhuma oferta cadastrada.</p>'
           : Object.entries(categorias).map(([cat, n]) =>
               `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,215,0,0.1);">
-                <span>${escapeHtml(cat)}</span>
-                <strong style="color:var(--gold);">${n}</strong>
-              </div>`).join('')
-        }
-      </div>
-
-      <div class="info" style="margin-top:20px;background:rgba(52,152,219,0.15);">
-        <strong>📌 Como usar este relatório:</strong><br>
-        Este painel resume o impacto do QuizLocal na economia local. Use esses números para:
-        • Apresentar resultados à prefeitura / associação comercial
-        • Recrutar novos lojistas ("veja quanto o comércio já ganhou")
-        • Justificar parcerias e editais de fomento
+                <span>${escapeHtml(cat)}</span><strong style="color:var(--gold);">${n}</strong>
+              </div>`).join('')}
       </div>
     `;
   } catch(e) {
-    console.error('Erro no relatório:', e);
-    document.getElementById('adm-content').innerHTML =
-      `<p style="color:var(--red);padding:15px;">Erro ao gerar relatório: ${escapeHtml(e.message)}</p>`;
+    console.error(e);
+    document.getElementById('adm-content').innerHTML = `<p style="color:var(--red);padding:15px;">Erro: ${escapeHtml(e.message)}</p>`;
   }
   finally { setLoading(btn, false); }
 }
