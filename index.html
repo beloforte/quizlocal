@@ -136,7 +136,6 @@
   .view-btn:disabled { opacity:0.4; cursor:not-allowed; }
   .view-btn.credited { background:rgba(39,174,96,0.4); color:#fff; }
   .view-timer { font-size:0.75em; opacity:0.7; margin-top:4px; }
-  /* Transações ricas */
   .tx-header-info { background: linear-gradient(135deg, rgba(52,152,219,0.15), rgba(155,48,255,0.08)); border-left: 3px solid #3498db; padding: 14px; border-radius: 8px; margin-bottom: 15px; font-size: 0.9em; line-height: 1.5; }
   .tx-summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; margin: 15px 0; }
   .tx-summary-card { background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03)); border: 1px solid rgba(255,215,0,0.25); border-radius: 12px; padding: 14px 10px; text-align: center; }
@@ -170,7 +169,7 @@
   .btn-export { background: rgba(39,174,96,0.25); border: 1px solid var(--green); color: #7dffa8; padding: 8px 16px; border-radius: 20px; font-size: 0.85em; font-weight: bold; cursor: pointer; }
   .btn-export:active { transform: scale(0.97); }
 
-  /* ============ GRADE DE CUPONS (Bloco B) ============ */
+  /* Grade de cupons */
   .coupon-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 15px 0; }
   .coupon-item { background: rgba(255,255,255,0.05); border: 2px dashed rgba(255,215,0,0.35); border-radius: 12px; padding: 16px 12px; text-align: center; position: relative; transition: 0.2s; }
   .coupon-item.available { border-color: var(--green); border-style: solid; background: linear-gradient(135deg, rgba(39,174,96,0.12), rgba(46,204,113,0.04)); }
@@ -188,13 +187,13 @@
   .coupon-item .ci-btn.active:active { transform: scale(0.97); }
   .coupon-item .ci-btn.locked { background: rgba(255,255,255,0.08); color: #888; cursor: not-allowed; }
 
-  /* ============ QR CODE (Bloco B) ============ */
+  /* QR Code */
   .qr-container { background: #fff; padding: 16px; border-radius: 12px; display: inline-block; margin: 15px 0; }
   .qr-container img, .qr-container canvas { display: block; }
   #qr-reader { width: 100%; min-height: 280px; border-radius: 12px; overflow: hidden; margin: 10px 0; background: #000; }
   #qr-reader.hidden { display: none; }
 
-  /* ============ CONVITE / INDICAÇÃO ============ */
+  /* Convite / Indicação */
   .referral-card { background: linear-gradient(135deg, rgba(155,48,255,0.18), rgba(52,152,219,0.10)); border: 1px solid rgba(155,48,255,0.4); border-radius: 12px; padding: 20px; margin-bottom: 15px; }
   .referral-card h3 { color: var(--gold); margin-bottom: 8px; font-size: 1.1em; }
   .referral-card p { font-size: 0.88em; line-height: 1.5; opacity: 0.92; margin-bottom: 12px; }
@@ -206,16 +205,52 @@
   .referral-actions .btn-copy:active { background: rgba(255,255,255,0.25); }
   .referral-actions .btn-wa { background: linear-gradient(90deg, #25D366, #128C7E); color: #fff; }
   .referral-actions .btn-wa:active { transform: scale(0.97); }
-
-  /* Banner de indicação na tela de login */
   .ref-banner { background: linear-gradient(90deg, rgba(39,174,96,0.25), rgba(46,204,113,0.15)); border: 1px solid var(--green); border-radius: 10px; padding: 12px; margin-bottom: 15px; font-size: 0.9em; text-align: center; }
   .ref-banner strong { color: #7dffa8; }
+
+  /* Histórico do perfil */
+  .history-list { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+  .history-item { display: flex; gap: 12px; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,215,0,0.15); border-left: 4px solid rgba(255,215,0,0.3); border-radius: 10px; align-items: center; transition: 0.2s; }
+  .history-item:hover { background: rgba(255,255,255,0.08); transform: translateX(2px); }
+  .history-item.redeem { border-left-color: #27ae60; }
+  .history-item.transfer-in { border-left-color: #27ae60; }
+  .history-item.transfer-out { border-left-color: #9b30ff; }
+  .history-item .hi-icon { width: 42px; height: 42px; flex-shrink: 0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.25em; background: rgba(255,255,255,0.08); }
+  .history-item.redeem .hi-icon { background: rgba(39,174,96,0.22); }
+  .history-item.transfer-in .hi-icon { background: rgba(39,174,96,0.22); }
+  .history-item.transfer-out .hi-icon { background: rgba(155,48,255,0.22); }
+  .history-item .hi-body { flex: 1; min-width: 0; }
+  .history-item .hi-title { font-weight: bold; font-size: 0.92em; color: #fff; margin-bottom: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .history-item .hi-sub { font-size: 0.76em; opacity: 0.72; line-height: 1.35; }
+  .history-item .hi-meta { text-align: right; flex-shrink: 0; display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
+  .history-item .hi-points { font-weight: bold; font-size: 1em; line-height: 1; }
+  .history-item .hi-points.neg { color: #ff9f43; }
+  .history-item .hi-points.pos { color: #7dffa8; }
+  .history-item .hi-when { font-size: 0.68em; opacity: 0.6; white-space: nowrap; }
+  .history-item .hi-status { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.62em; font-weight: bold; letter-spacing: 0.5px; }
+  .history-item .hi-status.validado { background: var(--green); color: #fff; }
+  .history-item .hi-status.pendente { background: #f39c12; color: #fff; }
+  .history-empty { text-align: center; padding: 35px 15px; opacity: 0.65; }
+  .history-empty .he-icon { font-size: 2.5em; margin-bottom: 10px; }
+  .history-empty p { font-size: 0.88em; line-height: 1.5; }
+
+  /* Admin: linha clicável + ficha do usuário */
+  .admin-user-row { cursor: pointer; transition: 0.15s; }
+  .admin-user-row:hover { background: rgba(255,215,0,0.12)!important; }
+  .admin-user-row:active { transform: scale(0.995); }
+  .admin-user-detail-head { background: linear-gradient(135deg, rgba(52,152,219,0.18), rgba(155,48,255,0.12)); border: 1px solid rgba(52,152,219,0.35); border-radius: 12px; padding: 18px; margin-bottom: 15px; }
+  .admin-user-detail-head .aud-name { font-size: 1.25em; font-weight: bold; color: var(--gold); margin-bottom: 4px; }
+  .admin-user-detail-head .aud-meta { font-size: 0.8em; opacity: 0.8; line-height: 1.5; }
+  .admin-user-detail-head .aud-meta span { display: inline-block; margin-right: 10px; }
+  .admin-user-detail-head .aud-badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 0.72em; font-weight: bold; margin-left: 6px; vertical-align: middle; }
+  .admin-user-detail-head .aud-badge.cliente { background: rgba(52,152,219,0.3); color: #a5d8ff; }
+  .admin-user-detail-head .aud-badge.lojista { background: rgba(255,140,0,0.3); color: #ffd28c; }
+  .admin-user-detail-head .aud-badge.admin { background: rgba(155,48,255,0.3); color: #d4b3ff; }
 </style>
 </head>
 <body>
 <div class="container">
   <header><h1>🎯 QuizLocal</h1><p>Conectando Saberes e Comércio Local</p></header>
-  
   <div class="marquee-container">
     <div class="marquee-track">
       <div class="marquee-content"><span>🏪 Padaria Central</span><span>💊 Farmácia Saúde</span><span>🛒 Mercado Bom Preço</span><span>✂️ Salão Estilo</span><span>🔧 Oficina Mecânica Silva</span><span>🍕 Pizzaria da Nonna</span><span>👗 Moda Elegante</span><span>🏗️ Material Construção João</span></div>
@@ -223,7 +258,6 @@
     </div>
   </div>
 
-  <!-- HOME -->
   <div id="scr-home" class="screen active">
     <div class="card" style="text-align:center;">
       <div style="font-size:4em;margin-bottom:15px;">🎯</div>
@@ -232,82 +266,59 @@
       <button class="btn" onclick="showScreen('scr-login')">🔑 Já tenho conta</button>
       <button class="btn btn-outline" onclick="showScreen('scr-register')" style="margin-top:10px;">✨ Criar nova conta</button>
     </div>
-    <div class="info">
-      <strong>📋 Como funciona:</strong><br>
-      • Responda perguntas e acumule pontos<br>
-      • <strong>1.000 pontos = R$ 1,00</strong> em desconto<br>
-      • Desconto máximo de <strong>10% por compra</strong><br>
-      • Válido apenas no comércio local parceiro
-    </div>
+    <div class="info"><strong>📋 Como funciona:</strong><br>• Responda perguntas e acumule pontos<br>• <strong>1.000 pontos = R$ 1,00</strong> em desconto<br>• Desconto máximo de <strong>10% por compra</strong><br>• Válido apenas no comércio local parceiro</div>
   </div>
 
-  <!-- LOGIN -->
   <div id="scr-login" class="screen">
     <button class="back-btn" onclick="showScreen('scr-home')">← Voltar</button>
     <div id="ref-banner-login" class="ref-banner hidden"></div>
     <div class="card">
       <h2 style="color:var(--gold);text-align:center;margin-bottom:15px;">🔑 Entrar</h2>
-      <label>E-mail ou CPF:</label>
-      <input type="text" id="login-id" placeholder="seu@email.com ou 00000000000">
-      <label>Senha:</label>
-      <input type="password" id="login-pass" placeholder="Sua senha">
+      <label>E-mail ou CPF:</label><input type="text" id="login-id" placeholder="seu@email.com ou 00000000000">
+      <label>Senha:</label><input type="password" id="login-pass" placeholder="Sua senha">
       <div class="forgot-link"><a onclick="showScreen('scr-forgot')">Esqueci minha senha</a></div>
       <button class="btn" onclick="handleLogin(this)">Entrar</button>
       <div class="auth-toggle">Não tem conta? <a onclick="showScreen('scr-register')">Cadastre-se aqui</a></div>
     </div>
   </div>
 
-  <!-- FORGOT -->
   <div id="scr-forgot" class="screen">
     <button class="back-btn" onclick="showScreen('scr-login')">← Voltar ao Login</button>
     <div class="card">
       <h2 style="color:var(--gold);text-align:center;margin-bottom:15px;">🔐 Recuperar Senha</h2>
-      <div class="info"><strong>Como funciona:</strong><br>1. Informe seu email ou CPF<br>2. Código gerado no console<br>3. Digite e crie nova senha</div>
-      <label>E-mail ou CPF cadastrado:</label>
-      <input type="text" id="forgot-id" placeholder="seu@email.com ou 00000000000">
+      <div class="info"><strong>Como funciona:</strong><br>1. Informe email ou CPF<br>2. Código gerado no console<br>3. Digite e crie nova senha</div>
+      <label>E-mail ou CPF cadastrado:</label><input type="text" id="forgot-id" placeholder="seu@email.com ou 00000000000">
       <button class="btn btn-purple" onclick="requestPasswordReset(this)">Enviar Código de Verificação</button>
       <div id="forgot-step2" class="hidden" style="margin-top:15px;">
-        <label>Código (6 dígitos):</label>
-        <input type="tel" id="forgot-code" placeholder="000000" maxlength="6" inputmode="numeric" style="text-align:center;font-size:1.3em;letter-spacing:5px;">
-        <label>Nova Senha:</label>
-        <input type="password" id="forgot-newpass" placeholder="Crie uma nova senha forte">
-        <label>Confirmar Nova Senha:</label>
-        <input type="password" id="forgot-confirmpass" placeholder="Repita a nova senha">
+        <label>Código (6 dígitos):</label><input type="tel" id="forgot-code" placeholder="000000" maxlength="6" inputmode="numeric" style="text-align:center;font-size:1.3em;letter-spacing:5px;">
+        <label>Nova Senha:</label><input type="password" id="forgot-newpass" placeholder="Crie uma nova senha forte">
+        <label>Confirmar Nova Senha:</label><input type="password" id="forgot-confirmpass" placeholder="Repita a nova senha">
         <button class="btn btn-green" onclick="confirmPasswordReset(this)">Redefinir Senha</button>
       </div>
     </div>
   </div>
 
-  <!-- REGISTER -->
   <div id="scr-register" class="screen">
     <button class="back-btn" onclick="showScreen('scr-home')">← Voltar</button>
     <div id="ref-banner-register" class="ref-banner hidden"></div>
     <div class="card">
       <h2 style="color:var(--gold);text-align:center;margin-bottom:15px;">✨ Criar Conta</h2>
-      <label>Nome Completo:</label>
-      <input type="text" id="reg-name" placeholder="Seu nome completo">
-      <label>CPF (apenas números):</label>
-      <input type="tel" id="reg-cpf" placeholder="00000000000" maxlength="11" inputmode="numeric">
-      <label>E-mail Pessoal:</label>
-      <input type="email" id="reg-email" placeholder="seu@email.com">
-      <label>Senha:</label>
-      <input type="password" id="reg-pass" placeholder="Crie uma senha forte">
+      <label>Nome Completo:</label><input type="text" id="reg-name" placeholder="Seu nome completo">
+      <label>CPF (apenas números):</label><input type="tel" id="reg-cpf" placeholder="00000000000" maxlength="11" inputmode="numeric">
+      <label>E-mail Pessoal:</label><input type="email" id="reg-email" placeholder="seu@email.com">
+      <label>Senha:</label><input type="password" id="reg-pass" placeholder="Crie uma senha forte">
       <label>Tipo de Conta:</label>
       <select id="reg-type">
         <option value="cliente">👤 Cliente</option>
         <option value="lojista">🏪 Lojista</option>
         <option value="admin">👑 Administrador</option>
       </select>
-      <div id="store-field" class="hidden">
-        <label>Nome do Estabelecimento:</label>
-        <input type="text" id="reg-store" placeholder="Ex: Padaria Central">
-      </div>
+      <div id="store-field" class="hidden"><label>Nome do Estabelecimento:</label><input type="text" id="reg-store" placeholder="Ex: Padaria Central"></div>
       <button class="btn btn-green" onclick="handleRegister(this)">Cadastrar</button>
       <div class="auth-toggle">Já tem conta? <a onclick="showScreen('scr-login')">Faça login aqui</a></div>
     </div>
   </div>
 
-  <!-- CLIENT DASHBOARD -->
   <div id="scr-client" class="screen">
     <div class="topbar"><span>👤 <strong id="cli-name"></strong></span><span class="pts-badge">⭐ <span id="cli-pts">0</span> pts</span><button class="back-btn" onclick="logout()" style="margin:0;">Sair</button></div>
     <div class="card">
@@ -323,9 +334,7 @@
       <button class="btn btn-sm" onclick="showScreen('scr-coupons')" style="background:rgba(255,255,255,0.15);color:#fff;">🎟️ Meus Cupons</button>
       <button class="btn btn-sm" onclick="showScreen('scr-profile')" style="background:rgba(255,255,255,0.15);color:#fff;">👤 Meu Perfil</button>
     </div>
-
-    <!-- CARD DE INDICAÇÃO -->
-    <div class="referral-card" id="referral-card">
+    <div class="referral-card">
       <h3>🎁 Convide amigos e ganhe 2.000 pontos</h3>
       <p>Compartilhe seu link com amigos da cidade. Quando eles se cadastrarem, <strong style="color:var(--gold);">você ganha 2.000 pts</strong> e eles já começam a jogar com você!</p>
       <div style="font-size:0.78em;opacity:0.75;margin-bottom:6px;">Seu código de indicação:</div>
@@ -337,11 +346,9 @@
       </div>
       <div style="font-size:0.78em;opacity:0.7;margin-top:10px;text-align:center;">Você já indicou <strong id="ref-count" style="color:var(--gold);">0</strong> pessoa(s)</div>
     </div>
-
     <div class="info"><strong>💡 Dica:</strong> Faça check-in todo dia em Ofertas do Dia para bônus de sequência.</div>
   </div>
 
-  <!-- OFERTAS DO DIA -->
   <div id="scr-daily-offers" class="screen">
     <button class="back-btn" onclick="showScreen('scr-client')">← Voltar</button>
     <div class="card" style="text-align:center;">
@@ -353,17 +360,11 @@
     </div>
     <div class="card">
       <h2 style="color:var(--gold);margin-bottom:5px;">🔥 Ofertas do Dia</h2>
-      <p style="font-size:0.85em;opacity:0.75;margin-bottom:10px;">
-        Ganhe <strong style="color:var(--gold);">+10 pts</strong> ao visualizar cada oferta (máx 50 pts/dia)
-        · <span id="views-pts-today">0/50 pts</span>
-      </p>
-      <div id="daily-offers-list">
-        <p style="opacity:0.6;text-align:center;padding:15px;">Carregando ofertas...</p>
-      </div>
+      <p style="font-size:0.85em;opacity:0.75;margin-bottom:10px;">Ganhe <strong style="color:var(--gold);">+10 pts</strong> ao visualizar cada oferta (máx 50 pts/dia) · <span id="views-pts-today">0/50 pts</span></p>
+      <div id="daily-offers-list"><p style="opacity:0.6;text-align:center;padding:15px;">Carregando ofertas...</p></div>
     </div>
   </div>
 
-  <!-- QUIZ INTRO -->
   <div id="scr-quiz-intro" class="screen">
     <button class="back-btn" onclick="showScreen('scr-client')">← Voltar</button>
     <div class="card">
@@ -381,7 +382,6 @@
     </div>
   </div>
 
-  <!-- QUIZ -->
   <div id="scr-quiz" class="screen">
     <div class="topbar"><span>Pergunta <span id="q-num">1</span>/<span id="q-total">10</span></span><span class="pts-badge">+<span id="q-round-pts">0</span> pts</span></div>
     <div class="helpers-bar">
@@ -393,7 +393,6 @@
     <div class="q-box"><div class="q-text" id="q-text">Carregando...</div><div id="q-options"></div></div>
   </div>
 
-  <!-- RESULT -->
   <div id="scr-result" class="screen">
     <div class="card" style="text-align:center;">
       <div style="font-size:4em;margin-bottom:10px;" id="res-icon"></div>
@@ -409,7 +408,6 @@
     </div>
   </div>
 
-  <!-- REDEEM (com grade de cupons) -->
   <div id="scr-redeem" class="screen">
     <button class="back-btn" onclick="showScreen('scr-client')">← Voltar</button>
     <div class="card">
@@ -425,7 +423,6 @@
     </div>
   </div>
 
-  <!-- TRANSFER -->
   <div id="scr-transfer" class="screen">
     <button class="back-btn" onclick="showScreen('scr-client')">← Voltar</button>
     <div class="card">
@@ -439,7 +436,6 @@
     </div>
   </div>
 
-  <!-- COUPONS (com filtro) -->
   <div id="scr-coupons" class="screen">
     <button class="back-btn" onclick="showScreen('scr-client')">← Voltar</button>
     <div class="card">
@@ -452,7 +448,6 @@
     </div>
   </div>
 
-  <!-- PROFILE -->
   <div id="scr-profile" class="screen">
     <button class="back-btn" onclick="showScreen('scr-client')">← Voltar</button>
     <div class="card">
@@ -468,7 +463,6 @@
     </div>
   </div>
 
-  <!-- SHOPKEEPER -->
   <div id="scr-shopkeeper" class="screen">
     <div class="topbar"><span>🏪 <strong id="shop-name"></strong></span><button class="back-btn" onclick="logout()" style="margin:0;">Sair</button></div>
     <div class="card">
@@ -484,17 +478,14 @@
     </div>
   </div>
 
-  <!-- VALIDATE (com QR reader) -->
   <div id="scr-validate" class="screen">
     <button class="back-btn" onclick="showScreen('scr-shopkeeper')">← Voltar</button>
     <div class="card">
       <h2 style="color:var(--gold);margin-bottom:10px;">✅ Validar Cupom</h2>
       <div class="info">Aponte a câmera para o QR Code do cliente, ou digite o código manualmente.</div>
-
       <button class="btn btn-purple" id="btn-start-scan" onclick="startQrScan()">📷 Ler QR Code com a Câmera</button>
       <div id="qr-reader" class="hidden"></div>
       <button class="btn btn-outline hidden" id="btn-stop-scan" onclick="stopQrScan()">✕ Cancelar leitura</button>
-
       <div style="margin-top:15px;text-align:center;opacity:0.6;font-size:0.85em;">— ou digite o código —</div>
       <label>Código do Cupom:</label>
       <input type="text" id="val-code" placeholder="QL-XXXXXX" style="text-transform:uppercase;text-align:center;font-size:1.3em;letter-spacing:3px;">
@@ -503,7 +494,6 @@
     </div>
   </div>
 
-  <!-- SHOP ADD -->
   <div id="scr-shop-add" class="screen">
     <button class="back-btn" onclick="showScreen('scr-shopkeeper')">← Voltar</button>
     <div class="card">
@@ -529,7 +519,6 @@
     </div>
   </div>
 
-  <!-- SHOP PRODUCTS -->
   <div id="scr-shop-products" class="screen">
     <button class="back-btn" onclick="showScreen('scr-shopkeeper')">← Voltar</button>
     <div class="card">
@@ -538,7 +527,6 @@
     </div>
   </div>
 
-  <!-- ADMIN -->
   <div id="scr-admin" class="screen">
     <div class="topbar"><span>👑 <strong id="adm-name"></strong></span><button class="back-btn" onclick="logout()" style="margin:0;">Sair</button></div>
     <div class="card">
@@ -566,7 +554,7 @@
   </div>
 </div>
 
-<!-- MODAL INFO -->
+<!-- MODAIS -->
 <div id="modal" class="modal">
   <div class="modal-box">
     <div class="modal-icon" id="m-icon"></div>
@@ -576,7 +564,6 @@
   </div>
 </div>
 
-<!-- MODAL CONFIRM -->
 <div id="modal-confirm" class="modal">
   <div class="modal-box">
     <div class="modal-icon" id="mc-icon">⚠️</div>
@@ -589,14 +576,13 @@
   </div>
 </div>
 
-<!-- MODAL QR CODE -->
 <div id="modal-qr" class="modal">
   <div class="modal-box">
     <div style="font-size:3em;margin-bottom:8px;">🏷️</div>
     <h2 style="color:var(--gold);margin-bottom:8px;">Cupom Gerado!</h2>
     <p style="font-size:0.85em;opacity:0.85;">Apresente este QR Code ao lojista</p>
     <div class="qr-container" id="qr-code-container"></div>
-    <div class="code" id="qr-modal-code" style="font-family:monospace;font-size:1.3em;color:var(--gold);letter-spacing:2px;margin:10px 0;"></div>
+    <div id="qr-modal-code" style="font-family:monospace;font-size:1.3em;color:var(--gold);letter-spacing:2px;margin:10px 0;"></div>
     <p id="qr-modal-info" style="font-size:0.9em;line-height:1.4;margin:10px 0;opacity:0.9;"></p>
     <button class="btn" onclick="closeQrModal()">OK</button>
   </div>
@@ -621,9 +607,6 @@ const CFG = {
   REFERRAL_BONUS: 2000,
   SITE_URL: 'https://quizlocal.vercel.app'
 };
-
-// Grade de cupons (valor desconto, compra mínima, pontos)
-// A regra é: desconto = 10% da compra mínima, e pontos = desconto × 1000
 const COUPONS = [
   { value: 3,  minPurchase: 30,  pts: 3000 },
   { value: 6,  minPurchase: 60,  pts: 6000 },
@@ -631,10 +614,8 @@ const COUPONS = [
   { value: 14, minPurchase: 140, pts: 14000 },
   { value: 20, minPurchase: 200, pts: 20000 }
 ];
-
 const SUPABASE_URL = 'https://klzjcpogqsasfigyxgxp.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtsempjcG9ncXNhc2ZpZ3l4Z3hwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzMDMxMjYsImV4cCI6MjEwNDg3OTEyNn0.0ENvP05STQtzrwAktvtJwdK8If7zSmamBTPlHcpF-KE';
-
 let supabaseClient = null;
 (function initSupabase() {
   try {
@@ -643,7 +624,6 @@ let supabaseClient = null;
     console.log('✅ Cliente Supabase inicializado.');
   } catch (e) { console.error('Erro ao iniciar Supabase:', e); }
 })();
-
 let SESSION = { userId: null, user: null, resetData: null, transferData: null };
 let DAILY = null;
 let REFERRAL_FROM_URL = null;
@@ -685,9 +665,7 @@ function sndClick() {
 }
 
 // ==================== UTILS ====================
-function escapeHtml(s) {
-  return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
+function escapeHtml(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function cleanCPF(cpf) { return cpf ? String(cpf).replace(/\D/g,'') : ''; }
 function isValidCPF(cpf) {
   cpf = cleanCPF(cpf);
@@ -744,13 +722,8 @@ function confirmDialog(title, text) {
     no.addEventListener('click', onNo);
   });
 }
-function saveSession() {
-  if (!SESSION.userId) return;
-  try { sessionStorage.setItem('ql_session', JSON.stringify({ userId: SESSION.userId, ts: Date.now() })); } catch(e) {}
-}
-function clearSessionStorage() {
-  try { sessionStorage.removeItem('ql_session'); } catch(e) {}
-}
+function saveSession() { if (!SESSION.userId) return; try { sessionStorage.setItem('ql_session', JSON.stringify({ userId: SESSION.userId, ts: Date.now() })); } catch(e) {} }
+function clearSessionStorage() { try { sessionStorage.removeItem('ql_session'); } catch(e) {} }
 
 // ==================== NAVEGAÇÃO ====================
 function showScreen(id) {
@@ -770,9 +743,7 @@ function showScreen(id) {
   if(id==='scr-forgot') {
     const step2 = document.getElementById('forgot-step2');
     if (step2) step2.classList.add('hidden');
-    ['forgot-id','forgot-code','forgot-newpass','forgot-confirmpass'].forEach(i => {
-      const el = document.getElementById(i); if (el) el.value = '';
-    });
+    ['forgot-id','forgot-code','forgot-newpass','forgot-confirmpass'].forEach(i => { const el = document.getElementById(i); if (el) el.value = ''; });
   }
 }
 function toast(msg, type='info') {
@@ -798,7 +769,6 @@ document.addEventListener('DOMContentLoaded', function() {
       if (storeField) storeField.classList.toggle('hidden', e.target.value !== 'lojista');
     });
   }
-  // Captura código de indicação da URL
   const urlParams = new URLSearchParams(window.location.search);
   const refFromUrl = urlParams.get('ref');
   if (refFromUrl) {
@@ -808,14 +778,10 @@ document.addEventListener('DOMContentLoaded', function() {
   } else {
     try {
       const stored = sessionStorage.getItem('ql_referral_code');
-      if (stored) {
-        REFERRAL_FROM_URL = stored;
-        showReferralBanner(stored);
-      }
+      if (stored) { REFERRAL_FROM_URL = stored; showReferralBanner(stored); }
     } catch(e) {}
   }
 });
-
 function showReferralBanner(code) {
   const html = `🎁 <strong>Você foi convidado!</strong> Código <strong style="font-family:monospace;">${escapeHtml(code)}</strong> será aplicado ao se cadastrar.`;
   const b1 = document.getElementById('ref-banner-login');
@@ -869,13 +835,11 @@ async function handleRegister(btn) {
   if(!isValidCPF(cpf)) { toast('CPF inválido!','error'); return; }
   if(type==='lojista' && !store) { toast('Informe o nome do estabelecimento!','error'); return; }
   if(pass.length < 4) { toast('Senha deve ter ao menos 4 caracteres.','error'); return; }
-
   setLoading(btn, true, 'Cadastrando...');
   try {
     const { data: byEmail } = await supabaseClient.from('users').select('id').eq('email', email).maybeSingle();
     const { data: byCpf } = await supabaseClient.from('users').select('id').eq('cpf', cpf).maybeSingle();
     if (byEmail || byCpf) { toast('CPF ou Email já cadastrado!','error'); return; }
-
     const newUser = {
       type, name, cpf, email,
       pass: await hashPassword(pass),
@@ -883,31 +847,20 @@ async function handleRegister(btn) {
       points: 0, games_played: 0, correct_answers: 0, total_redeemed: 0,
       verified: true, created_at: new Date().toISOString()
     };
-    const { data: inserted, error: insertError } = await supabaseClient
-      .from('users').insert([newUser]).select('id').single();
+    const { data: inserted, error: insertError } = await supabaseClient.from('users').insert([newUser]).select('id').single();
     if(insertError) { toast('Erro: ' + insertError.message, 'error'); return; }
-
-    // Aplica indicação se houver código
     const refCode = REFERRAL_FROM_URL || sessionStorage.getItem('ql_referral_code');
     if (refCode && inserted?.id) {
       try {
-        const { data: refRes } = await supabaseClient.rpc('apply_referral', {
-          p_new_user_id: Number(inserted.id),
-          p_referral_code: String(refCode)
-        });
-        if (refRes?.success) {
-          toast(`🎁 Você foi indicado! +${refRes.points} pts para quem te convidou.`, 'success');
-        }
+        const { data: refRes } = await supabaseClient.rpc('apply_referral', { p_new_user_id: Number(inserted.id), p_referral_code: String(refCode) });
+        if (refRes?.success) toast(`🎁 Você foi indicado! +${refRes.points} pts para quem te convidou.`, 'success');
       } catch(e) { console.warn('Falha ao aplicar referral:', e); }
       try { sessionStorage.removeItem('ql_referral_code'); } catch(e) {}
       REFERRAL_FROM_URL = null;
     }
-
     toast('Conta criada! Faça login.','success');
     sndCorrect();
-    ['reg-name','reg-cpf','reg-email','reg-pass','reg-store'].forEach(id => {
-      const el = document.getElementById(id); if (el) el.value = '';
-    });
+    ['reg-name','reg-cpf','reg-email','reg-pass','reg-store'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
     document.getElementById('reg-type').value = 'cliente';
     document.getElementById('store-field').classList.add('hidden');
     document.getElementById('login-id').value = email;
@@ -967,8 +920,7 @@ function redirectToRole(type) {
 }
 function logout() {
   SESSION = { userId:null, user:null, resetData:null, transferData:null };
-  DAILY = null;
-  COUPONS_DATA = [];
+  DAILY = null; COUPONS_DATA = [];
   clearSessionStorage();
   document.getElementById('login-id').value = '';
   document.getElementById('login-pass').value = '';
@@ -976,7 +928,7 @@ function logout() {
   toast('Você saiu do sistema','info');
 }
 
-// ==================== BANCO LOCAL (FALLBACK) ====================
+// ==================== BANCO LOCAL ====================
 const QUESTIONS = [
   {q:"Capital do Brasil?",o:["São Paulo","Rio de Janeiro","Brasília","Salvador"],a:2,c:"Geografia",d:1},
   {q:"Quem pintou a Mona Lisa?",o:["Van Gogh","Da Vinci","Picasso","Michelangelo"],a:1,c:"Arte",d:1},
@@ -1063,9 +1015,7 @@ const QUESTIONS = [
 async function loadQuestionsFromDB() {
   if (!supabaseClient) return null;
   try {
-    const { data, error } = await supabaseClient.from('questions')
-      .select('id, question, option_a, option_b, option_c, option_d, correct_answer, category, difficulty')
-      .eq('active', true);
+    const { data, error } = await supabaseClient.from('questions').select('id, question, option_a, option_b, option_c, option_d, correct_answer, category, difficulty').eq('active', true);
     if (error) return null;
     if (!data || data.length < CFG.MIN_DB_QUESTIONS) return null;
     const valid = data.map(normalizeQuestion).filter(Boolean);
@@ -1089,11 +1039,7 @@ function pickQuestionsByDifficulty(pool, total) {
   const dist = CFG.DIFFICULTY_DISTRIBUTION;
   const picked = [];
   const used = { 1: 0, 2: 0, 3: 0 };
-  for (const d of [1, 2, 3]) {
-    const take = Math.min(dist[d], byDiff[d].length);
-    picked.push(...byDiff[d].slice(0, take));
-    used[d] = take;
-  }
+  for (const d of [1, 2, 3]) { const take = Math.min(dist[d], byDiff[d].length); picked.push(...byDiff[d].slice(0, take)); used[d] = take; }
   const remaining = total - picked.length;
   if (remaining > 0) {
     const leftover = [];
@@ -1111,14 +1057,8 @@ let timerInterval = null;
 let timerState = { seconds: 0, remaining: 0, paused: false };
 document.addEventListener('visibilitychange', () => {
   if (!quiz.active) return;
-  if (document.hidden) {
-    timerState.paused = true;
-    document.getElementById('timer-bar')?.classList.add('paused');
-    toast('⏸️ Jogo pausado.','info');
-  } else {
-    timerState.paused = false;
-    document.getElementById('timer-bar')?.classList.remove('paused');
-  }
+  if (document.hidden) { timerState.paused = true; document.getElementById('timer-bar')?.classList.add('paused'); toast('⏸️ Jogo pausado.','info'); }
+  else { timerState.paused = false; document.getElementById('timer-bar')?.classList.remove('paused'); }
 });
 async function startQuiz(btn) {
   setLoading(btn, true, 'Carregando perguntas...');
@@ -1126,18 +1066,15 @@ async function startQuiz(btn) {
     let pool = await loadQuestionsFromDB();
     if (!pool) { console.warn('⚠️ Usando banco local.'); pool = [...QUESTIONS]; }
     const selected = pickQuestionsByDifficulty(pool, CFG.QUIZ_QUESTIONS_PER_ROUND);
-    quiz = { questions: selected, current:0, correct:0, wrong:0, points:0, active:false, caughtCheating:false,
-             helpers: { fifty: true, skip: true, stop: true } };
+    quiz = { questions: selected, current:0, correct:0, wrong:0, points:0, active:false, caughtCheating:false, helpers: { fifty: true, skip: true, stop: true } };
     document.getElementById('q-total').textContent = selected.length;
     showScreen('scr-quiz-intro');
   } finally { setLoading(btn, false); }
 }
 function beginQuiz(btn) {
   if (!quiz.questions || !quiz.questions.length) { toast('Nenhuma pergunta carregada.','error'); return; }
-  quiz.active = true;
-  quiz.current = 0;
-  showScreen('scr-quiz');
-  renderQuestion();
+  quiz.active = true; quiz.current = 0;
+  showScreen('scr-quiz'); renderQuestion();
 }
 function renderQuestion() {
   if(quiz.current >= quiz.questions.length) { finishQuiz(); return; }
@@ -1149,9 +1086,7 @@ function renderQuestion() {
   qOptions.innerHTML = '';
   q.o.forEach((o,i) => {
     const d = document.createElement('div');
-    d.className = 'opt';
-    d.tabIndex = 0;
-    d.setAttribute('role', 'button');
+    d.className = 'opt'; d.tabIndex = 0; d.setAttribute('role', 'button');
     d.textContent = `${String.fromCharCode(65+i)}) ${o}`;
     d.onclick = () => answerQ(i, d);
     d.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); answerQ(i, d); } };
@@ -1178,17 +1113,12 @@ function useFiftyFifty() {
   wrong.sort(() => Math.random() - 0.5);
   const toRemove = wrong.slice(0, 2);
   document.querySelectorAll('.opt').forEach((el, i) => { if (toRemove.includes(i)) el.classList.add('eliminated'); });
-  quiz.helpers.fifty = false;
-  updateHelpersUI();
-  sndClick();
+  quiz.helpers.fifty = false; updateHelpersUI(); sndClick();
   toast('✂️ 50/50 usada!','info');
 }
 function useSkip() {
   if (!quiz.active || !quiz.helpers.skip) return;
-  quiz.helpers.skip = false;
-  clearInterval(timerInterval);
-  quiz.active = false;
-  sndClick();
+  quiz.helpers.skip = false; clearInterval(timerInterval); quiz.active = false; sndClick();
   toast('⏭️ Pergunta pulada.','info');
   setTimeout(() => { quiz.current++; quiz.active = true; renderQuestion(); }, 400);
 }
@@ -1196,9 +1126,7 @@ async function useStop() {
   if (!quiz.active || !quiz.helpers.stop) return;
   const ok = await confirmDialog('Parar o Quiz?', `Você vai encerrar agora com ${quiz.points} pontos.\n\nTem certeza?`);
   if (!ok) return;
-  quiz.helpers.stop = false;
-  clearInterval(timerInterval);
-  quiz.active = false;
+  quiz.helpers.stop = false; clearInterval(timerInterval); quiz.active = false;
   toast('🛑 Quiz encerrado.','info');
   finishQuiz();
 }
@@ -1226,28 +1154,23 @@ function updateTimerBar() {
 }
 function answerQ(idx, el) {
   if(!quiz.active) return;
-  clearInterval(timerInterval);
-  quiz.active = false;
+  clearInterval(timerInterval); quiz.active = false;
   const q = quiz.questions[quiz.current];
   document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
   const ptsValue = q.d * 100;
   if(idx === q.a) {
-    el.classList.add('correct');
-    quiz.correct++; quiz.points += ptsValue;
+    el.classList.add('correct'); quiz.correct++; quiz.points += ptsValue;
     sndCorrect(); toast(`✅ Correto! +${ptsValue} pts`,'success');
   } else {
-    el.classList.add('wrong');
-    document.querySelectorAll('.opt')[q.a]?.classList.add('correct');
-    quiz.wrong++;
-    quiz.points = Math.max(0, quiz.points - ptsValue);
+    el.classList.add('wrong'); document.querySelectorAll('.opt')[q.a]?.classList.add('correct');
+    quiz.wrong++; quiz.points = Math.max(0, quiz.points - ptsValue);
     sndWrong(); toast(`❌ Errado! -${ptsValue} pts`,'error');
   }
   setTimeout(nextQuestion, 1600);
 }
 function nextQuestion() { quiz.active = true; quiz.current++; renderQuestion(); }
 async function finishQuiz() {
-  quiz.active = false;
-  clearInterval(timerInterval);
+  quiz.active = false; clearInterval(timerInterval);
   if (!SESSION.userId || !supabaseClient) { toast('Faça login para salvar!','error'); showScreen('scr-home'); return; }
   const earnedPoints = Math.max(0, quiz.points);
   try {
@@ -1286,22 +1209,16 @@ async function loadDailyOffers() {
     const btn = document.getElementById('btn-checkin');
     const status = document.getElementById('checkin-status');
     if (DAILY.checked_today) {
-      btn.disabled = true;
-      btn.classList.remove('btn-green');
+      btn.disabled = true; btn.classList.remove('btn-green');
       btn.style.background = 'rgba(255,255,255,0.15)';
       btn.textContent = '✓ Check-in feito hoje';
       status.textContent = `🔥 Sequência de ${DAILY.streak} dia(s). Volte amanhã!`;
     } else {
-      btn.disabled = false;
-      btn.classList.add('btn-green');
-      btn.style.background = '';
+      btn.disabled = false; btn.classList.add('btn-green'); btn.style.background = '';
       btn.textContent = '🎁 Fazer Check-in Hoje (+50 pts)';
       status.textContent = DAILY.streak > 0 ? `Sequência atual: ${DAILY.streak} dia(s)` : 'Comece sua sequência hoje!';
     }
-  } catch(e) {
-    console.error(e);
-    cont.innerHTML = '<p style="color:var(--red);padding:15px;">Erro ao carregar.</p>';
-  }
+  } catch(e) { console.error(e); cont.innerHTML = '<p style="color:var(--red);padding:15px;">Erro ao carregar.</p>'; }
 }
 function renderStreakCalendar(daily) {
   const el = document.getElementById('streak-calendar');
@@ -1310,16 +1227,14 @@ function renderStreakCalendar(daily) {
   const cells = [];
   const currentStreak = daily.streak || 0;
   for (let i = 6; i >= 0; i--) {
-    const d = new Date(today);
-    d.setDate(d.getDate() - i);
+    const d = new Date(today); d.setDate(d.getDate() - i);
     const isToday = i === 0;
     const isDone = i < currentStreak;
     const dayNumber = 7 - i;
     const isBonusDay = (dayNumber % 7 === 0) || (dayNumber % 3 === 0);
     const dayLabel = isToday ? 'Hoje' : `Dia ${dayNumber}`;
     let pts = CFG.REWARDS.CHECKIN;
-    if (dayNumber % 7 === 0) pts = 200;
-    else if (dayNumber % 3 === 0) pts = 100;
+    if (dayNumber % 7 === 0) pts = 200; else if (dayNumber % 3 === 0) pts = 100;
     let cls = 'streak-cell';
     if (isDone && !isToday) cls += ' done';
     if (isToday) cls += ' today';
@@ -1333,38 +1248,16 @@ function renderDailyOffersList(daily) {
   const cont = document.getElementById('daily-offers-list');
   const ptsInfo = document.getElementById('views-pts-today');
   if (ptsInfo) ptsInfo.textContent = `${daily.views_pts_today || 0}/${daily.views_cap || 50} pts`;
-  if (!daily.offers || !daily.offers.length) {
-    cont.innerHTML = '<p style="opacity:0.6;text-align:center;padding:15px;">Nenhuma oferta em destaque hoje. Volte amanhã!</p>';
-    return;
-  }
+  if (!daily.offers || !daily.offers.length) { cont.innerHTML = '<p style="opacity:0.6;text-align:center;padding:15px;">Nenhuma oferta em destaque hoje.</p>'; return; }
   const followedSet = new Set((daily.followed || []).map(Number));
   const cap = daily.views_cap || 50;
   const viewsToday = daily.views_pts_today || 0;
   const capReached = viewsToday >= cap;
   cont.innerHTML = daily.offers.map(o => {
     const isFollowing = followedSet.has(Number(o.store_id));
-    const followBtn = isFollowing
-      ? `<button class="follow-btn following" disabled>✓ Seguindo</button>`
-      : `<button class="follow-btn" onclick="followStore(${Number(o.store_id)}, this)">+ Seguir loja (+50 pts)</button>`;
-    const viewBtn = capReached
-      ? `<button class="view-btn" disabled>Limite diário atingido</button>`
-      : `<button class="view-btn" onclick="viewOffer(${Number(o.id)}, this)">Ver oferta (+10 pts)</button>`;
-    return `
-      <div class="daily-offer featured">
-        <div class="do-head">
-          <div>
-            <h4>🔥 ${escapeHtml(o.name)} <span class="cat-badge">${escapeHtml(o.category || 'Outros')}</span></h4>
-            <div class="do-store">🏪 ${escapeHtml(o.store_name || 'Loja')}</div>
-          </div>
-        </div>
-        <div class="do-desc">${escapeHtml(o.description || '')}</div>
-        <div style="font-size:0.8em;opacity:0.75;">${o.points} pts · Estoque: ${o.stock}</div>
-        <div class="do-actions">
-          ${viewBtn}
-          ${followBtn}
-        </div>
-        <div class="view-timer hidden" id="view-timer-${Number(o.id)}"></div>
-      </div>`;
+    const followBtn = isFollowing ? `<button class="follow-btn following" disabled>✓ Seguindo</button>` : `<button class="follow-btn" onclick="followStore(${Number(o.store_id)}, this)">+ Seguir loja (+50 pts)</button>`;
+    const viewBtn = capReached ? `<button class="view-btn" disabled>Limite diário atingido</button>` : `<button class="view-btn" onclick="viewOffer(${Number(o.id)}, this)">Ver oferta (+10 pts)</button>`;
+    return `<div class="daily-offer featured"><div class="do-head"><div><h4>🔥 ${escapeHtml(o.name)} <span class="cat-badge">${escapeHtml(o.category || 'Outros')}</span></h4><div class="do-store">🏪 ${escapeHtml(o.store_name || 'Loja')}</div></div></div><div class="do-desc">${escapeHtml(o.description || '')}</div><div style="font-size:0.8em;opacity:0.75;">${o.points} pts · Estoque: ${o.stock}</div><div class="do-actions">${viewBtn}${followBtn}</div><div class="view-timer hidden" id="view-timer-${Number(o.id)}"></div></div>`;
   }).join('');
 }
 async function doCheckin(btn) {
@@ -1377,26 +1270,19 @@ async function doCheckin(btn) {
     sndWin();
     const bonusMsg = data.bonus > 0 ? ` (+${data.bonus} pts de bônus! 🎁)` : '';
     showModal('🎁', 'Check-in feito!', `+${data.points} pontos${bonusMsg}\n\nSequência: ${data.streak} dia(s)`);
-    await loadDailyOffers();
-    refreshClient();
+    await loadDailyOffers(); refreshClient();
   } catch(e) { toast('Erro: ' + e.message, 'error'); }
   finally { setLoading(btn, false); }
 }
 async function followStore(storeId, btn) {
   if (!SESSION.userId || !supabaseClient) return;
-  btn.disabled = true;
-  btn.textContent = 'Seguindo...';
+  btn.disabled = true; btn.textContent = 'Seguindo...';
   try {
-    const { data, error } = await supabaseClient.rpc('follow_store', {
-      p_user_id: Number(SESSION.userId), p_store_id: Number(storeId)
-    });
+    const { data, error } = await supabaseClient.rpc('follow_store', { p_user_id: Number(SESSION.userId), p_store_id: Number(storeId) });
     if (error) { toast('Erro: ' + error.message, 'error'); btn.disabled = false; btn.textContent = '+ Seguir loja'; return; }
     if (data?.error) { toast(data.error, 'error'); btn.disabled = false; btn.textContent = '+ Seguir loja'; return; }
-    sndCorrect();
-    toast(`+${data.points} pts por seguir a loja!`, 'success');
-    btn.classList.add('following');
-    btn.textContent = '✓ Seguindo';
-    btn.disabled = true;
+    sndCorrect(); toast(`+${data.points} pts por seguir a loja!`, 'success');
+    btn.classList.add('following'); btn.textContent = '✓ Seguindo'; btn.disabled = true;
     refreshClient();
   } catch(e) { toast('Erro: ' + e.message, 'error'); btn.disabled = false; btn.textContent = '+ Seguir loja'; }
 }
@@ -1410,24 +1296,17 @@ function viewOffer(offerId, btn) {
   update();
   const interval = setInterval(() => {
     remaining--;
-    if (remaining <= 0) {
-      clearInterval(interval);
-      if (timerEl) timerEl.textContent = '✓ Pronto!';
-      creditViewOffer(offerId, btn, timerEl);
-    } else update();
+    if (remaining <= 0) { clearInterval(interval); if (timerEl) timerEl.textContent = '✓ Pronto!'; creditViewOffer(offerId, btn, timerEl); }
+    else update();
   }, 1000);
 }
 async function creditViewOffer(offerId, btn, timerEl) {
   try {
-    const { data, error } = await supabaseClient.rpc('view_offer', {
-      p_user_id: Number(SESSION.userId), p_offer_id: Number(offerId)
-    });
+    const { data, error } = await supabaseClient.rpc('view_offer', { p_user_id: Number(SESSION.userId), p_offer_id: Number(offerId) });
     if (error) { toast('Erro: ' + error.message, 'error'); btn.disabled = false; btn.textContent = 'Ver oferta (+10 pts)'; if (timerEl) timerEl.classList.add('hidden'); return; }
     if (data?.error) { toast(data.error, 'error'); btn.disabled = true; btn.textContent = 'Já vista hoje'; if (timerEl) timerEl.textContent = data.error; return; }
-    sndCorrect();
-    toast(`+${data.points} pts!`, 'success');
-    btn.classList.add('credited');
-    btn.textContent = `✓ +${data.points} pts`;
+    sndCorrect(); toast(`+${data.points} pts!`, 'success');
+    btn.classList.add('credited'); btn.textContent = `✓ +${data.points} pts`;
     if (timerEl) timerEl.textContent = `✓ Você ganhou ${data.points} pts por visualizar`;
     refreshClient();
     if (DAILY) {
@@ -1442,9 +1321,7 @@ async function creditViewOffer(offerId, btn, timerEl) {
 async function refreshClient() {
   if(!SESSION.userId || !supabaseClient) return;
   try {
-    const { data: u } = await supabaseClient.from('users')
-      .select('name, points, games_played, total_redeemed, referral_code, referred_by')
-      .eq('id', SESSION.userId).single();
+    const { data: u } = await supabaseClient.from('users').select('name, points, games_played, total_redeemed, referral_code, referred_by').eq('id', SESSION.userId).single();
     if(u) {
       document.getElementById('cli-name').textContent = u.name;
       document.getElementById('cli-pts').textContent = u.points;
@@ -1452,19 +1329,13 @@ async function refreshClient() {
       document.getElementById('cli-games').textContent = u.games_played;
       document.getElementById('cli-redeemed').textContent = fmtMoney(u.total_redeemed);
       SESSION.user = { ...SESSION.user, ...u };
-
-      // Atualiza card de indicação
       if (u.referral_code) {
         const codeEl = document.getElementById('ref-code-badge');
         const linkEl = document.getElementById('ref-link-display');
         if (codeEl) codeEl.textContent = u.referral_code;
         if (linkEl) linkEl.textContent = `${CFG.SITE_URL}/?ref=${u.referral_code}`;
       }
-
-      // Conta quantas pessoas ele indicou
-      const { count } = await supabaseClient.from('users')
-        .select('id', { count: 'exact', head: true })
-        .eq('referred_by', SESSION.userId);
+      const { count } = await supabaseClient.from('users').select('id', { count: 'exact', head: true }).eq('referred_by', SESSION.userId);
       const cnt = document.getElementById('ref-count');
       if (cnt) cnt.textContent = count || 0;
     }
@@ -1474,57 +1345,29 @@ async function refreshClient() {
 // ==================== INDICAÇÃO ====================
 function copyReferralLink() {
   const code = SESSION.user?.referral_code;
-  if (!code) { toast('Código de indicação indisponível. Recarregue a página.', 'error'); return; }
+  if (!code) { toast('Código indisponível. Recarregue a página.', 'error'); return; }
   const link = `${CFG.SITE_URL}/?ref=${code}`;
   if (navigator.clipboard && window.isSecureContext) {
-    navigator.clipboard.writeText(link).then(() => {
-      toast('✅ Link copiado! Cole no WhatsApp ou onde quiser.', 'success');
-      sndCorrect();
-    }).catch(() => fallbackCopy(link));
-  } else {
-    fallbackCopy(link);
-  }
+    navigator.clipboard.writeText(link).then(() => { toast('✅ Link copiado!', 'success'); sndCorrect(); }).catch(() => fallbackCopy(link));
+  } else fallbackCopy(link);
 }
 function fallbackCopy(text) {
   try {
-    const ta = document.createElement('textarea');
-    ta.value = text;
-    ta.style.position = 'fixed';
-    ta.style.opacity = '0';
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand('copy');
-    document.body.removeChild(ta);
-    toast('✅ Link copiado!', 'success');
-    sndCorrect();
-  } catch(e) { toast('Não foi possível copiar. Selecione manualmente.', 'error'); }
+    const ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    toast('✅ Link copiado!', 'success'); sndCorrect();
+  } catch(e) { toast('Não foi possível copiar.', 'error'); }
 }
 function shareWhatsApp() {
   const code = SESSION.user?.referral_code;
   const name = SESSION.user?.name?.split(' ')[0] || 'seu amigo';
-  if (!code) { toast('Código de indicação indisponível.', 'error'); return; }
+  if (!code) { toast('Código indisponível.', 'error'); return; }
   const link = `${CFG.SITE_URL}/?ref=${code}`;
-  const text =
-`🎯 *QuizLocal* — Conhecimento que vira desconto!
-
-Oi! Sou ${name} e estou usando o *QuizLocal*, um app da nossa cidade onde você responde quiz de conhecimentos gerais, acumula pontos e troca por descontos nas lojas locais.
-
-🏆 *Como funciona:*
-• Responda 10 perguntas por rodada
-• Acertos valem pontos (100 a 300 por pergunta)
-• 1.000 pontos = R$ 1,00 de desconto
-• Desconto de até 10% em compras parceiras
-
-🎁 *Usando meu link você começa a jogar e a gente acumula pontos juntos!*
-
-👉 ${link}
-
-É grátis, leva 30 segundos para se cadastrar e tem quiz novo todo dia. Vem!`;
-  const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
-  window.open(url, '_blank');
+  const text = `🎯 *QuizLocal* — Conhecimento que vira desconto!\n\nOi! Sou ${name} e estou usando o *QuizLocal*, um app da nossa cidade onde você responde quiz de conhecimentos gerais, acumula pontos e troca por descontos nas lojas locais.\n\n🏆 *Como funciona:*\n• Responda 10 perguntas por rodada\n• Acertos valem pontos (100 a 300 por pergunta)\n• 1.000 pontos = R$ 1,00 de desconto\n• Desconto de até 10% em compras parceiras\n\n🎁 *Usando meu link você começa a jogar e a gente acumula pontos juntos!*\n\n👉 ${link}\n\nÉ grátis, leva 30 segundos para se cadastrar e tem quiz novo todo dia. Vem!`;
+  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
 }
 
-// ==================== RESGATE — GRADE DE CUPONS (Bloco B) ====================
+// ==================== RESGATE — GRADE DE CUPONS ====================
 async function loadRedeemStores() {
   if (!supabaseClient) return;
   try {
@@ -1545,7 +1388,6 @@ async function renderCouponGrid() {
     const saldo = u?.points || 0;
     const balanceEl = document.getElementById('grid-balance');
     if (balanceEl) balanceEl.textContent = `${saldo.toLocaleString('pt-BR')} pts`;
-
     cont.innerHTML = COUPONS.map(c => {
       const available = saldo >= c.pts;
       const pct = Math.min(100, (saldo / c.pts) * 100);
@@ -1553,47 +1395,26 @@ async function renderCouponGrid() {
       const btnCls = available ? 'ci-btn active' : 'ci-btn locked';
       const btnLabel = available ? `Trocar por R$ ${c.value}` : `Faltam ${(c.pts - saldo).toLocaleString('pt-BR')} pts`;
       const btnAction = available ? `onclick="redeemCoupon(${c.value}, ${c.minPurchase}, ${c.pts})"` : 'disabled';
-      return `
-        <div class="${cls}">
-          <div class="ci-value">R$ ${c.value} <small>OFF</small></div>
-          <div class="ci-min">Compra mínima R$ ${c.minPurchase}</div>
-          <div class="ci-progress"><div class="ci-progress-fill ${available ? 'full' : ''}" style="width:${pct}%"></div></div>
-          <div class="ci-pts">${saldo.toLocaleString('pt-BR')} / ${c.pts.toLocaleString('pt-BR')} pts</div>
-          <button class="${btnCls}" ${btnAction}>${btnLabel}</button>
-        </div>`;
+      return `<div class="${cls}"><div class="ci-value">R$ ${c.value} <small>OFF</small></div><div class="ci-min">Compra mínima R$ ${c.minPurchase}</div><div class="ci-progress"><div class="ci-progress-fill ${available ? 'full' : ''}" style="width:${pct}%"></div></div><div class="ci-pts">${saldo.toLocaleString('pt-BR')} / ${c.pts.toLocaleString('pt-BR')} pts</div><button class="${btnCls}" ${btnAction}>${btnLabel}</button></div>`;
     }).join('');
-  } catch(e) {
-    console.error(e);
-    cont.innerHTML = '<p style="color:var(--red);padding:15px;">Erro ao carregar cupons.</p>';
-  }
+  } catch(e) { console.error(e); cont.innerHTML = '<p style="color:var(--red);padding:15px;">Erro.</p>'; }
 }
 async function redeemCoupon(value, minPurchase, points) {
   const storeId = document.getElementById('redeem-store').value;
   if (!storeId) { toast('⚠️ Selecione a loja primeiro!', 'error'); return; }
-
-  const ok = await confirmDialog(
-    `Resgatar cupom R$ ${value}`,
-    `Você vai usar ${points.toLocaleString('pt-BR')} pts para gerar um cupom de R$ ${value} de desconto.\n\n⚠️ Necessário gastar pelo menos R$ ${minPurchase} na loja.\n\nConfirmar?`
-  );
+  const ok = await confirmDialog(`Resgatar cupom R$ ${value}`, `Você vai usar ${points.toLocaleString('pt-BR')} pts para gerar um cupom de R$ ${value} de desconto.\n\n⚠️ Necessário gastar pelo menos R$ ${minPurchase} na loja.\n\nConfirmar?`);
   if (!ok) return;
-
   try {
-    const { data, error } = await supabaseClient.rpc('redeem_discount', {
-      p_user_id: Number(SESSION.userId),
-      p_store_id: Number(storeId),
-      p_purchase_value: Number(minPurchase)
-    });
+    const { data, error } = await supabaseClient.rpc('redeem_discount', { p_user_id: Number(SESSION.userId), p_store_id: Number(storeId), p_purchase_value: Number(minPurchase) });
     if (error) { toast('Erro: ' + error.message, 'error'); return; }
     if (data?.error) { toast(data.error, 'error'); return; }
-
     sndWin();
     showQrModal(data.code, data.discount);
-    refreshClient();
-    renderCouponGrid();
+    refreshClient(); renderCouponGrid();
   } catch(e) { toast('Erro: ' + e.message, 'error'); }
 }
 
-// ==================== QR CODE (Bloco B) ====================
+// ==================== QR CODE ====================
 function showQrModal(code, discount) {
   const cont = document.getElementById('qr-code-container');
   const codeEl = document.getElementById('qr-modal-code');
@@ -1607,56 +1428,31 @@ function showQrModal(code, discount) {
       qr.addData(code);
       qr.make();
       cont.innerHTML = qr.createImgTag(4, 8);
-    } catch(e) {
-      console.error('Erro ao gerar QR:', e);
-      cont.innerHTML = '<span style="color:#333;font-size:0.8em;">QR indisponível. Use o código abaixo.</span>';
-    }
+    } catch(e) { console.error(e); cont.innerHTML = '<span style="color:#333;font-size:0.8em;">QR indisponível.</span>'; }
   }
   document.getElementById('modal-qr').classList.add('active');
 }
 function closeQrModal() { document.getElementById('modal-qr').classList.remove('active'); }
-
 async function startQrScan() {
   const reader = document.getElementById('qr-reader');
   const btnStart = document.getElementById('btn-start-scan');
   const btnStop = document.getElementById('btn-stop-scan');
-  reader.classList.remove('hidden');
-  btnStart.classList.add('hidden');
-  btnStop.classList.remove('hidden');
-
+  reader.classList.remove('hidden'); btnStart.classList.add('hidden'); btnStop.classList.remove('hidden');
   try {
-    if (!qrScannerInstance) {
-      qrScannerInstance = new Html5Qrcode("qr-reader");
-    }
+    if (!qrScannerInstance) qrScannerInstance = new Html5Qrcode("qr-reader");
     await qrScannerInstance.start(
       { facingMode: "environment" },
       { fps: 10, qrbox: { width: 240, height: 240 } },
-      (decodedText) => {
-        sndCorrect();
-        document.getElementById('val-code').value = decodedText.trim();
-        stopQrScan();
-        validateCoupon();
-      },
-      () => { /* scan falhou num frame — ignora */ }
+      (decodedText) => { sndCorrect(); document.getElementById('val-code').value = decodedText.trim(); stopQrScan(); validateCoupon(); },
+      () => {}
     );
-  } catch(e) {
-    console.error('Erro ao iniciar câmera:', e);
-    toast('Não foi possível acessar a câmera. Use a digitação manual.', 'error');
-    stopQrScan();
-  }
+  } catch(e) { console.error(e); toast('Não foi possível acessar a câmera. Use a digitação manual.', 'error'); stopQrScan(); }
 }
 async function stopQrScan() {
   const reader = document.getElementById('qr-reader');
   const btnStart = document.getElementById('btn-start-scan');
   const btnStop = document.getElementById('btn-stop-scan');
-  if (qrScannerInstance) {
-    try {
-      const state = qrScannerInstance.getState();
-      if (state === Html5QrcodeScannerState?.SCANNING || state === 2) {
-        await qrScannerInstance.stop();
-      }
-    } catch(e) { /* ignore */ }
-  }
+  if (qrScannerInstance) { try { const state = qrScannerInstance.getState(); if (state === 2) await qrScannerInstance.stop(); } catch(e) {} }
   if (reader) reader.classList.add('hidden');
   if (btnStart) btnStart.classList.remove('hidden');
   if (btnStop) btnStop.classList.add('hidden');
@@ -1685,14 +1481,7 @@ async function previewTransfer(btn) {
     const tax = Math.floor(amount * CFG.TRANSFER_TAX_PCT);
     const net = amount - tax;
     document.getElementById('tr-preview').classList.remove('hidden');
-    document.getElementById('tr-preview').innerHTML = `
-      <strong>💸 Simulação:</strong><br>
-      Destinatário: <strong>${escapeHtml(dest.name)}</strong><br>
-      Enviados: ${amount}<br>
-      Taxa (20%): <strong>-${tax} pts</strong> → Caixa<br>
-      <strong style="color:var(--gold);">Destinatário recebe: ${net} pts</strong><br>
-      Seu saldo após: ${u.points - amount} pts
-    `;
+    document.getElementById('tr-preview').innerHTML = `<strong>💸 Simulação:</strong><br>Destinatário: <strong>${escapeHtml(dest.name)}</strong><br>Enviados: ${amount}<br>Taxa (20%): <strong>-${tax} pts</strong> → Caixa<br><strong style="color:var(--gold);">Destinatário recebe: ${net} pts</strong><br>Seu saldo após: ${u.points - amount} pts`;
     SESSION.transferData = { destId:dest.id, destName:dest.name, amount, tax, net };
     document.getElementById('btn-confirm-tr').classList.remove('hidden');
   } catch(e) { toast('Erro: ' + e.message, 'error'); }
@@ -1705,11 +1494,7 @@ async function confirmTransfer(btn) {
   if (!ok) return;
   setLoading(btn, true, 'Transferindo...');
   try {
-    const { data, error } = await supabaseClient.rpc('transfer_points', {
-      p_from_user_id: Number(SESSION.userId),
-      p_to_cpf: cleanCPF(document.getElementById('tr-cpf').value),
-      p_amount: Number(d.amount)
-    });
+    const { data, error } = await supabaseClient.rpc('transfer_points', { p_from_user_id: Number(SESSION.userId), p_to_cpf: cleanCPF(document.getElementById('tr-cpf').value), p_amount: Number(d.amount) });
     if (error) { toast('Erro: ' + error.message, 'error'); return; }
     if (data?.error) { toast(data.error, 'error'); return; }
     sndCorrect();
@@ -1724,7 +1509,7 @@ async function confirmTransfer(btn) {
   finally { setLoading(btn, false); }
 }
 
-// ==================== MEUS CUPONS (com filtro) ====================
+// ==================== MEUS CUPONS ====================
 async function renderCoupons() {
   if (!SESSION.userId || !supabaseClient) return;
   const cont = document.getElementById('coupons-list');
@@ -1738,7 +1523,7 @@ async function renderCoupons() {
     renderCouponsFiltered();
   } catch(e) { console.error(e); cont.innerHTML = '<p style="color:var(--red);padding:15px;">Erro.</p>'; }
 }
-async function filterCoupons(filter) {
+function filterCoupons(filter) {
   COUPON_FILTER = filter;
   document.querySelectorAll('#coupons-tabs .tab').forEach(t => t.classList.toggle('active', t.dataset.filter === filter));
   sndClick();
@@ -1751,70 +1536,98 @@ async function renderCouponsFiltered() {
     if (COUPON_FILTER === 'pendente') return c.status !== 'validado';
     return c.status === 'validado';
   });
-
   if (!list.length) {
-    const msg = COUPON_FILTER === 'pendente'
-      ? 'Você não tem cupons pendentes. Gere um novo na tela de resgate!'
-      : 'Você ainda não usou nenhum cupom.';
+    const msg = COUPON_FILTER === 'pendente' ? 'Você não tem cupons pendentes. Gere um novo na tela de resgate!' : 'Você ainda não usou nenhum cupom.';
     cont.innerHTML = `<p style="opacity:0.6;text-align:center;padding:15px;">${msg}</p>`;
     return;
   }
-
-  // Busca nomes de lojas
   const storeIds = [...new Set(list.map(c => c.store_id).filter(Boolean))];
   let storeMap = {};
   if (storeIds.length) {
     const { data: stores } = await supabaseClient.from('users').select('id, store').in('id', storeIds);
     (stores || []).forEach(s => storeMap[s.id] = s.store);
   }
-
   cont.innerHTML = '';
   list.forEach(c => {
-    const badge = c.status === 'validado'
-      ? '<span class="badge-status badge-validado">✅ Usado</span>'
-      : '<span class="badge-status badge-pendente">⏳ Pendente</span>';
+    const badge = c.status === 'validado' ? '<span class="badge-status badge-validado">✅ Usado</span>' : '<span class="badge-status badge-pendente">⏳ Pendente</span>';
     const dt = new Date(c.created_at).toLocaleDateString('pt-BR');
     const qrBtn = c.status === 'validado' ? '' : `<button class="btn btn-sm" style="margin-top:10px;background:rgba(255,255,255,0.15);color:#fff;width:auto;padding:6px 14px;font-size:0.85em;" onclick="showQrModal('${escapeHtml(c.code)}', ${Number(c.discount)})">📷 Ver QR Code</button>`;
-    cont.innerHTML += `
-      <div class="coupon-card">
-        <div style="display:flex;justify-content:space-between;align-items:center;">
-          <strong>${escapeHtml(storeMap[c.store_id] || 'Loja')}</strong>
-          ${badge}
-        </div>
-        <div class="code">${escapeHtml(c.code)}</div>
-        <div style="font-size:0.85em;opacity:0.8;">Desconto: ${fmtMoney(c.discount)} · Compra mínima: ${fmtMoney(c.purchase_value)} · ${dt}</div>
-        ${qrBtn}
-      </div>`;
+    cont.innerHTML += `<div class="coupon-card"><div style="display:flex;justify-content:space-between;align-items:center;"><strong>${escapeHtml(storeMap[c.store_id] || 'Loja')}</strong>${badge}</div><div class="code">${escapeHtml(c.code)}</div><div style="font-size:0.85em;opacity:0.8;">Desconto: ${fmtMoney(c.discount)} · Compra mínima: ${fmtMoney(c.purchase_value)} · ${dt}</div>${qrBtn}</div>`;
   });
 }
 
-// ==================== PERFIL ====================
+// ==================== PERFIL (histórico reformulado) ====================
 async function refreshProfile() {
-  if(!SESSION.userId || !supabaseClient) return;
+  if (!SESSION.userId || !supabaseClient) return;
   try {
     const { data: u } = await supabaseClient.from('users').select('points, games_played, correct_answers, total_redeemed').eq('id', SESSION.userId).single();
-    if(!u) return;
+    if (!u) return;
     document.getElementById('prof-pts').textContent = u.points;
     document.getElementById('prof-games').textContent = u.games_played;
     document.getElementById('prof-correct').textContent = u.correct_answers;
     document.getElementById('prof-redeemed').textContent = fmtMoney(u.total_redeemed);
+
     const { data: hist } = await supabaseClient.from('transactions')
-      .select('type, points_used, amount, net, from_user_id, to_user_id, created_at')
+      .select('id, type, user_id, store_id, from_user_id, to_user_id, amount, tax, net, points_used, discount, purchase_value, code, status, created_at')
       .or(`user_id.eq.${SESSION.userId},from_user_id.eq.${SESSION.userId},to_user_id.eq.${SESSION.userId}`)
-      .order('created_at', { ascending: false }).limit(10);
+      .order('created_at', { ascending: false })
+      .limit(15);
+
     const cont = document.getElementById('prof-history');
-    if(!hist || !hist.length) { cont.innerHTML='<p style="opacity:0.6;text-align:center;padding:15px;">Sem histórico.</p>'; return; }
-    cont.innerHTML='<table><tr><th>Data</th><th>Tipo</th><th>Detalhe</th></tr>';
-    hist.forEach(t => {
-      const d = new Date(t.created_at).toLocaleDateString('pt-BR');
-      let detail = '';
-      if(t.type==='redeem') detail=`-${t.points_used} pts → Loja`;
-      else if(t.type==='transfer' && t.from_user_id===SESSION.userId) detail=`-${t.amount} pts (enviado)`;
-      else if(t.type==='transfer' && t.to_user_id===SESSION.userId) detail=`+${t.net} pts (recebido)`;
-      cont.innerHTML+=`<tr><td>${escapeHtml(d)}</td><td>${escapeHtml(t.type)}</td><td>${escapeHtml(detail)}</td></tr>`;
-    });
-    cont.innerHTML+='</table>';
-  } catch(e) { console.error(e); }
+    if (!cont) return;
+    await renderHistoryInto(cont, hist, SESSION.userId);
+  } catch (e) { console.error('Erro refreshProfile:', e); }
+}
+
+async function renderHistoryInto(container, hist, viewerId) {
+  if (!hist || !hist.length) {
+    container.innerHTML = `<div class="history-empty"><div class="he-icon">📭</div><p>Nenhuma movimentação.<br>Jogue um quiz ou resgate um cupom para começar!</p></div>`;
+    return;
+  }
+  const ids = new Set();
+  hist.forEach(t => { [t.user_id, t.store_id, t.from_user_id, t.to_user_id].forEach(id => { if (id) ids.add(id); }); });
+  let people = {};
+  if (ids.size > 0) {
+    const { data: ppl } = await supabaseClient.from('users').select('id, name, store').in('id', [...ids]);
+    (ppl || []).forEach(p => { people[p.id] = p; });
+  }
+  container.innerHTML = '<div class="history-list">' +
+    hist.map(t => renderHistoryItem(t, people, viewerId)).join('') +
+    '</div>';
+}
+
+function renderHistoryItem(t, people, viewerId) {
+  const when = relativeTime(t.created_at);
+  if (t.type === 'redeem') {
+    const store = people[t.store_id] || {};
+    const statusBadge = t.status === 'validado' ? '<span class="hi-status validado">✓ USADO</span>' : '<span class="hi-status pendente">⏳ PENDENTE</span>';
+    return `<div class="history-item redeem"><div class="hi-icon">🏷️</div><div class="hi-body"><div class="hi-title">Resgate na ${escapeHtml(store.store || store.name || 'loja')}</div><div class="hi-sub">Compra ${fmtMoney(t.purchase_value)} · Desconto ${fmtMoney(t.discount)}</div></div><div class="hi-meta"><div class="hi-points neg">−${(t.points_used || 0).toLocaleString('pt-BR')}</div><div class="hi-when">${when}</div>${statusBadge}</div></div>`;
+  }
+  if (t.type === 'transfer') {
+    const from = people[t.from_user_id] || {};
+    const to = people[t.to_user_id] || {};
+    const isIncoming = Number(t.to_user_id) === Number(viewerId);
+    if (isIncoming) {
+      return `<div class="history-item transfer-in"><div class="hi-icon">📥</div><div class="hi-body"><div class="hi-title">Pontos recebidos</div><div class="hi-sub">De ${escapeHtml(from.name || 'outro usuário')}</div></div><div class="hi-meta"><div class="hi-points pos">+${(t.net || 0).toLocaleString('pt-BR')}</div><div class="hi-when">${when}</div></div></div>`;
+    }
+    return `<div class="history-item transfer-out"><div class="hi-icon">📤</div><div class="hi-body"><div class="hi-title">Pontos enviados</div><div class="hi-sub">Para ${escapeHtml(to.name || 'outro usuário')} · taxa ${(t.tax || 0).toLocaleString('pt-BR')} pts</div></div><div class="hi-meta"><div class="hi-points neg">−${(t.amount || 0).toLocaleString('pt-BR')}</div><div class="hi-when">${when}</div></div></div>`;
+  }
+  return '';
+}
+
+function relativeTime(iso) {
+  const d = new Date(iso);
+  const now = new Date();
+  const diffMs = now - d;
+  const diffMin = Math.floor(diffMs / 60000);
+  const diffDay = Math.floor(diffMs / 86400000);
+  const time = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  if (diffMin < 1) return 'Agora mesmo';
+  if (diffMin < 60) return `${diffMin} min atrás`;
+  if (diffDay === 0) return `Hoje · ${time}`;
+  if (diffDay === 1) return `Ontem · ${time}`;
+  if (diffDay < 7) return `${diffDay} dias atrás`;
+  return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit' });
 }
 
 // ==================== LOJISTA ====================
@@ -1864,10 +1677,7 @@ async function addOffer(btn) {
   if(pts < CFG.OFFER_MIN_POINTS) { toast(`Mínimo ${CFG.OFFER_MIN_POINTS} pts!`,'error'); return; }
   setLoading(btn, true, 'Salvando...');
   try {
-    await supabaseClient.from('offers').insert([{
-      name, description, category, points:pts, stock, is_featured: isFeatured,
-      store_id:SESSION.userId, created_at:new Date().toISOString()
-    }]);
+    await supabaseClient.from('offers').insert([{ name, description, category, points:pts, stock, is_featured: isFeatured, store_id:SESSION.userId, created_at:new Date().toISOString() }]);
     sndCorrect(); toast('Oferta criada!','success');
     ['offer-name','offer-desc','offer-pts','offer-stock'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('offer-category').value = 'Alimentação';
@@ -1879,8 +1689,7 @@ async function addOffer(btn) {
 async function renderShopProducts() {
   if (!supabaseClient || !SESSION.userId) return;
   try {
-    const { data: list } = await supabaseClient.from('offers')
-      .select('id, name, description, category, points, stock, is_featured').eq('store_id', SESSION.userId);
+    const { data: list } = await supabaseClient.from('offers').select('id, name, description, category, points, stock, is_featured').eq('store_id', SESSION.userId);
     const cont = document.getElementById('shop-prod-list');
     if(!list || !list.length) { cont.innerHTML='<p style="opacity:0.6;text-align:center;padding:15px;">Nenhuma oferta cadastrada.</p>'; return; }
     const grouped = {};
@@ -1890,15 +1699,7 @@ async function renderShopProducts() {
       cont.innerHTML += `<h3 style="color:var(--gold);margin-top:15px;margin-bottom:5px;">${escapeHtml(cat)}</h3>`;
       grouped[cat].forEach(o => {
         const feat = o.is_featured ? ' <span class="badge-featured">🔥 DESTAQUE</span>' : '';
-        cont.innerHTML += `
-          <div class="prod-card">
-            <div>
-              <h4>${escapeHtml(o.name)} <span class="cat-badge">${escapeHtml(o.category || 'Outros')}</span>${feat}</h4>
-              <p style="font-size:0.85em;opacity:0.8;">${escapeHtml(o.description)}</p>
-              <small>${o.points} pts | Estoque: ${o.stock}</small>
-            </div>
-            <button class="btn btn-red btn-sm" onclick="deleteOffer(${Number(o.id)})">🗑️</button>
-          </div>`;
+        cont.innerHTML += `<div class="prod-card"><div><h4>${escapeHtml(o.name)} <span class="cat-badge">${escapeHtml(o.category || 'Outros')}</span>${feat}</h4><p style="font-size:0.85em;opacity:0.8;">${escapeHtml(o.description)}</p><small>${o.points} pts | Estoque: ${o.stock}</small></div><button class="btn btn-red btn-sm" onclick="deleteOffer(${Number(o.id)})">🗑️</button></div>`;
       });
     });
   } catch(e) { console.error(e); }
@@ -1933,6 +1734,7 @@ async function refreshAdmin() {
     filterAdminUsers(adminUserFilter, null, true);
   } catch(e) { console.error(e); }
 }
+
 async function filterAdminUsers(filter, btnEl, silent = false) {
   adminUserFilter = filter;
   document.querySelectorAll('#adm-tabs .tab').forEach(t => t.classList.toggle('active', t.dataset.filter === filter));
@@ -1946,16 +1748,98 @@ async function filterAdminUsers(filter, btnEl, silent = false) {
     const { data: users, error } = await query;
     if (error) { cont.innerHTML = `<p style="color:var(--red);padding:15px;">Erro: ${escapeHtml(error.message)}</p>`; return; }
     if (!users || !users.length) { cont.innerHTML = '<p style="opacity:0.6;text-align:center;padding:15px;">Nenhum usuário.</p>'; return; }
-    let html = `<p style="font-size:0.85em;opacity:0.7;margin:8px 0;">${users.length} usuário(s)</p>`;
+    let html = `<p style="font-size:0.85em;opacity:0.7;margin:8px 0;">${users.length} usuário(s) · toque para ver detalhes</p>`;
     html += '<table><tr><th>Nome</th><th>Tipo</th><th>Pts</th></tr>';
     users.forEach(u => {
       const tipo = u.type === 'lojista' ? '🏪' : u.type === 'admin' ? '👑' : '👤';
       const label = u.store ? ` (${escapeHtml(u.store)})` : '';
-      html += `<tr><td>${escapeHtml(u.name)}${label}</td><td>${tipo}</td><td>${u.points || 0}</td></tr>`;
+      html += `<tr class="admin-user-row" onclick="showAdminUserDetail(${Number(u.id)})"><td>${escapeHtml(u.name)}${label}</td><td>${tipo}</td><td>${u.points || 0}</td></tr>`;
     });
     html += '</table>';
     cont.innerHTML = html;
   } catch(e) { console.error(e); }
+}
+
+// ==================== ADMIN: FICHA DO USUÁRIO ====================
+async function showAdminUserDetail(userId) {
+  const cont = document.getElementById('adm-users-content');
+  if (!cont || !supabaseClient) return;
+  cont.innerHTML = '<p style="opacity:0.6;text-align:center;padding:15px;">Carregando ficha...</p>';
+
+  try {
+    // 1) Dados do usuário
+    const { data: u, error } = await supabaseClient.from('users')
+      .select('id, name, type, cpf, email, points, games_played, correct_answers, total_redeemed, verified, store, created_at, referral_code, referred_by')
+      .eq('id', userId).single();
+    if (error || !u) { cont.innerHTML = '<p style="color:var(--red);padding:15px;">Usuário não encontrado.</p>'; return; }
+
+    // 2) Histórico (últimas 30 transações)
+    const { data: hist } = await supabaseClient.from('transactions')
+      .select('id, type, user_id, store_id, from_user_id, to_user_id, amount, tax, net, points_used, discount, purchase_value, code, status, created_at')
+      .or(`user_id.eq.${userId},from_user_id.eq.${userId},to_user_id.eq.${userId}`)
+      .order('created_at', { ascending: false })
+      .limit(30);
+
+    // 3) Quem indicou este usuário
+    let referrerName = null;
+    if (u.referred_by) {
+      const { data: ref } = await supabaseClient.from('users').select('name').eq('id', u.referred_by).maybeSingle();
+      if (ref) referrerName = ref.name;
+    }
+
+    // 4) Quantos ele indicou
+    const { count: referredCount } = await supabaseClient.from('users')
+      .select('id', { count: 'exact', head: true })
+      .eq('referred_by', userId);
+
+    // 5) Tipo badge
+    const typeBadge = u.type === 'lojista' ? '<span class="aud-badge lojista">🏪 Lojista</span>'
+                     : u.type === 'admin' ? '<span class="aud-badge admin">👑 Admin</span>'
+                     : '<span class="aud-badge cliente">👤 Cliente</span>';
+
+    // 6) Cabeçalho rico
+    let html = `
+      <button class="back-btn" onclick="filterAdminUsers(adminUserFilter, null, true)">← Voltar à lista</button>
+      <div class="admin-user-detail-head">
+        <div class="aud-name">${escapeHtml(u.name)}${typeBadge}</div>
+        <div class="aud-meta">
+          ${u.store ? `<span>🏪 <strong>${escapeHtml(u.store)}</strong></span>` : ''}
+          ${u.cpf ? `<span>📄 CPF ${escapeHtml(u.cpf)}</span>` : ''}
+          ${u.email ? `<span>✉️ ${escapeHtml(u.email)}</span>` : ''}
+          ${u.created_at ? `<span>📅 Desde ${new Date(u.created_at).toLocaleDateString('pt-BR')}</span>` : ''}
+          ${u.verified ? '<span>✅ Verificado</span>' : '<span style="color:#ffd28c;">⚠️ Não verificado</span>'}
+        </div>
+      </div>
+
+      <div class="stats" style="grid-template-columns:repeat(auto-fit,minmax(110px,1fr));">
+        <div class="stat"><div class="stat-val">${u.points || 0}</div><div class="stat-lbl">Pontos</div></div>
+        <div class="stat"><div class="stat-val">${u.games_played || 0}</div><div class="stat-lbl">Quizes</div></div>
+        <div class="stat"><div class="stat-val">${u.correct_answers || 0}</div><div class="stat-lbl">Acertos</div></div>
+        <div class="stat"><div class="stat-val">${fmtMoney(u.total_redeemed)}</div><div class="stat-lbl">Resgatado</div></div>
+      </div>`;
+
+    // 7) Info de indicação
+    if (referrerName || referredCount > 0) {
+      html += `<div class="info" style="background:rgba(155,48,255,0.12);border-left-color:#9b30ff;">`;
+      html += `<strong style="color:#d4b3ff;">🎁 Indicações</strong><br>`;
+      if (referrerName) html += `• Foi indicado por: <strong>${escapeHtml(referrerName)}</strong><br>`;
+      html += `• Já indicou: <strong>${referredCount || 0}</strong> pessoa(s)`;
+      html += `</div>`;
+    }
+
+    // 8) Histórico
+    html += `<h3 style="color:var(--gold);margin-top:20px;margin-bottom:5px;">📜 Histórico de Movimentações</h3>`;
+    html += `<div id="adm-user-history"></div>`;
+
+    cont.innerHTML = html;
+
+    // 9) Renderiza o histórico usando o mesmo helper do perfil
+    const historyEl = document.getElementById('adm-user-history');
+    await renderHistoryInto(historyEl, hist, userId);
+  } catch (e) {
+    console.error('Erro showAdminUserDetail:', e);
+    cont.innerHTML = `<p style="color:var(--red);padding:15px;">Erro: ${escapeHtml(e.message)}</p>`;
+  }
 }
 
 // ==================== TRANSAÇÕES RICAS ====================
@@ -1965,13 +1849,8 @@ async function renderAdminTransactions(btn) {
   if (!supabaseClient) return;
   setLoading(btn, true, 'Carregando...');
   try {
-    const { data: txs, error } = await supabaseClient
-      .from('transactions')
-      .select('id, type, user_id, store_id, from_user_id, to_user_id, amount, tax, net, discount, points_used, purchase_value, code, status, created_at')
-      .order('created_at', { ascending: false })
-      .limit(200);
+    const { data: txs, error } = await supabaseClient.from('transactions').select('id, type, user_id, store_id, from_user_id, to_user_id, amount, tax, net, discount, points_used, purchase_value, code, status, created_at').order('created_at', { ascending: false }).limit(200);
     if (error) { document.getElementById('adm-content').innerHTML = `<p style="color:var(--red);padding:15px;">Erro: ${escapeHtml(error.message)}</p>`; return; }
-
     const allIds = new Set();
     (txs || []).forEach(t => { [t.user_id, t.store_id, t.from_user_id, t.to_user_id].forEach(id => { if (id) allIds.add(id); }); });
     let people = {};
@@ -1995,7 +1874,6 @@ function renderAdminTxContent() {
   const totalTransfers = txs.filter(t => t.type === 'transfer').length;
   const totalPoints = txs.reduce((s, t) => { if (t.type === 'redeem') return s + (t.points_used || 0); if (t.type === 'transfer') return s + (t.amount || 0); return s; }, 0);
   const totalDiscount = txs.filter(t => t.type === 'redeem').reduce((s, t) => s + Number(t.discount || 0), 0);
-
   const groups = {};
   filtered.forEach(t => {
     const d = new Date(t.created_at);
@@ -2009,12 +1887,8 @@ function renderAdminTxContent() {
     if (!groups[label]) groups[label] = [];
     groups[label].push(t);
   });
-
   let html = `
-    <div class="tx-header-info">
-      <strong style="color:#3498db;">💳 Painel de Transações</strong><br>
-      Acompanhe toda a movimentação da plataforma.
-    </div>
+    <div class="tx-header-info"><strong style="color:#3498db;">💳 Painel de Transações</strong><br>Acompanhe toda a movimentação da plataforma.</div>
     <div class="tx-summary-grid">
       <div class="tx-summary-card redeem"><div class="tss-icon">🏷️</div><div class="tss-val">${totalRedeems}</div><div class="tss-lbl">Resgates</div></div>
       <div class="tx-summary-card transfer"><div class="tss-icon">💸</div><div class="tss-val">${totalTransfers}</div><div class="tss-lbl">Transferências</div></div>
@@ -2026,26 +1900,17 @@ function renderAdminTxContent() {
       <button class="tab ${adminTxFilter === 'redeem' ? 'active' : ''}" onclick="filterAdminTx('redeem')">🏷️ Resgates (${totalRedeems})</button>
       <button class="tab ${adminTxFilter === 'transfer' ? 'active' : ''}" onclick="filterAdminTx('transfer')">💸 Transferências (${totalTransfers})</button>
     </div>
-    <div class="tx-export-bar">
-      <button class="btn-export" onclick="exportTransactionsCSV()">📥 Exportar CSV</button>
-    </div>`;
-
+    <div class="tx-export-bar"><button class="btn-export" onclick="exportTransactionsCSV()">📥 Exportar CSV</button></div>`;
   if (!filtered.length) {
     html += `<div class="tx-empty"><div class="te-icon">📭</div><p>Nenhuma transação ${adminTxFilter !== 'todas' ? 'desse tipo ' : ''}registrada ainda.</p></div>`;
-    cont.innerHTML = html;
-    return;
+    cont.innerHTML = html; return;
   }
   const groupOrder = Object.keys(groups).sort((a, b) => {
-    if (a.includes('Hoje')) return -1;
-    if (b.includes('Hoje')) return 1;
-    if (a.includes('Ontem')) return -1;
-    if (b.includes('Ontem')) return 1;
+    if (a.includes('Hoje')) return -1; if (b.includes('Hoje')) return 1;
+    if (a.includes('Ontem')) return -1; if (b.includes('Ontem')) return 1;
     return b.localeCompare(a);
   });
-  groupOrder.forEach(label => {
-    html += `<div class="tx-group-label">${label}</div>`;
-    groups[label].forEach(t => { html += buildTxItem(t, people); });
-  });
+  groupOrder.forEach(label => { html += `<div class="tx-group-label">${label}</div>`; groups[label].forEach(t => { html += buildTxItem(t, people); }); });
   cont.innerHTML = html;
 }
 function buildTxItem(t, people) {
@@ -2054,36 +1919,13 @@ function buildTxItem(t, people) {
   if (t.type === 'redeem') {
     const user = people[t.user_id] || {};
     const store = people[t.store_id] || {};
-    const statusBadge = t.status === 'validado'
-      ? '<span class="badge-status badge-validado" style="font-size:0.7em;">✅ Validado</span>'
-      : '<span class="badge-status badge-pendente" style="font-size:0.7em;">⏳ Pendente</span>';
-    return `
-      <div class="tx-item redeem">
-        <div class="tx-item-head"><span class="tx-type-badge redeem">🏷️ Resgate</span><span class="tx-time">🕐 ${time}</span></div>
-        <div class="tx-body">
-          <div class="tx-line"><span class="tx-lbl">👤 Cliente</span><span class="tx-val">${escapeHtml(user.name || '—')}</span></div>
-          <div class="tx-line"><span class="tx-lbl">🏪 Loja</span><span class="tx-val">${escapeHtml(store.store || store.name || '—')}</span></div>
-          <div class="tx-line"><span class="tx-lbl">💵 Compra</span><span class="tx-val">${fmtMoney(t.purchase_value)}</span></div>
-          <div class="tx-line"><span class="tx-lbl">🎯 Pontos</span><span class="tx-val" style="color:#ff8c00;">− ${(t.points_used || 0).toLocaleString('pt-BR')} pts</span></div>
-          <div class="tx-line"><span class="tx-lbl">💰 Desconto</span><span class="tx-val" style="color:#7dffa8;">${fmtMoney(t.discount)}</span></div>
-        </div>
-        <div class="tx-item-foot"><span class="tx-code">${escapeHtml(t.code || '—')}</span>${statusBadge}</div>
-      </div>`;
+    const statusBadge = t.status === 'validado' ? '<span class="badge-status badge-validado" style="font-size:0.7em;">✅ Validado</span>' : '<span class="badge-status badge-pendente" style="font-size:0.7em;">⏳ Pendente</span>';
+    return `<div class="tx-item redeem"><div class="tx-item-head"><span class="tx-type-badge redeem">🏷️ Resgate</span><span class="tx-time">🕐 ${time}</span></div><div class="tx-body"><div class="tx-line"><span class="tx-lbl">👤 Cliente</span><span class="tx-val">${escapeHtml(user.name || '—')}</span></div><div class="tx-line"><span class="tx-lbl">🏪 Loja</span><span class="tx-val">${escapeHtml(store.store || store.name || '—')}</span></div><div class="tx-line"><span class="tx-lbl">💵 Compra</span><span class="tx-val">${fmtMoney(t.purchase_value)}</span></div><div class="tx-line"><span class="tx-lbl">🎯 Pontos</span><span class="tx-val" style="color:#ff8c00;">− ${(t.points_used || 0).toLocaleString('pt-BR')} pts</span></div><div class="tx-line"><span class="tx-lbl">💰 Desconto</span><span class="tx-val" style="color:#7dffa8;">${fmtMoney(t.discount)}</span></div></div><div class="tx-item-foot"><span class="tx-code">${escapeHtml(t.code || '—')}</span>${statusBadge}</div></div>`;
   }
   if (t.type === 'transfer') {
     const from = people[t.from_user_id] || {};
     const to = people[t.to_user_id] || {};
-    return `
-      <div class="tx-item transfer">
-        <div class="tx-item-head"><span class="tx-type-badge transfer">💸 Transferência</span><span class="tx-time">🕐 ${time}</span></div>
-        <div class="tx-body">
-          <div class="tx-line"><span class="tx-lbl">👤 De</span><span class="tx-val">${escapeHtml(from.name || '—')}</span></div>
-          <div class="tx-line"><span class="tx-lbl">👤 Para</span><span class="tx-val">${escapeHtml(to.name || '—')}</span></div>
-          <div class="tx-line"><span class="tx-lbl">📤 Enviados</span><span class="tx-val">${(t.amount || 0).toLocaleString('pt-BR')} pts</span></div>
-          <div class="tx-line"><span class="tx-lbl">🏦 Taxa</span><span class="tx-val" style="color:#d4b3ff;">${(t.tax || 0).toLocaleString('pt-BR')} pts</span></div>
-          <div class="tx-line"><span class="tx-lbl">✅ Recebidos</span><span class="tx-val" style="color:#7dffa8;">${(t.net || 0).toLocaleString('pt-BR')} pts</span></div>
-        </div>
-      </div>`;
+    return `<div class="tx-item transfer"><div class="tx-item-head"><span class="tx-type-badge transfer">💸 Transferência</span><span class="tx-time">🕐 ${time}</span></div><div class="tx-body"><div class="tx-line"><span class="tx-lbl">👤 De</span><span class="tx-val">${escapeHtml(from.name || '—')}</span></div><div class="tx-line"><span class="tx-lbl">👤 Para</span><span class="tx-val">${escapeHtml(to.name || '—')}</span></div><div class="tx-line"><span class="tx-lbl">📤 Enviados</span><span class="tx-val">${(t.amount || 0).toLocaleString('pt-BR')} pts</span></div><div class="tx-line"><span class="tx-lbl">🏦 Taxa</span><span class="tx-val" style="color:#d4b3ff;">${(t.tax || 0).toLocaleString('pt-BR')} pts</span></div><div class="tx-line"><span class="tx-lbl">✅ Recebidos</span><span class="tx-val" style="color:#7dffa8;">${(t.net || 0).toLocaleString('pt-BR')} pts</span></div></div></div>`;
   }
   return '';
 }
@@ -2113,10 +1955,7 @@ function exportTransactionsCSV() {
   const a = document.createElement('a');
   a.href = url;
   a.download = `quizlocal-transacoes-${adminTxFilter}-${todayStr()}.csv`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
   toast('📥 CSV gerado!', 'success');
 }
 
@@ -2151,12 +1990,8 @@ async function renderImpactReport(btn) {
     const indicadosTotal = (users||[]).filter(u => u.referred_by != null).length;
     const categorias = {};
     (offers||[]).forEach(o => { const c = o.category || 'Outros'; categorias[c] = (categorias[c] || 0) + 1; });
-
     document.getElementById('adm-content').innerHTML = `
-      <div class="info" style="background:rgba(39,174,96,0.15);border-left-color:var(--green);">
-        <strong style="color:var(--green);">🌍 Relatório de Impacto Local</strong><br>
-        Resumo consolidado do movimento econômico e engajamento.
-      </div>
+      <div class="info" style="background:rgba(39,174,96,0.15);border-left-color:var(--green);"><strong style="color:var(--green);">🌍 Relatório de Impacto Local</strong><br>Resumo consolidado do movimento econômico e engajamento.</div>
       <h4 style="color:var(--gold);margin:15px 0 5px;">💰 Impacto Econômico</h4>
       <div class="impact-grid">
         <div class="impact-card"><div class="ic-icon">💵</div><div class="ic-val">${fmtMoney(totalDesconto)}</div><div class="ic-lbl">Injetados no comércio</div></div>
@@ -2187,16 +2022,10 @@ async function renderImpactReport(btn) {
       </div>
       <h4 style="color:var(--gold);margin:20px 0 5px;">🏷️ Ofertas por Categoria</h4>
       <div style="background:rgba(0,0,0,0.2);border-radius:10px;padding:12px;">
-        ${Object.keys(categorias).length === 0
-          ? '<p style="opacity:0.6;font-size:0.9em;">Nenhuma oferta cadastrada.</p>'
-          : Object.entries(categorias).map(([cat, n]) =>
-              `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,215,0,0.1);"><span>${escapeHtml(cat)}</span><strong style="color:var(--gold);">${n}</strong></div>`).join('')}
+        ${Object.keys(categorias).length === 0 ? '<p style="opacity:0.6;font-size:0.9em;">Nenhuma oferta cadastrada.</p>' : Object.entries(categorias).map(([cat, n]) => `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,215,0,0.1);"><span>${escapeHtml(cat)}</span><strong style="color:var(--gold);">${n}</strong></div>`).join('')}
       </div>
     `;
-  } catch(e) {
-    console.error(e);
-    document.getElementById('adm-content').innerHTML = `<p style="color:var(--red);padding:15px;">Erro: ${escapeHtml(e.message)}</p>`;
-  }
+  } catch(e) { console.error(e); document.getElementById('adm-content').innerHTML = `<p style="color:var(--red);padding:15px;">Erro: ${escapeHtml(e.message)}</p>`; }
   finally { setLoading(btn, false); }
 }
 
