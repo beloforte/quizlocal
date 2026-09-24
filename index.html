@@ -169,31 +169,28 @@
   .btn-export { background: rgba(39,174,96,0.25); border: 1px solid var(--green); color: #7dffa8; padding: 8px 16px; border-radius: 20px; font-size: 0.85em; font-weight: bold; cursor: pointer; }
   .btn-export:active { transform: scale(0.97); }
 
-  /* Grade de cupons */
-  .coupon-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 15px 0; }
-  .coupon-item { background: rgba(255,255,255,0.05); border: 2px dashed rgba(255,215,0,0.35); border-radius: 12px; padding: 16px 12px; text-align: center; position: relative; transition: 0.2s; }
+  .coupon-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin: 15px 0; }
+  .coupon-item { background: rgba(255,255,255,0.05); border: 2px dashed rgba(255,215,0,0.35); border-radius: 12px; padding: 14px 10px; text-align: center; position: relative; transition: 0.2s; }
   .coupon-item.available { border-color: var(--green); border-style: solid; background: linear-gradient(135deg, rgba(39,174,96,0.12), rgba(46,204,113,0.04)); }
   .coupon-item.available:active { transform: scale(0.97); }
   .coupon-item.locked { opacity: 0.55; }
-  .coupon-item .ci-value { font-size: 1.8em; color: var(--gold); font-weight: bold; line-height: 1; }
+  .coupon-item .ci-value { font-size: 1.6em; color: var(--gold); font-weight: bold; line-height: 1; }
   .coupon-item .ci-value small { font-size: 0.5em; opacity: 0.7; }
-  .coupon-item .ci-min { font-size: 0.72em; opacity: 0.75; margin: 6px 0; }
-  .coupon-item .ci-progress { height: 5px; background: rgba(0,0,0,0.35); border-radius: 3px; overflow: hidden; margin: 10px 0 6px; }
+  .coupon-item .ci-min { font-size: 0.7em; opacity: 0.75; margin: 5px 0; }
+  .coupon-item .ci-progress { height: 5px; background: rgba(0,0,0,0.35); border-radius: 3px; overflow: hidden; margin: 8px 0 5px; }
   .coupon-item .ci-progress-fill { height: 100%; background: linear-gradient(90deg, var(--gold), #ff8c00); transition: width 0.4s; }
   .coupon-item .ci-progress-fill.full { background: linear-gradient(90deg, var(--green), #2ecc71); }
-  .coupon-item .ci-pts { font-size: 0.72em; opacity: 0.85; font-family: monospace; }
-  .coupon-item .ci-btn { width: 100%; padding: 8px; border-radius: 20px; border: none; font-weight: bold; font-size: 0.82em; margin-top: 10px; cursor: pointer; transition: 0.2s; }
+  .coupon-item .ci-pts { font-size: 0.68em; opacity: 0.85; font-family: monospace; }
+  .coupon-item .ci-btn { width: 100%; padding: 8px; border-radius: 20px; border: none; font-weight: bold; font-size: 0.78em; margin-top: 10px; cursor: pointer; transition: 0.2s; }
   .coupon-item .ci-btn.active { background: linear-gradient(90deg, var(--green), #2ecc71); color: #fff; }
   .coupon-item .ci-btn.active:active { transform: scale(0.97); }
   .coupon-item .ci-btn.locked { background: rgba(255,255,255,0.08); color: #888; cursor: not-allowed; }
 
-  /* QR Code */
   .qr-container { background: #fff; padding: 16px; border-radius: 12px; display: inline-block; margin: 15px 0; }
   .qr-container img, .qr-container canvas { display: block; }
   #qr-reader { width: 100%; min-height: 280px; border-radius: 12px; overflow: hidden; margin: 10px 0; background: #000; }
   #qr-reader.hidden { display: none; }
 
-  /* Convite / Indicação */
   .referral-card { background: linear-gradient(135deg, rgba(155,48,255,0.18), rgba(52,152,219,0.10)); border: 1px solid rgba(155,48,255,0.4); border-radius: 12px; padding: 20px; margin-bottom: 15px; }
   .referral-card h3 { color: var(--gold); margin-bottom: 8px; font-size: 1.1em; }
   .referral-card p { font-size: 0.88em; line-height: 1.5; opacity: 0.92; margin-bottom: 12px; }
@@ -208,7 +205,6 @@
   .ref-banner { background: linear-gradient(90deg, rgba(39,174,96,0.25), rgba(46,204,113,0.15)); border: 1px solid var(--green); border-radius: 10px; padding: 12px; margin-bottom: 15px; font-size: 0.9em; text-align: center; }
   .ref-banner strong { color: #7dffa8; }
 
-  /* Histórico do perfil */
   .history-list { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
   .history-item { display: flex; gap: 12px; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,215,0,0.15); border-left: 4px solid rgba(255,215,0,0.3); border-radius: 10px; align-items: center; transition: 0.2s; }
   .history-item:hover { background: rgba(255,255,255,0.08); transform: translateX(2px); }
@@ -234,7 +230,6 @@
   .history-empty .he-icon { font-size: 2.5em; margin-bottom: 10px; }
   .history-empty p { font-size: 0.88em; line-height: 1.5; }
 
-  /* Admin: linha clicável + ficha do usuário */
   .admin-user-row { cursor: pointer; transition: 0.15s; }
   .admin-user-row:hover { background: rgba(255,215,0,0.12)!important; }
   .admin-user-row:active { transform: scale(0.995); }
@@ -554,7 +549,6 @@
   </div>
 </div>
 
-<!-- MODAIS -->
 <div id="modal" class="modal">
   <div class="modal-box">
     <div class="modal-icon" id="m-icon"></div>
@@ -607,13 +601,21 @@ const CFG = {
   REFERRAL_BONUS: 2000,
   SITE_URL: 'https://quizlocal.vercel.app'
 };
+
+// ✅ NOVO: grade de cupons de R$ 1 a R$ 10
 const COUPONS = [
+  { value: 1,  minPurchase: 10,  pts: 1000 },
+  { value: 2,  minPurchase: 20,  pts: 2000 },
   { value: 3,  minPurchase: 30,  pts: 3000 },
+  { value: 4,  minPurchase: 40,  pts: 4000 },
+  { value: 5,  minPurchase: 50,  pts: 5000 },
   { value: 6,  minPurchase: 60,  pts: 6000 },
+  { value: 7,  minPurchase: 70,  pts: 7000 },
+  { value: 8,  minPurchase: 80,  pts: 8000 },
   { value: 9,  minPurchase: 90,  pts: 9000 },
-  { value: 14, minPurchase: 140, pts: 14000 },
-  { value: 20, minPurchase: 200, pts: 20000 }
+  { value: 10, minPurchase: 100, pts: 10000 }
 ];
+
 const SUPABASE_URL = 'https://klzjcpogqsasfigyxgxp.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtsempjcG9ncXNhc2ZpZ3l4Z3hwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzMDMxMjYsImV4cCI6MjEwNDg3OTEyNn0.0ENvP05STQtzrwAktvtJwdK8If7zSmamBTPlHcpF-KE';
 let supabaseClient = null;
@@ -1556,7 +1558,7 @@ async function renderCouponsFiltered() {
   });
 }
 
-// ==================== PERFIL (histórico reformulado) ====================
+// ==================== PERFIL ====================
 async function refreshProfile() {
   if (!SESSION.userId || !supabaseClient) return;
   try {
@@ -1566,19 +1568,16 @@ async function refreshProfile() {
     document.getElementById('prof-games').textContent = u.games_played;
     document.getElementById('prof-correct').textContent = u.correct_answers;
     document.getElementById('prof-redeemed').textContent = fmtMoney(u.total_redeemed);
-
     const { data: hist } = await supabaseClient.from('transactions')
       .select('id, type, user_id, store_id, from_user_id, to_user_id, amount, tax, net, points_used, discount, purchase_value, code, status, created_at')
       .or(`user_id.eq.${SESSION.userId},from_user_id.eq.${SESSION.userId},to_user_id.eq.${SESSION.userId}`)
       .order('created_at', { ascending: false })
       .limit(15);
-
     const cont = document.getElementById('prof-history');
     if (!cont) return;
     await renderHistoryInto(cont, hist, SESSION.userId);
   } catch (e) { console.error('Erro refreshProfile:', e); }
 }
-
 async function renderHistoryInto(container, hist, viewerId) {
   if (!hist || !hist.length) {
     container.innerHTML = `<div class="history-empty"><div class="he-icon">📭</div><p>Nenhuma movimentação.<br>Jogue um quiz ou resgate um cupom para começar!</p></div>`;
@@ -1591,11 +1590,8 @@ async function renderHistoryInto(container, hist, viewerId) {
     const { data: ppl } = await supabaseClient.from('users').select('id, name, store').in('id', [...ids]);
     (ppl || []).forEach(p => { people[p.id] = p; });
   }
-  container.innerHTML = '<div class="history-list">' +
-    hist.map(t => renderHistoryItem(t, people, viewerId)).join('') +
-    '</div>';
+  container.innerHTML = '<div class="history-list">' + hist.map(t => renderHistoryItem(t, people, viewerId)).join('') + '</div>';
 }
-
 function renderHistoryItem(t, people, viewerId) {
   const when = relativeTime(t.created_at);
   if (t.type === 'redeem') {
@@ -1614,7 +1610,6 @@ function renderHistoryItem(t, people, viewerId) {
   }
   return '';
 }
-
 function relativeTime(iso) {
   const d = new Date(iso);
   const now = new Date();
@@ -1734,7 +1729,6 @@ async function refreshAdmin() {
     filterAdminUsers(adminUserFilter, null, true);
   } catch(e) { console.error(e); }
 }
-
 async function filterAdminUsers(filter, btnEl, silent = false) {
   adminUserFilter = filter;
   document.querySelectorAll('#adm-tabs .tab').forEach(t => t.classList.toggle('active', t.dataset.filter === filter));
@@ -1759,45 +1753,31 @@ async function filterAdminUsers(filter, btnEl, silent = false) {
     cont.innerHTML = html;
   } catch(e) { console.error(e); }
 }
-
-// ==================== ADMIN: FICHA DO USUÁRIO ====================
 async function showAdminUserDetail(userId) {
   const cont = document.getElementById('adm-users-content');
   if (!cont || !supabaseClient) return;
   cont.innerHTML = '<p style="opacity:0.6;text-align:center;padding:15px;">Carregando ficha...</p>';
-
   try {
-    // 1) Dados do usuário
     const { data: u, error } = await supabaseClient.from('users')
       .select('id, name, type, cpf, email, points, games_played, correct_answers, total_redeemed, verified, store, created_at, referral_code, referred_by')
       .eq('id', userId).single();
     if (error || !u) { cont.innerHTML = '<p style="color:var(--red);padding:15px;">Usuário não encontrado.</p>'; return; }
-
-    // 2) Histórico (últimas 30 transações)
     const { data: hist } = await supabaseClient.from('transactions')
       .select('id, type, user_id, store_id, from_user_id, to_user_id, amount, tax, net, points_used, discount, purchase_value, code, status, created_at')
       .or(`user_id.eq.${userId},from_user_id.eq.${userId},to_user_id.eq.${userId}`)
       .order('created_at', { ascending: false })
       .limit(30);
-
-    // 3) Quem indicou este usuário
     let referrerName = null;
     if (u.referred_by) {
       const { data: ref } = await supabaseClient.from('users').select('name').eq('id', u.referred_by).maybeSingle();
       if (ref) referrerName = ref.name;
     }
-
-    // 4) Quantos ele indicou
     const { count: referredCount } = await supabaseClient.from('users')
       .select('id', { count: 'exact', head: true })
       .eq('referred_by', userId);
-
-    // 5) Tipo badge
     const typeBadge = u.type === 'lojista' ? '<span class="aud-badge lojista">🏪 Lojista</span>'
                      : u.type === 'admin' ? '<span class="aud-badge admin">👑 Admin</span>'
                      : '<span class="aud-badge cliente">👤 Cliente</span>';
-
-    // 6) Cabeçalho rico
     let html = `
       <button class="back-btn" onclick="filterAdminUsers(adminUserFilter, null, true)">← Voltar à lista</button>
       <div class="admin-user-detail-head">
@@ -1810,15 +1790,12 @@ async function showAdminUserDetail(userId) {
           ${u.verified ? '<span>✅ Verificado</span>' : '<span style="color:#ffd28c;">⚠️ Não verificado</span>'}
         </div>
       </div>
-
       <div class="stats" style="grid-template-columns:repeat(auto-fit,minmax(110px,1fr));">
         <div class="stat"><div class="stat-val">${u.points || 0}</div><div class="stat-lbl">Pontos</div></div>
         <div class="stat"><div class="stat-val">${u.games_played || 0}</div><div class="stat-lbl">Quizes</div></div>
         <div class="stat"><div class="stat-val">${u.correct_answers || 0}</div><div class="stat-lbl">Acertos</div></div>
         <div class="stat"><div class="stat-val">${fmtMoney(u.total_redeemed)}</div><div class="stat-lbl">Resgatado</div></div>
       </div>`;
-
-    // 7) Info de indicação
     if (referrerName || referredCount > 0) {
       html += `<div class="info" style="background:rgba(155,48,255,0.12);border-left-color:#9b30ff;">`;
       html += `<strong style="color:#d4b3ff;">🎁 Indicações</strong><br>`;
@@ -1826,14 +1803,9 @@ async function showAdminUserDetail(userId) {
       html += `• Já indicou: <strong>${referredCount || 0}</strong> pessoa(s)`;
       html += `</div>`;
     }
-
-    // 8) Histórico
     html += `<h3 style="color:var(--gold);margin-top:20px;margin-bottom:5px;">📜 Histórico de Movimentações</h3>`;
     html += `<div id="adm-user-history"></div>`;
-
     cont.innerHTML = html;
-
-    // 9) Renderiza o histórico usando o mesmo helper do perfil
     const historyEl = document.getElementById('adm-user-history');
     await renderHistoryInto(historyEl, hist, userId);
   } catch (e) {
