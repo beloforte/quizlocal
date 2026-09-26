@@ -74,10 +74,18 @@
   .prod-card h4 { color:var(--gold); margin-bottom:4px; }
   .cat-badge { display:inline-block; padding:2px 8px; border-radius:10px; font-size:0.7em; font-weight:bold; background:rgba(52,152,219,0.3); color:#fff; margin-left:6px; }
   .coupon-card { background:rgba(255,255,255,0.08); border:1px solid rgba(255,215,0,0.3); border-radius:10px; padding:15px; margin:10px 0; }
+  .coupon-card.expired { opacity:0.65; border-color:rgba(255,255,255,0.15); background:rgba(0,0,0,0.15); }
   .coupon-card .code { font-family:monospace; font-size:1.4em; letter-spacing:2px; color:var(--gold); user-select:text; margin:6px 0; }
+  .coupon-card.expired .code { color: #999; text-decoration: line-through; }
+  .countdown { display:inline-block; padding:4px 10px; border-radius:12px; font-size:0.75em; font-weight:bold; margin-top:6px; }
+  .countdown.ok { background: rgba(39,174,96,0.25); color: #7dffa8; }
+  .countdown.warn { background: rgba(243,156,18,0.25); color: #ffcc66; }
+  .countdown.critical { background: rgba(231,76,60,0.3); color: #ffb3b3; animation: pulseWarn 1.5s infinite; }
+  @keyframes pulseWarn { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
   .badge-status { display:inline-block; padding:3px 10px; border-radius:12px; font-size:0.75em; font-weight:bold; }
   .badge-pendente { background:#f39c12; color:#fff; }
   .badge-validado { background:var(--green); color:#fff; }
+  .badge-expirado { background:#555; color:#ddd; }
   .badge-featured { background:linear-gradient(90deg,#ff8c00,#ffd700); color:var(--dark); padding:3px 10px; border-radius:12px; font-size:0.75em; font-weight:bold; }
   .toast { position:fixed; top:15px; right:15px; padding:12px 20px; border-radius:10px; color:#fff; font-weight:bold; z-index:9999; animation:slideIn 0.3s; font-size:0.9em; max-width:90%; }
   .toast.success { background:var(--green); } .toast.error { background:var(--red); } .toast.info { background:#2980b9; }
@@ -168,7 +176,6 @@
   .tx-export-bar { display: flex; justify-content: flex-end; margin: 8px 0 4px; }
   .btn-export { background: rgba(39,174,96,0.25); border: 1px solid var(--green); color: #7dffa8; padding: 8px 16px; border-radius: 20px; font-size: 0.85em; font-weight: bold; cursor: pointer; }
   .btn-export:active { transform: scale(0.97); }
-
   .coupon-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin: 15px 0; }
   .coupon-item { background: rgba(255,255,255,0.05); border: 2px dashed rgba(255,215,0,0.35); border-radius: 12px; padding: 14px 10px; text-align: center; position: relative; transition: 0.2s; }
   .coupon-item.available { border-color: var(--green); border-style: solid; background: linear-gradient(135deg, rgba(39,174,96,0.12), rgba(46,204,113,0.04)); }
@@ -185,12 +192,10 @@
   .coupon-item .ci-btn.active { background: linear-gradient(90deg, var(--green), #2ecc71); color: #fff; }
   .coupon-item .ci-btn.active:active { transform: scale(0.97); }
   .coupon-item .ci-btn.locked { background: rgba(255,255,255,0.08); color: #888; cursor: not-allowed; }
-
   .qr-container { background: #fff; padding: 16px; border-radius: 12px; display: inline-block; margin: 15px 0; }
   .qr-container img, .qr-container canvas { display: block; }
   #qr-reader { width: 100%; min-height: 280px; border-radius: 12px; overflow: hidden; margin: 10px 0; background: #000; }
   #qr-reader.hidden { display: none; }
-
   .referral-card { background: linear-gradient(135deg, rgba(155,48,255,0.18), rgba(52,152,219,0.10)); border: 1px solid rgba(155,48,255,0.4); border-radius: 12px; padding: 20px; margin-bottom: 15px; }
   .referral-card h3 { color: var(--gold); margin-bottom: 8px; font-size: 1.1em; }
   .referral-card p { font-size: 0.88em; line-height: 1.5; opacity: 0.92; margin-bottom: 12px; }
@@ -204,15 +209,16 @@
   .referral-actions .btn-wa:active { transform: scale(0.97); }
   .ref-banner { background: linear-gradient(90deg, rgba(39,174,96,0.25), rgba(46,204,113,0.15)); border: 1px solid var(--green); border-radius: 10px; padding: 12px; margin-bottom: 15px; font-size: 0.9em; text-align: center; }
   .ref-banner strong { color: #7dffa8; }
-
   .history-list { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
   .history-item { display: flex; gap: 12px; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,215,0,0.15); border-left: 4px solid rgba(255,215,0,0.3); border-radius: 10px; align-items: center; transition: 0.2s; }
   .history-item:hover { background: rgba(255,255,255,0.08); transform: translateX(2px); }
   .history-item.redeem { border-left-color: #27ae60; }
+  .history-item.redeem.expired { border-left-color: #666; }
   .history-item.transfer-in { border-left-color: #27ae60; }
   .history-item.transfer-out { border-left-color: #9b30ff; }
   .history-item .hi-icon { width: 42px; height: 42px; flex-shrink: 0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.25em; background: rgba(255,255,255,0.08); }
   .history-item.redeem .hi-icon { background: rgba(39,174,96,0.22); }
+  .history-item.redeem.expired .hi-icon { background: rgba(85,85,85,0.35); }
   .history-item.transfer-in .hi-icon { background: rgba(39,174,96,0.22); }
   .history-item.transfer-out .hi-icon { background: rgba(155,48,255,0.22); }
   .history-item .hi-body { flex: 1; min-width: 0; }
@@ -222,14 +228,15 @@
   .history-item .hi-points { font-weight: bold; font-size: 1em; line-height: 1; }
   .history-item .hi-points.neg { color: #ff9f43; }
   .history-item .hi-points.pos { color: #7dffa8; }
+  .history-item .hi-points.neutral { color: #999; }
   .history-item .hi-when { font-size: 0.68em; opacity: 0.6; white-space: nowrap; }
   .history-item .hi-status { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.62em; font-weight: bold; letter-spacing: 0.5px; }
   .history-item .hi-status.validado { background: var(--green); color: #fff; }
   .history-item .hi-status.pendente { background: #f39c12; color: #fff; }
+  .history-item .hi-status.expirado { background: #555; color: #ddd; }
   .history-empty { text-align: center; padding: 35px 15px; opacity: 0.65; }
   .history-empty .he-icon { font-size: 2.5em; margin-bottom: 10px; }
   .history-empty p { font-size: 0.88em; line-height: 1.5; }
-
   .admin-user-row { cursor: pointer; transition: 0.15s; }
   .admin-user-row:hover { background: rgba(255,215,0,0.12)!important; }
   .admin-user-row:active { transform: scale(0.995); }
@@ -241,6 +248,146 @@
   .admin-user-detail-head .aud-badge.cliente { background: rgba(52,152,219,0.3); color: #a5d8ff; }
   .admin-user-detail-head .aud-badge.lojista { background: rgba(255,140,0,0.3); color: #ffd28c; }
   .admin-user-detail-head .aud-badge.admin { background: rgba(155,48,255,0.3); color: #d4b3ff; }
+
+  /* ==================== ALERTA DE CUPOM URGENTE ==================== */
+  .urgent-banner {
+    background: linear-gradient(135deg, #ff3b30, #ff9500, #ff2d55);
+    background-size: 200% 200%;
+    animation: urgentPulse 2s ease-in-out infinite, urgentGradient 4s ease infinite;
+    border: 2px solid #fff;
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 15px;
+    box-shadow: 0 0 30px rgba(255, 59, 48, 0.6), 0 0 15px rgba(255, 149, 0, 0.5);
+    position: relative;
+    overflow: hidden;
+  }
+  .urgent-banner::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    animation: urgentShine 2.5s ease-in-out infinite;
+  }
+  @keyframes urgentPulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 30px rgba(255, 59, 48, 0.6); }
+    50% { transform: scale(1.015); box-shadow: 0 0 45px rgba(255, 59, 48, 0.95), 0 0 20px rgba(255, 149, 0, 0.85); }
+  }
+  @keyframes urgentGradient {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+  @keyframes urgentShine {
+    0% { left: -100%; }
+    60% { left: 100%; }
+    100% { left: 100%; }
+  }
+  .urgent-banner .ub-head {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 8px;
+    position: relative; z-index: 1;
+  }
+  .urgent-banner .ub-icon {
+    font-size: 2em;
+    animation: urgentShake 1s ease-in-out infinite;
+    filter: drop-shadow(0 0 8px #fff);
+  }
+  @keyframes urgentShake {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-12deg); }
+    75% { transform: rotate(12deg); }
+  }
+  .urgent-banner .ub-title {
+    font-size: 1.05em;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    color: #fff;
+  }
+  .urgent-banner .ub-body {
+    font-size: 0.92em;
+    line-height: 1.5;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+    position: relative; z-index: 1;
+  }
+  .urgent-banner .ub-body strong {
+    color: #fff;
+    background: rgba(0,0,0,0.3);
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-weight: 900;
+  }
+  .urgent-banner .ub-project {
+    background: rgba(0,0,0,0.35);
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-top: 10px;
+    font-size: 0.85em;
+    line-height: 1.4;
+    position: relative; z-index: 1;
+  }
+  .urgent-banner .ub-action {
+    margin-top: 12px;
+    display: flex; gap: 8px;
+    position: relative; z-index: 1;
+  }
+  .urgent-banner .ub-action button {
+    flex: 1;
+    padding: 11px 14px;
+    border-radius: 20px;
+    border: 2px solid #fff;
+    background: #fff;
+    color: #c0392b;
+    font-weight: 900;
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .urgent-banner .ub-action button:active { transform: scale(0.97); }
+  .urgent-banner .ub-countdown {
+    display: inline-block;
+    background: #fff;
+    color: #c0392b;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-weight: 900;
+    font-size: 0.9em;
+    font-family: monospace;
+    margin-left: 4px;
+    animation: urgentBlink 1.2s ease-in-out infinite;
+  }
+  @keyframes urgentBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.45; }
+  }
+
+  /* Card do Caixa do Projeto (instruções) */
+  .project-fund-card {
+    background: linear-gradient(135deg, rgba(255,140,0,0.18), rgba(255,215,0,0.08));
+    border: 2px solid rgba(255,140,0,0.5);
+    border-radius: 12px;
+    padding: 16px;
+    margin: 15px 0;
+  }
+  .project-fund-card h4 {
+    color: var(--gold);
+    font-size: 1em;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .project-fund-card p {
+    font-size: 0.88em;
+    line-height: 1.5;
+    opacity: 0.92;
+  }
+  .project-fund-card p + p { margin-top: 8px; }
 </style>
 </head>
 <body>
@@ -261,7 +408,7 @@
       <button class="btn" onclick="showScreen('scr-login')">🔑 Já tenho conta</button>
       <button class="btn btn-outline" onclick="showScreen('scr-register')" style="margin-top:10px;">✨ Criar nova conta</button>
     </div>
-    <div class="info"><strong>📋 Como funciona:</strong><br>• Responda perguntas e acumule pontos<br>• <strong>1.000 pontos = R$ 1,00</strong> em desconto<br>• Desconto máximo de <strong>10% por compra</strong><br>• Válido apenas no comércio local parceiro</div>
+    <div class="info"><strong>📋 Como funciona:</strong><br>• Responda perguntas e acumule pontos<br>• <strong>1.000 pontos = R$ 1,00</strong> em desconto<br>• Desconto máximo de <strong>10% por compra</strong><br>• Cupom válido por <strong>48 horas</strong> após o resgate<br>• Cupons não usados alimentam o <strong>Caixa do Projeto</strong> (projetos sociais)<br>• Válido apenas no comércio local parceiro</div>
   </div>
 
   <div id="scr-login" class="screen">
@@ -316,6 +463,10 @@
 
   <div id="scr-client" class="screen">
     <div class="topbar"><span>👤 <strong id="cli-name"></strong></span><span class="pts-badge">⭐ <span id="cli-pts">0</span> pts</span><button class="back-btn" onclick="logout()" style="margin:0;">Sair</button></div>
+
+    <!-- ALERTA DE CUPOM URGENTE -->
+    <div id="urgent-alert-container"></div>
+
     <div class="card">
       <div class="stats">
         <div class="stat"><div class="stat-val" id="cli-balance">R$ 0</div><div class="stat-lbl">Saldo em Reais</div></div>
@@ -341,7 +492,7 @@
       </div>
       <div style="font-size:0.78em;opacity:0.7;margin-top:10px;text-align:center;">Você já indicou <strong id="ref-count" style="color:var(--gold);">0</strong> pessoa(s)</div>
     </div>
-    <div class="info"><strong>💡 Dica:</strong> Faça check-in todo dia em Ofertas do Dia para bônus de sequência.</div>
+    <div class="info"><strong>💡 Dica:</strong> Faça check-in todo dia em Ofertas do Dia. Cupons de desconto valem <strong>48h</strong> — depois disso, os pontos vão para o <strong>Caixa do Projeto</strong>.</div>
   </div>
 
   <div id="scr-daily-offers" class="screen">
@@ -360,6 +511,7 @@
     </div>
   </div>
 
+  <!-- INSTRUÇÕES DO QUIZ (ATUALIZADA) -->
   <div id="scr-quiz-intro" class="screen">
     <button class="back-btn" onclick="showScreen('scr-client')">← Voltar</button>
     <div class="card">
@@ -371,7 +523,18 @@
         <li><span class="il-icon">⏱️</span><div class="il-text"><strong>Tempo por pergunta</strong>15s · 20s · 30s.</div></li>
         <li><span class="il-icon">✂️</span><div class="il-text"><strong>Ajudas (1 uso cada)</strong>50/50 · Pular · Parar.</div></li>
         <li><span class="il-icon">🏆</span><div class="il-text"><strong>Ao final</strong>Total de acertos, pontos e saldo.</div></li>
+        <li><span class="il-icon">🏷️</span><div class="il-text"><strong>Cupons com validade de 48h</strong>Ao resgatar um desconto, você tem 48 horas para usar na loja. Passado o prazo, o cupom expira.</div></li>
       </ul>
+
+      <!-- CARD DO CAIXA DO PROJETO -->
+      <div class="project-fund-card">
+        <h4>💼 Sobre o Caixa do Projeto</h4>
+        <p><strong>O que é?</strong> Um fundo comunitário alimentado por cupons que expiram sem uso, taxas de transferência entre usuários e outras contribuições do sistema.</p>
+        <p><strong>Para onde vai?</strong> O saldo do Caixa do Projeto será futuramente destinado a <strong>projetos sociais da comunidade</strong> — definidos com participação dos moradores e parceiros locais.</p>
+        <p><strong>Por que isso importa?</strong> Mesmo quando um cupom expira, sua pontuação não se perde: ela é convertida em impacto real para a cidade. O QuizLocal devolve para a comunidade o valor que circula dentro dele.</p>
+        <p style="font-size:0.82em;opacity:0.8;margin-top:10px;">📊 Você pode acompanhar o saldo do Caixa do Projeto no painel administrativo.</p>
+      </div>
+
       <button class="btn" onclick="beginQuiz(this)">▶️ Começar Quiz</button>
       <button class="btn btn-outline" onclick="showScreen('scr-client')" style="margin-top:10px;">Agora não</button>
     </div>
@@ -407,7 +570,7 @@
     <button class="back-btn" onclick="showScreen('scr-client')">← Voltar</button>
     <div class="card">
       <h2 style="color:var(--gold);margin-bottom:10px;">🏷️ Resgatar Desconto</h2>
-      <div class="info"><strong>Como funciona:</strong> escolha um cupom abaixo. Você precisará gastar o valor mínimo na loja para usar o desconto.</div>
+      <div class="info"><strong>Importante:</strong> após gerar o cupom, você tem <strong>48 horas</strong> para usar na loja. Se não usar a tempo, os pontos vão para o <strong>Caixa do Projeto</strong> (destinado a projetos sociais da comunidade).</div>
       <label>1️⃣ Selecione a loja:</label>
       <select id="redeem-store" onchange="renderCouponGrid()"></select>
       <div style="margin-top:15px;">
@@ -422,7 +585,7 @@
     <button class="back-btn" onclick="showScreen('scr-client')">← Voltar</button>
     <div class="card">
       <h2 style="color:var(--gold);margin-bottom:10px;">💸 Transferir Pontos</h2>
-      <div class="info"><strong>Regras:</strong> taxa 20% · limite diário 5.000 pts · mensal 150.000 pts</div>
+      <div class="info"><strong>Regras:</strong> taxa 20% (vai para o Caixa do Projeto) · limite diário 5.000 pts · mensal 150.000 pts</div>
       <label>CPF do Destinatário:</label><input type="tel" id="tr-cpf" placeholder="00000000000" maxlength="11" inputmode="numeric">
       <label>Quantidade de Pontos:</label><input type="number" id="tr-amount" placeholder="Ex: 5000" min="100">
       <div id="tr-preview" class="hidden" style="background:rgba(255,215,0,0.1);padding:12px;border-radius:8px;margin:10px 0;font-size:0.9em;"></div>
@@ -438,6 +601,7 @@
       <div class="tab-bar" id="coupons-tabs">
         <button class="tab active" data-filter="pendente" onclick="filterCoupons('pendente')">⏳ Pendentes</button>
         <button class="tab" data-filter="validado" onclick="filterCoupons('validado')">✅ Usados</button>
+        <button class="tab" data-filter="expirado" onclick="filterCoupons('expirado')">⏰ Expirados</button>
       </div>
       <div id="coupons-list"></div>
     </div>
@@ -477,7 +641,7 @@
     <button class="back-btn" onclick="showScreen('scr-shopkeeper')">← Voltar</button>
     <div class="card">
       <h2 style="color:var(--gold);margin-bottom:10px;">✅ Validar Cupom</h2>
-      <div class="info">Aponte a câmera para o QR Code do cliente, ou digite o código manualmente.</div>
+      <div class="info">Cupons têm validade de <strong>48 horas</strong>. Após esse prazo, os pontos vão para o Caixa do Projeto.</div>
       <button class="btn btn-purple" id="btn-start-scan" onclick="startQrScan()">📷 Ler QR Code com a Câmera</button>
       <div id="qr-reader" class="hidden"></div>
       <button class="btn btn-outline hidden" id="btn-stop-scan" onclick="stopQrScan()">✕ Cancelar leitura</button>
@@ -533,6 +697,10 @@
         <div class="stat"><div class="stat-val" id="adm-fund">0 pts</div><div class="stat-lbl" id="adm-fund-lbl">Caixa do Projeto</div></div>
         <div class="stat"><div class="stat-val" id="adm-transfers">0</div><div class="stat-lbl">Transferências</div></div>
       </div>
+      <div class="info" style="background:rgba(255,140,0,0.15);border-left-color:#ff8c00;">
+        <strong style="color:#ff8c00;">💼 Caixa do Projeto</strong><br>
+        O saldo acumulado será destinado a <strong>projetos sociais da comunidade</strong>, definidos com participação dos moradores e parceiros locais.
+      </div>
       <h3 style="color:var(--gold);margin-top:15px;margin-bottom:5px;">👥 Usuários</h3>
       <div class="tab-bar" id="adm-tabs">
         <button class="tab active" data-filter="todos" onclick="filterAdminUsers('todos', this)">Todos</button>
@@ -578,6 +746,7 @@
     <div class="qr-container" id="qr-code-container"></div>
     <div id="qr-modal-code" style="font-family:monospace;font-size:1.3em;color:var(--gold);letter-spacing:2px;margin:10px 0;"></div>
     <p id="qr-modal-info" style="font-size:0.9em;line-height:1.4;margin:10px 0;opacity:0.9;"></p>
+    <p style="font-size:0.82em;background:rgba(243,156,18,0.2);padding:8px;border-radius:8px;margin:10px 0;"><strong>⏰ Válido por 48 horas</strong><br>Se não for usado a tempo, os pontos vão para o <strong>Caixa do Projeto</strong> — fundo destinado a projetos sociais da comunidade.</p>
     <button class="btn" onclick="closeQrModal()">OK</button>
   </div>
 </div>
@@ -599,10 +768,11 @@ const CFG = {
   TIME_BY_DIFFICULTY: { 1: 15, 2: 20, 3: 30 },
   REWARDS: { CHECKIN: 50, FOLLOW: 50, VIEW_OFFER: 10, VIEW_OFFER_DAILY_CAP: 50 },
   REFERRAL_BONUS: 2000,
-  SITE_URL: 'https://quizlocal.vercel.app'
+  SITE_URL: 'https://quizlocal.vercel.app',
+  COUPON_TTL_HOURS: 48,
+  URGENT_THRESHOLD_HOURS: 6
 };
 
-// ✅ NOVO: grade de cupons de R$ 1 a R$ 10
 const COUPONS = [
   { value: 1,  minPurchase: 10,  pts: 1000 },
   { value: 2,  minPurchase: 20,  pts: 2000 },
@@ -632,6 +802,8 @@ let REFERRAL_FROM_URL = null;
 let COUPONS_DATA = [];
 let COUPON_FILTER = 'pendente';
 let qrScannerInstance = null;
+let countdownInterval = null;
+let urgentCountdownInterval = null;
 
 // ==================== SONS ====================
 let actx = null;
@@ -727,9 +899,108 @@ function confirmDialog(title, text) {
 function saveSession() { if (!SESSION.userId) return; try { sessionStorage.setItem('ql_session', JSON.stringify({ userId: SESSION.userId, ts: Date.now() })); } catch(e) {} }
 function clearSessionStorage() { try { sessionStorage.removeItem('ql_session'); } catch(e) {} }
 
+// ==================== TEMPO E COUNTDOWN ====================
+function timeRemaining(expiresAtIso) {
+  if (!expiresAtIso) return null;
+  const diff = new Date(expiresAtIso) - new Date();
+  if (diff <= 0) return { expired: true, ms: 0, h: 0, m: 0, text: 'Expirado' };
+  const h = Math.floor(diff / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  let text = '';
+  if (h >= 24) text = `${Math.floor(h/24)}d ${h%24}h`;
+  else if (h > 0) text = `${h}h ${m}min`;
+  else text = `${m} min`;
+  return { expired: false, ms: diff, h, m, text };
+}
+function countdownClass(tr) {
+  if (!tr || tr.expired) return 'critical';
+  if (tr.ms < 3600000) return 'critical';
+  if (tr.ms < 6 * 3600000) return 'warn';
+  return 'ok';
+}
+function relativeTime(iso) {
+  const d = new Date(iso);
+  const now = new Date();
+  const diffMs = now - d;
+  const diffMin = Math.floor(diffMs / 60000);
+  const diffDay = Math.floor(diffMs / 86400000);
+  const time = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  if (diffMin < 1) return 'Agora mesmo';
+  if (diffMin < 60) return `${diffMin} min atrás`;
+  if (diffDay === 0) return `Hoje · ${time}`;
+  if (diffDay === 1) return `Ontem · ${time}`;
+  if (diffDay < 7) return `${diffDay} dias atrás`;
+  return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit' });
+}
+
+// ==================== ALERTA DE CUPOM URGENTE (< 6h) ====================
+async function checkUrgentCoupons() {
+  if (!SESSION.userId || !supabaseClient) return;
+  const cont = document.getElementById('urgent-alert-container');
+  if (!cont) return;
+  try {
+    const now = new Date();
+    const in6h = new Date(now.getTime() + CFG.URGENT_THRESHOLD_HOURS * 3600 * 1000).toISOString();
+    const { data: coupons } = await supabaseClient
+      .from('transactions')
+      .select('code, discount, purchase_value, expires_at, store_id')
+      .eq('user_id', SESSION.userId)
+      .eq('type', 'redeem')
+      .eq('status', 'pendente')
+      .gt('expires_at', now.toISOString())
+      .lt('expires_at', in6h)
+      .order('expires_at', { ascending: true });
+
+    if (!coupons || !coupons.length) { cont.innerHTML = ''; return; }
+
+    const storeIds = [...new Set(coupons.map(c => c.store_id).filter(Boolean))];
+    let storeMap = {};
+    if (storeIds.length) {
+      const { data: stores } = await supabaseClient.from('users').select('id, store').in('id', storeIds);
+      (stores || []).forEach(s => storeMap[s.id] = s.store);
+    }
+
+    const first = coupons[0];
+    const tr = timeRemaining(first.expires_at);
+    const storeName = storeMap[first.store_id] || 'loja';
+    const extraText = coupons.length > 1
+      ? ` <span style="opacity:0.9;">(+${coupons.length - 1} outro${coupons.length > 2 ? 's' : ''} cupom${coupons.length > 2 ? 's' : ''} também urgente${coupons.length > 2 ? 's' : ''})</span>`
+      : '';
+
+    cont.innerHTML = `
+      <div class="urgent-banner">
+        <div class="ub-head">
+          <div class="ub-icon">🚨</div>
+          <div class="ub-title">Cupom expirando!</div>
+        </div>
+        <div class="ub-body">
+          Seu cupom de <strong>${fmtMoney(first.discount)}</strong> na <strong>${escapeHtml(storeName)}</strong>${extraText} expira em <span class="ub-countdown" data-expires="${escapeHtml(first.expires_at)}">${escapeHtml(tr.text)}</span>
+        </div>
+        <div class="ub-project">
+          ⚠️ <strong>Atenção:</strong> se não for usado a tempo, os pontos vão para o <strong>Caixa do Projeto</strong> — fundo destinado a projetos sociais da comunidade.
+        </div>
+        <div class="ub-action">
+          <button onclick="showScreen('scr-coupons')">🏷️ Ver meus cupons agora</button>
+        </div>
+      </div>`;
+
+    // Atualiza o countdown a cada 30 segundos
+    if (urgentCountdownInterval) clearInterval(urgentCountdownInterval);
+    urgentCountdownInterval = setInterval(() => {
+      const el = cont.querySelector('.ub-countdown');
+      if (!el) { clearInterval(urgentCountdownInterval); urgentCountdownInterval = null; return; }
+      const iso = el.getAttribute('data-expires');
+      const tr2 = timeRemaining(iso);
+      if (tr2 && !tr2.expired) el.textContent = tr2.text;
+      else { el.textContent = 'Expirado'; clearInterval(urgentCountdownInterval); urgentCountdownInterval = null; }
+    }, 30000);
+  } catch(e) { console.warn('Erro urgent coupons:', e); }
+}
+
 // ==================== NAVEGAÇÃO ====================
 function showScreen(id) {
   sndClick();
+  if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   const target = document.getElementById(id);
   if (target) target.classList.add('active');
@@ -921,6 +1192,8 @@ function redirectToRole(type) {
   else if(type==='admin') showScreen('scr-admin');
 }
 function logout() {
+  if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
+  if (urgentCountdownInterval) { clearInterval(urgentCountdownInterval); urgentCountdownInterval = null; }
   SESSION = { userId:null, user:null, resetData:null, transferData:null };
   DAILY = null; COUPONS_DATA = [];
   clearSessionStorage();
@@ -1340,6 +1613,8 @@ async function refreshClient() {
       const { count } = await supabaseClient.from('users').select('id', { count: 'exact', head: true }).eq('referred_by', SESSION.userId);
       const cnt = document.getElementById('ref-count');
       if (cnt) cnt.textContent = count || 0;
+      // Verifica cupons urgentes
+      await checkUrgentCoupons();
     }
   } catch(e) { console.error(e); }
 }
@@ -1365,11 +1640,11 @@ function shareWhatsApp() {
   const name = SESSION.user?.name?.split(' ')[0] || 'seu amigo';
   if (!code) { toast('Código indisponível.', 'error'); return; }
   const link = `${CFG.SITE_URL}/?ref=${code}`;
-  const text = `🎯 *QuizLocal* — Conhecimento que vira desconto!\n\nOi! Sou ${name} e estou usando o *QuizLocal*, um app da nossa cidade onde você responde quiz de conhecimentos gerais, acumula pontos e troca por descontos nas lojas locais.\n\n🏆 *Como funciona:*\n• Responda 10 perguntas por rodada\n• Acertos valem pontos (100 a 300 por pergunta)\n• 1.000 pontos = R$ 1,00 de desconto\n• Desconto de até 10% em compras parceiras\n\n🎁 *Usando meu link você começa a jogar e a gente acumula pontos juntos!*\n\n👉 ${link}\n\nÉ grátis, leva 30 segundos para se cadastrar e tem quiz novo todo dia. Vem!`;
+  const text = `🎯 *QuizLocal* — Conhecimento que vira desconto!\n\nOi! Sou ${name} e estou usando o *QuizLocal*, um app da nossa cidade onde você responde quiz de conhecimentos gerais, acumula pontos e troca por descontos nas lojas locais.\n\n🏆 *Como funciona:*\n• Responda 10 perguntas por rodada\n• Acertos valem pontos (100 a 300 por pergunta)\n• 1.000 pontos = R$ 1,00 de desconto\n• Desconto de até 10% em compras parceiras\n• Cupom válido por 48h após o resgate\n\n🎁 *Usando meu link você começa a jogar e a gente acumula pontos juntos!*\n\n👉 ${link}\n\nÉ grátis, leva 30 segundos para se cadastrar e tem quiz novo todo dia. Vem!`;
   window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
 }
 
-// ==================== RESGATE — GRADE DE CUPONS ====================
+// ==================== RESGATE ====================
 async function loadRedeemStores() {
   if (!supabaseClient) return;
   try {
@@ -1404,7 +1679,12 @@ async function renderCouponGrid() {
 async function redeemCoupon(value, minPurchase, points) {
   const storeId = document.getElementById('redeem-store').value;
   if (!storeId) { toast('⚠️ Selecione a loja primeiro!', 'error'); return; }
-  const ok = await confirmDialog(`Resgatar cupom R$ ${value}`, `Você vai usar ${points.toLocaleString('pt-BR')} pts para gerar um cupom de R$ ${value} de desconto.\n\n⚠️ Necessário gastar pelo menos R$ ${minPurchase} na loja.\n\nConfirmar?`);
+  const ok = await confirmDialog(`Resgatar cupom R$ ${value}`,
+    `Você vai usar ${points.toLocaleString('pt-BR')} pts para gerar um cupom de R$ ${value} de desconto.\n\n` +
+    `⚠️ Necessário gastar pelo menos R$ ${minPurchase} na loja.\n\n` +
+    `⏰ O cupom vale por 48 horas.\n` +
+    `💼 Se não for usado a tempo, os pontos vão para o Caixa do Projeto — fundo destinado a projetos sociais da comunidade.\n\n` +
+    `Confirmar?`);
   if (!ok) return;
   try {
     const { data, error } = await supabaseClient.rpc('redeem_discount', { p_user_id: Number(SESSION.userId), p_store_id: Number(storeId), p_purchase_value: Number(minPurchase) });
@@ -1483,7 +1763,7 @@ async function previewTransfer(btn) {
     const tax = Math.floor(amount * CFG.TRANSFER_TAX_PCT);
     const net = amount - tax;
     document.getElementById('tr-preview').classList.remove('hidden');
-    document.getElementById('tr-preview').innerHTML = `<strong>💸 Simulação:</strong><br>Destinatário: <strong>${escapeHtml(dest.name)}</strong><br>Enviados: ${amount}<br>Taxa (20%): <strong>-${tax} pts</strong> → Caixa<br><strong style="color:var(--gold);">Destinatário recebe: ${net} pts</strong><br>Seu saldo após: ${u.points - amount} pts`;
+    document.getElementById('tr-preview').innerHTML = `<strong>💸 Simulação:</strong><br>Destinatário: <strong>${escapeHtml(dest.name)}</strong><br>Enviados: ${amount}<br>Taxa (20%): <strong>-${tax} pts</strong> → Caixa do Projeto<br><strong style="color:var(--gold);">Destinatário recebe: ${net} pts</strong><br>Seu saldo após: ${u.points - amount} pts`;
     SESSION.transferData = { destId:dest.id, destName:dest.name, amount, tax, net };
     document.getElementById('btn-confirm-tr').classList.remove('hidden');
   } catch(e) { toast('Erro: ' + e.message, 'error'); }
@@ -1492,7 +1772,7 @@ async function previewTransfer(btn) {
 async function confirmTransfer(btn) {
   const d = SESSION.transferData;
   if(!d || !supabaseClient || !SESSION.userId) return;
-  const ok = await confirmDialog('Confirmar Transferência', `Enviar ${d.amount} pts para ${d.destName}?\n\nTaxa: ${d.tax} pts · Recebe: ${d.net} pts`);
+  const ok = await confirmDialog('Confirmar Transferência', `Enviar ${d.amount} pts para ${d.destName}?\n\nTaxa: ${d.tax} pts (Caixa do Projeto) · Recebe: ${d.net} pts`);
   if (!ok) return;
   setLoading(btn, true, 'Transferindo...');
   try {
@@ -1500,7 +1780,7 @@ async function confirmTransfer(btn) {
     if (error) { toast('Erro: ' + error.message, 'error'); return; }
     if (data?.error) { toast(data.error, 'error'); return; }
     sndCorrect();
-    showModal('✅','Transferência Realizada!',`${data.net} pts enviados para ${d.destName}.\nTaxa de ${data.tax} pts ao caixa.`);
+    showModal('✅','Transferência Realizada!',`${data.net} pts enviados para ${d.destName}.\nTaxa de ${data.tax} pts ao Caixa do Projeto.`);
     document.getElementById('tr-preview').classList.add('hidden');
     document.getElementById('btn-confirm-tr').classList.add('hidden');
     document.getElementById('tr-cpf').value = '';
@@ -1517,12 +1797,29 @@ async function renderCoupons() {
   const cont = document.getElementById('coupons-list');
   cont.innerHTML = '<p style="opacity:0.6;text-align:center;padding:15px;">Carregando...</p>';
   try {
+    // Verifica expiração — pontos vão para o Caixa do Projeto
+    try {
+      const { data: expResult } = await supabaseClient.rpc('check_expired_coupons', { p_user_id: Number(SESSION.userId) });
+      if (expResult?.expired_count > 0) {
+        toast(`⏰ ${expResult.expired_count} cupom(ns) expirado(s). ${expResult.transferred_to_fund.toLocaleString('pt-BR')} pts foram para o Caixa do Projeto.`, 'info');
+        refreshClient();
+      }
+    } catch(e) { console.warn('Erro ao verificar expiração:', e); }
+
     const { data: coupons } = await supabaseClient.from('transactions')
-      .select('code, discount, purchase_value, status, created_at, store_id')
+      .select('code, discount, purchase_value, status, created_at, expires_at, store_id')
       .eq('user_id', SESSION.userId).eq('type', 'redeem')
       .order('created_at', { ascending: false });
     COUPONS_DATA = coupons || [];
     renderCouponsFiltered();
+
+    if (countdownInterval) clearInterval(countdownInterval);
+    countdownInterval = setInterval(() => {
+      if (!document.getElementById('scr-coupons')?.classList.contains('active')) {
+        clearInterval(countdownInterval); countdownInterval = null; return;
+      }
+      updateCountdownsLive();
+    }, 30000);
   } catch(e) { console.error(e); cont.innerHTML = '<p style="color:var(--red);padding:15px;">Erro.</p>'; }
 }
 function filterCoupons(filter) {
@@ -1535,12 +1832,18 @@ async function renderCouponsFiltered() {
   const cont = document.getElementById('coupons-list');
   if (!cont) return;
   const list = COUPONS_DATA.filter(c => {
-    if (COUPON_FILTER === 'pendente') return c.status !== 'validado';
-    return c.status === 'validado';
+    if (COUPON_FILTER === 'pendente') return c.status !== 'validado' && c.status !== 'expirado';
+    if (COUPON_FILTER === 'validado') return c.status === 'validado';
+    if (COUPON_FILTER === 'expirado') return c.status === 'expirado';
+    return false;
   });
   if (!list.length) {
-    const msg = COUPON_FILTER === 'pendente' ? 'Você não tem cupons pendentes. Gere um novo na tela de resgate!' : 'Você ainda não usou nenhum cupom.';
-    cont.innerHTML = `<p style="opacity:0.6;text-align:center;padding:15px;">${msg}</p>`;
+    const msgs = {
+      pendente: 'Você não tem cupons pendentes. Gere um novo na tela de resgate!',
+      validado: 'Você ainda não usou nenhum cupom.',
+      expirado: 'Nenhum cupom expirado. Continue aproveitando!'
+    };
+    cont.innerHTML = `<p style="opacity:0.6;text-align:center;padding:15px;">${msgs[COUPON_FILTER]}</p>`;
     return;
   }
   const storeIds = [...new Set(list.map(c => c.store_id).filter(Boolean))];
@@ -1551,10 +1854,54 @@ async function renderCouponsFiltered() {
   }
   cont.innerHTML = '';
   list.forEach(c => {
-    const badge = c.status === 'validado' ? '<span class="badge-status badge-validado">✅ Usado</span>' : '<span class="badge-status badge-pendente">⏳ Pendente</span>';
+    const isExpired = c.status === 'expirado';
+    const isUsed = c.status === 'validado';
+    const isPending = c.status === 'pendente';
     const dt = new Date(c.created_at).toLocaleDateString('pt-BR');
-    const qrBtn = c.status === 'validado' ? '' : `<button class="btn btn-sm" style="margin-top:10px;background:rgba(255,255,255,0.15);color:#fff;width:auto;padding:6px 14px;font-size:0.85em;" onclick="showQrModal('${escapeHtml(c.code)}', ${Number(c.discount)})">📷 Ver QR Code</button>`;
-    cont.innerHTML += `<div class="coupon-card"><div style="display:flex;justify-content:space-between;align-items:center;"><strong>${escapeHtml(storeMap[c.store_id] || 'Loja')}</strong>${badge}</div><div class="code">${escapeHtml(c.code)}</div><div style="font-size:0.85em;opacity:0.8;">Desconto: ${fmtMoney(c.discount)} · Compra mínima: ${fmtMoney(c.purchase_value)} · ${dt}</div>${qrBtn}</div>`;
+    let badge = '';
+    if (isUsed) badge = '<span class="badge-status badge-validado">✅ Usado</span>';
+    else if (isExpired) badge = '<span class="badge-status badge-expirado">⏰ Expirado</span>';
+    else badge = '<span class="badge-status badge-pendente">⏳ Pendente</span>';
+
+    let countdownHTML = '';
+    if (isPending && c.expires_at) {
+      const tr = timeRemaining(c.expires_at);
+      const cls = countdownClass(tr);
+      countdownHTML = `<div class="countdown ${cls}" data-expires="${escapeHtml(c.expires_at)}">⏰ Expira em ${escapeHtml(tr.text)}</div>`;
+    } else if (isExpired) {
+      countdownHTML = `<div class="countdown" style="background:rgba(85,85,85,0.3);color:#ccc;">💼 Pontos foram para o Caixa do Projeto</div>`;
+    }
+
+    const qrBtn = isPending ? `<button class="btn btn-sm" style="margin-top:10px;background:rgba(255,255,255,0.15);color:#fff;width:auto;padding:6px 14px;font-size:0.85em;" onclick="showQrModal('${escapeHtml(c.code)}', ${Number(c.discount)})">📷 Ver QR Code</button>` : '';
+
+    cont.innerHTML += `
+      <div class="coupon-card ${isExpired ? 'expired' : ''}">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
+          <strong>${escapeHtml(storeMap[c.store_id] || 'Loja')}</strong>
+          ${badge}
+        </div>
+        <div class="code">${escapeHtml(c.code)}</div>
+        <div style="font-size:0.85em;opacity:0.8;">
+          Desconto: ${fmtMoney(c.discount)} · Compra mínima: ${fmtMoney(c.purchase_value)} · Emitido em ${dt}
+        </div>
+        ${countdownHTML}
+        ${qrBtn}
+      </div>`;
+  });
+}
+function updateCountdownsLive() {
+  document.querySelectorAll('.countdown[data-expires]').forEach(el => {
+    const iso = el.getAttribute('data-expires');
+    const tr = timeRemaining(iso);
+    if (tr && !tr.expired) {
+      el.textContent = `⏰ Expira em ${tr.text}`;
+      el.classList.remove('ok', 'warn', 'critical');
+      el.classList.add(countdownClass(tr));
+    } else {
+      el.textContent = '⏰ Expirado';
+      el.classList.remove('ok', 'warn', 'critical');
+      el.classList.add('critical');
+    }
   });
 }
 
@@ -1569,7 +1916,7 @@ async function refreshProfile() {
     document.getElementById('prof-correct').textContent = u.correct_answers;
     document.getElementById('prof-redeemed').textContent = fmtMoney(u.total_redeemed);
     const { data: hist } = await supabaseClient.from('transactions')
-      .select('id, type, user_id, store_id, from_user_id, to_user_id, amount, tax, net, points_used, discount, purchase_value, code, status, created_at')
+      .select('id, type, user_id, store_id, from_user_id, to_user_id, amount, tax, net, points_used, discount, purchase_value, code, status, created_at, expires_at')
       .or(`user_id.eq.${SESSION.userId},from_user_id.eq.${SESSION.userId},to_user_id.eq.${SESSION.userId}`)
       .order('created_at', { ascending: false })
       .limit(15);
@@ -1596,8 +1943,19 @@ function renderHistoryItem(t, people, viewerId) {
   const when = relativeTime(t.created_at);
   if (t.type === 'redeem') {
     const store = people[t.store_id] || {};
-    const statusBadge = t.status === 'validado' ? '<span class="hi-status validado">✓ USADO</span>' : '<span class="hi-status pendente">⏳ PENDENTE</span>';
-    return `<div class="history-item redeem"><div class="hi-icon">🏷️</div><div class="hi-body"><div class="hi-title">Resgate na ${escapeHtml(store.store || store.name || 'loja')}</div><div class="hi-sub">Compra ${fmtMoney(t.purchase_value)} · Desconto ${fmtMoney(t.discount)}</div></div><div class="hi-meta"><div class="hi-points neg">−${(t.points_used || 0).toLocaleString('pt-BR')}</div><div class="hi-when">${when}</div>${statusBadge}</div></div>`;
+    const isExpired = t.status === 'expirado';
+    const isUsed = t.status === 'validado';
+    const statusBadge = isUsed
+      ? '<span class="hi-status validado">✓ USADO</span>'
+      : isExpired
+        ? '<span class="hi-status expirado">⏰ EXPIRADO</span>'
+        : '<span class="hi-status pendente">⏳ PENDENTE</span>';
+    const pointsSign = isExpired ? '' : '−';
+    const pointsClass = isExpired ? 'neutral' : 'neg';
+    const subtext = isExpired
+      ? `Compra ${fmtMoney(t.purchase_value)} · pontos foram ao Caixa do Projeto`
+      : `Compra ${fmtMoney(t.purchase_value)} · Desconto ${fmtMoney(t.discount)}`;
+    return `<div class="history-item redeem${isExpired ? ' expired' : ''}"><div class="hi-icon">${isExpired ? '💼' : '🏷️'}</div><div class="hi-body"><div class="hi-title">Resgate na ${escapeHtml(store.store || store.name || 'loja')}</div><div class="hi-sub">${escapeHtml(subtext)}</div></div><div class="hi-meta"><div class="hi-points ${pointsClass}">${pointsSign}${(t.points_used || 0).toLocaleString('pt-BR')}</div><div class="hi-when">${when}</div>${statusBadge}</div></div>`;
   }
   if (t.type === 'transfer') {
     const from = people[t.from_user_id] || {};
@@ -1606,23 +1964,9 @@ function renderHistoryItem(t, people, viewerId) {
     if (isIncoming) {
       return `<div class="history-item transfer-in"><div class="hi-icon">📥</div><div class="hi-body"><div class="hi-title">Pontos recebidos</div><div class="hi-sub">De ${escapeHtml(from.name || 'outro usuário')}</div></div><div class="hi-meta"><div class="hi-points pos">+${(t.net || 0).toLocaleString('pt-BR')}</div><div class="hi-when">${when}</div></div></div>`;
     }
-    return `<div class="history-item transfer-out"><div class="hi-icon">📤</div><div class="hi-body"><div class="hi-title">Pontos enviados</div><div class="hi-sub">Para ${escapeHtml(to.name || 'outro usuário')} · taxa ${(t.tax || 0).toLocaleString('pt-BR')} pts</div></div><div class="hi-meta"><div class="hi-points neg">−${(t.amount || 0).toLocaleString('pt-BR')}</div><div class="hi-when">${when}</div></div></div>`;
+    return `<div class="history-item transfer-out"><div class="hi-icon">📤</div><div class="hi-body"><div class="hi-title">Pontos enviados</div><div class="hi-sub">Para ${escapeHtml(to.name || 'outro usuário')} · taxa ${(t.tax || 0).toLocaleString('pt-BR')} pts ao Caixa</div></div><div class="hi-meta"><div class="hi-points neg">−${(t.amount || 0).toLocaleString('pt-BR')}</div><div class="hi-when">${when}</div></div></div>`;
   }
   return '';
-}
-function relativeTime(iso) {
-  const d = new Date(iso);
-  const now = new Date();
-  const diffMs = now - d;
-  const diffMin = Math.floor(diffMs / 60000);
-  const diffDay = Math.floor(diffMs / 86400000);
-  const time = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-  if (diffMin < 1) return 'Agora mesmo';
-  if (diffMin < 60) return `${diffMin} min atrás`;
-  if (diffDay === 0) return `Hoje · ${time}`;
-  if (diffDay === 1) return `Ontem · ${time}`;
-  if (diffDay < 7) return `${diffDay} dias atrás`;
-  return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit' });
 }
 
 // ==================== LOJISTA ====================
@@ -1632,7 +1976,7 @@ async function refreshShop() {
     const { data: u } = await supabaseClient.from('users').select('store').eq('id', SESSION.userId).single();
     if(!u) return;
     document.getElementById('shop-name').textContent = u.store;
-    const { data: redeems } = await supabaseClient.from('transactions').select('user_id, discount').eq('store_id', SESSION.userId).eq('type', 'redeem');
+    const { data: redeems } = await supabaseClient.from('transactions').select('user_id, discount').eq('store_id', SESSION.userId).eq('type', 'redeem').eq('status', 'validado');
     const clients = [...new Set((redeems||[]).map(r=>r.user_id))].length;
     const total = (redeems||[]).reduce((s,t)=>s+(t.discount||0),0);
     document.getElementById('shop-redeems').textContent = (redeems||[]).length;
@@ -1648,10 +1992,15 @@ async function validateCoupon(btn) {
   if(!code) { toast('Digite o código!','error'); return; }
   setLoading(btn, true, 'Validando...');
   try {
-    const { data: t } = await supabaseClient.from('transactions').select('id, store_id, discount, purchase_value, status').eq('code', code).maybeSingle();
+    const { data: t } = await supabaseClient.from('transactions').select('id, store_id, discount, purchase_value, status, expires_at').eq('code', code).maybeSingle();
     if(!t) { valResult.innerHTML='<div class="toast error" style="position:static;">❌ Cupom não encontrado!</div>'; sndWrong(); return; }
     if(t.store_id!==SESSION.userId) { valResult.innerHTML='<div class="toast error" style="position:static;">⚠️ Cupom de outra loja!</div>'; sndWrong(); return; }
     if(t.status==='validado') { valResult.innerHTML='<div class="toast error" style="position:static;">⚠️ Cupom já utilizado!</div>'; return; }
+    if(t.status==='expirado') { valResult.innerHTML='<div class="toast error" style="position:static;">⏰ Cupom expirado (48h). Peça ao cliente para gerar um novo.</div>'; sndWrong(); return; }
+    if(t.expires_at && new Date(t.expires_at) < new Date()) {
+      valResult.innerHTML='<div class="toast error" style="position:static;">⏰ Cupom expirado (48h). Peça ao cliente para gerar um novo.</div>';
+      sndWrong(); return;
+    }
     await supabaseClient.from('transactions').update({ status: 'validado' }).eq('id', t.id);
     sndCorrect();
     valResult.innerHTML=`<div class="card" style="background:rgba(39,174,96,0.2);border-color:var(--green);"><h3 style="color:var(--green);">✅ Cupom Válido!</h3><p><strong>Desconto:</strong> ${fmtMoney(t.discount)}</p><p><strong>Compra:</strong> ${fmtMoney(t.purchase_value)}</p></div>`;
@@ -1763,7 +2112,7 @@ async function showAdminUserDetail(userId) {
       .eq('id', userId).single();
     if (error || !u) { cont.innerHTML = '<p style="color:var(--red);padding:15px;">Usuário não encontrado.</p>'; return; }
     const { data: hist } = await supabaseClient.from('transactions')
-      .select('id, type, user_id, store_id, from_user_id, to_user_id, amount, tax, net, points_used, discount, purchase_value, code, status, created_at')
+      .select('id, type, user_id, store_id, from_user_id, to_user_id, amount, tax, net, points_used, discount, purchase_value, code, status, created_at, expires_at')
       .or(`user_id.eq.${userId},from_user_id.eq.${userId},to_user_id.eq.${userId}`)
       .order('created_at', { ascending: false })
       .limit(30);
@@ -1814,14 +2163,14 @@ async function showAdminUserDetail(userId) {
   }
 }
 
-// ==================== TRANSAÇÕES RICAS ====================
+// ==================== TRANSAÇÕES ====================
 let adminTxFilter = 'todas';
 let adminTxCache = null;
 async function renderAdminTransactions(btn) {
   if (!supabaseClient) return;
   setLoading(btn, true, 'Carregando...');
   try {
-    const { data: txs, error } = await supabaseClient.from('transactions').select('id, type, user_id, store_id, from_user_id, to_user_id, amount, tax, net, discount, points_used, purchase_value, code, status, created_at').order('created_at', { ascending: false }).limit(200);
+    const { data: txs, error } = await supabaseClient.from('transactions').select('id, type, user_id, store_id, from_user_id, to_user_id, amount, tax, net, discount, points_used, purchase_value, code, status, expires_at, created_at').order('created_at', { ascending: false }).limit(200);
     if (error) { document.getElementById('adm-content').innerHTML = `<p style="color:var(--red);padding:15px;">Erro: ${escapeHtml(error.message)}</p>`; return; }
     const allIds = new Set();
     (txs || []).forEach(t => { [t.user_id, t.store_id, t.from_user_id, t.to_user_id].forEach(id => { if (id) allIds.add(id); }); });
@@ -1891,13 +2240,24 @@ function buildTxItem(t, people) {
   if (t.type === 'redeem') {
     const user = people[t.user_id] || {};
     const store = people[t.store_id] || {};
-    const statusBadge = t.status === 'validado' ? '<span class="badge-status badge-validado" style="font-size:0.7em;">✅ Validado</span>' : '<span class="badge-status badge-pendente" style="font-size:0.7em;">⏳ Pendente</span>';
-    return `<div class="tx-item redeem"><div class="tx-item-head"><span class="tx-type-badge redeem">🏷️ Resgate</span><span class="tx-time">🕐 ${time}</span></div><div class="tx-body"><div class="tx-line"><span class="tx-lbl">👤 Cliente</span><span class="tx-val">${escapeHtml(user.name || '—')}</span></div><div class="tx-line"><span class="tx-lbl">🏪 Loja</span><span class="tx-val">${escapeHtml(store.store || store.name || '—')}</span></div><div class="tx-line"><span class="tx-lbl">💵 Compra</span><span class="tx-val">${fmtMoney(t.purchase_value)}</span></div><div class="tx-line"><span class="tx-lbl">🎯 Pontos</span><span class="tx-val" style="color:#ff8c00;">− ${(t.points_used || 0).toLocaleString('pt-BR')} pts</span></div><div class="tx-line"><span class="tx-lbl">💰 Desconto</span><span class="tx-val" style="color:#7dffa8;">${fmtMoney(t.discount)}</span></div></div><div class="tx-item-foot"><span class="tx-code">${escapeHtml(t.code || '—')}</span>${statusBadge}</div></div>`;
+    const isExpired = t.status === 'expirado';
+    const isUsed = t.status === 'validado';
+    const statusBadge = isUsed
+      ? '<span class="badge-status badge-validado" style="font-size:0.7em;">✅ Validado</span>'
+      : isExpired
+        ? '<span class="badge-status badge-expirado" style="font-size:0.7em;">⏰ Expirado</span>'
+        : '<span class="badge-status badge-pendente" style="font-size:0.7em;">⏳ Pendente</span>';
+    let countdownInfo = '';
+    if (!isUsed && !isExpired && t.expires_at) {
+      const tr = timeRemaining(t.expires_at);
+      countdownInfo = `<div class="tx-line"><span class="tx-lbl">⏰ Expira</span><span class="tx-val" style="color:#ffcc66;">${escapeHtml(tr.text)}</span></div>`;
+    }
+    return `<div class="tx-item redeem"><div class="tx-item-head"><span class="tx-type-badge redeem">🏷️ Resgate</span><span class="tx-time">🕐 ${time}</span></div><div class="tx-body"><div class="tx-line"><span class="tx-lbl">👤 Cliente</span><span class="tx-val">${escapeHtml(user.name || '—')}</span></div><div class="tx-line"><span class="tx-lbl">🏪 Loja</span><span class="tx-val">${escapeHtml(store.store || store.name || '—')}</span></div><div class="tx-line"><span class="tx-lbl">💵 Compra</span><span class="tx-val">${fmtMoney(t.purchase_value)}</span></div><div class="tx-line"><span class="tx-lbl">🎯 Pontos</span><span class="tx-val" style="color:#ff8c00;">− ${(t.points_used || 0).toLocaleString('pt-BR')} pts</span></div><div class="tx-line"><span class="tx-lbl">💰 Desconto</span><span class="tx-val" style="color:#7dffa8;">${fmtMoney(t.discount)}</span></div>${countdownInfo}</div><div class="tx-item-foot"><span class="tx-code">${escapeHtml(t.code || '—')}</span>${statusBadge}</div></div>`;
   }
   if (t.type === 'transfer') {
     const from = people[t.from_user_id] || {};
     const to = people[t.to_user_id] || {};
-    return `<div class="tx-item transfer"><div class="tx-item-head"><span class="tx-type-badge transfer">💸 Transferência</span><span class="tx-time">🕐 ${time}</span></div><div class="tx-body"><div class="tx-line"><span class="tx-lbl">👤 De</span><span class="tx-val">${escapeHtml(from.name || '—')}</span></div><div class="tx-line"><span class="tx-lbl">👤 Para</span><span class="tx-val">${escapeHtml(to.name || '—')}</span></div><div class="tx-line"><span class="tx-lbl">📤 Enviados</span><span class="tx-val">${(t.amount || 0).toLocaleString('pt-BR')} pts</span></div><div class="tx-line"><span class="tx-lbl">🏦 Taxa</span><span class="tx-val" style="color:#d4b3ff;">${(t.tax || 0).toLocaleString('pt-BR')} pts</span></div><div class="tx-line"><span class="tx-lbl">✅ Recebidos</span><span class="tx-val" style="color:#7dffa8;">${(t.net || 0).toLocaleString('pt-BR')} pts</span></div></div></div>`;
+    return `<div class="tx-item transfer"><div class="tx-item-head"><span class="tx-type-badge transfer">💸 Transferência</span><span class="tx-time">🕐 ${time}</span></div><div class="tx-body"><div class="tx-line"><span class="tx-lbl">👤 De</span><span class="tx-val">${escapeHtml(from.name || '—')}</span></div><div class="tx-line"><span class="tx-lbl">👤 Para</span><span class="tx-val">${escapeHtml(to.name || '—')}</span></div><div class="tx-line"><span class="tx-lbl">📤 Enviados</span><span class="tx-val">${(t.amount || 0).toLocaleString('pt-BR')} pts</span></div><div class="tx-line"><span class="tx-lbl">🏦 Taxa</span><span class="tx-val" style="color:#d4b3ff;">${(t.tax || 0).toLocaleString('pt-BR')} pts → Caixa</span></div><div class="tx-line"><span class="tx-lbl">✅ Recebidos</span><span class="tx-val" style="color:#7dffa8;">${(t.net || 0).toLocaleString('pt-BR')} pts</span></div></div></div>`;
   }
   return '';
 }
@@ -1907,19 +2267,20 @@ function exportTransactionsCSV() {
   const list = adminTxFilter === 'todas' ? txs : txs.filter(t => t.type === adminTxFilter);
   if (!list.length) { toast('Sem transações para exportar.', 'error'); return; }
   const esc = (v) => { const s = String(v ?? ''); if (s.includes(',') || s.includes('"') || s.includes('\n')) return '"' + s.replace(/"/g, '""') + '"'; return s; };
-  const headers = ['Data','Hora','Tipo','Cliente/De','Loja/Para','Valor Compra','Pontos Usados','Desconto','Valor Enviado','Taxa','Líquido','Código','Status'];
+  const headers = ['Data','Hora','Tipo','Cliente/De','Loja/Para','Valor Compra','Pontos Usados','Desconto','Valor Enviado','Taxa','Líquido','Código','Status','Expira em'];
   const rows = list.map(t => {
     const d = new Date(t.created_at);
     const date = d.toLocaleDateString('pt-BR');
     const time = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    const expires = t.expires_at ? new Date(t.expires_at).toLocaleString('pt-BR') : '';
     if (t.type === 'redeem') {
       const user = people[t.user_id] || {};
       const store = people[t.store_id] || {};
-      return [date, time, 'Resgate', user.name || '', store.store || store.name || '', t.purchase_value || '', t.points_used || '', t.discount || '', '', '', '', t.code || '', t.status || ''];
+      return [date, time, 'Resgate', user.name || '', store.store || store.name || '', t.purchase_value || '', t.points_used || '', t.discount || '', '', '', '', t.code || '', t.status || '', expires];
     }
     const from = people[t.from_user_id] || {};
     const to = people[t.to_user_id] || {};
-    return [date, time, 'Transferência', from.name || '', to.name || '', '', '', '', t.amount || '', t.tax || '', t.net || '', '', ''];
+    return [date, time, 'Transferência', from.name || '', to.name || '', '', '', '', t.amount || '', t.tax || '', t.net || '', '', '', ''];
   });
   const csv = [headers, ...rows].map(r => r.map(esc).join(',')).join('\n');
   const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
@@ -1939,7 +2300,7 @@ async function renderImpactReport(btn) {
     const [{ data: users }, { data: offers }, { data: redeems }, { data: transfers }, { data: fund }, { data: daily }] = await Promise.all([
       supabaseClient.from('users').select('id, type, points, games_played, correct_answers, referred_by'),
       supabaseClient.from('offers').select('id, category'),
-      supabaseClient.from('transactions').select('user_id, store_id, discount, points_used, purchase_value').eq('type','redeem'),
+      supabaseClient.from('transactions').select('user_id, store_id, discount, points_used, purchase_value, status').eq('type','redeem'),
       supabaseClient.from('transactions').select('tax').eq('type','transfer'),
       supabaseClient.from('project_fund').select('amount').eq('id', 1).single(),
       supabaseClient.from('daily_actions').select('action_type, points')
@@ -1960,9 +2321,19 @@ async function renderImpactReport(btn) {
     const followsTotal = (daily||[]).filter(d => d.action_type === 'follow').length;
     const viewsTotal = (daily||[]).filter(d => d.action_type === 'view_offer').length;
     const indicadosTotal = (users||[]).filter(u => u.referred_by != null).length;
+    const cuponsUsados = (redeems||[]).filter(r => r.status === 'validado').length;
+    const cuponsExpirados = (redeems||[]).filter(r => r.status === 'expirado').length;
+    const cuponsPendentes = (redeems||[]).filter(r => r.status === 'pendente').length;
+    const taxaConversao = (redeems||[]).length > 0
+      ? ((cuponsUsados / (redeems||[]).length) * 100).toFixed(1)
+      : 0;
+    const ptsParaProjeto = (redeems||[]).filter(r => r.status === 'expirado').reduce((s,t)=>s+(t.points_used||0),0);
+
     const categorias = {};
     (offers||[]).forEach(o => { const c = o.category || 'Outros'; categorias[c] = (categorias[c] || 0) + 1; });
     document.getElementById('adm-content').innerHTML = `
+      <div class="info" style="background:rgba(255,140,0,0.15);border-left-color:#ff8c00;"><strong style="color:#ff8c00;">💼 Caixa do Projeto</strong><br>Saldo atual: <strong>${fundPts.toLocaleString('pt-BR')} pts (${fmtMoney(fundPts / CFG.POINTS_PER_REAL)})</strong><br>Será destinado a projetos sociais da comunidade.</div>
+
       <div class="info" style="background:rgba(39,174,96,0.15);border-left-color:var(--green);"><strong style="color:var(--green);">🌍 Relatório de Impacto Local</strong><br>Resumo consolidado do movimento econômico e engajamento.</div>
       <h4 style="color:var(--gold);margin:15px 0 5px;">💰 Impacto Econômico</h4>
       <div class="impact-grid">
@@ -1970,6 +2341,16 @@ async function renderImpactReport(btn) {
         <div class="impact-card"><div class="ic-icon">🎯</div><div class="ic-val">${fmtMoney(ticketMedio)}</div><div class="ic-lbl">Ticket médio</div></div>
         <div class="impact-card"><div class="ic-icon">🏪</div><div class="ic-val">${lojasAtivas}</div><div class="ic-lbl">Lojas com resgates</div></div>
         <div class="impact-card"><div class="ic-icon">👥</div><div class="ic-val">${clientesAtivos}</div><div class="ic-lbl">Clientes beneficiados</div></div>
+      </div>
+      <h4 style="color:var(--gold);margin:20px 0 5px;">🏷️ Cupons (48h)</h4>
+      <div class="impact-grid">
+        <div class="impact-card"><div class="ic-icon">⏳</div><div class="ic-val">${cuponsPendentes}</div><div class="ic-lbl">Pendentes</div></div>
+        <div class="impact-card"><div class="ic-icon">✅</div><div class="ic-val">${cuponsUsados}</div><div class="ic-lbl">Usados</div></div>
+        <div class="impact-card"><div class="ic-icon">💼</div><div class="ic-val">${cuponsExpirados}</div><div class="ic-lbl">Expirados (→ Caixa)</div></div>
+        <div class="impact-card"><div class="ic-icon">📈</div><div class="ic-val">${taxaConversao}%</div><div class="ic-lbl">Taxa de uso</div></div>
+      </div>
+      <div class="impact-grid">
+        <div class="impact-card" style="grid-column: span 2;"><div class="ic-icon">💼</div><div class="ic-val">${ptsParaProjeto.toLocaleString('pt-BR')} pts</div><div class="ic-lbl">Total já direcionado ao Caixa do Projeto por expiração de cupons</div></div>
       </div>
       <h4 style="color:var(--gold);margin:20px 0 5px;">📊 Movimento</h4>
       <div class="impact-grid">
