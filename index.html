@@ -1601,6 +1601,58 @@ async function checkUrgentCoupons(){
 }
 /* ==================== NOTIFICAÇÕES PUSH (opt-in) ==================== */
 // Não pede permissão. Só inicia o loop se já foi concedida antes.
+/* ==================== CHECAGEM DE NOTIFICAÇÕES ==================== */
+async function checkPushCoupons(){
+  if(!SESSION.userId||!supabaseClient)return;
+  if(!('Notification' in window))return;
+  if(Notification.permission!=='granted')return;
+
+  try{
+    const now=new Date();
+    const in6h=new Date(now.getTime()+CFG.URGENT_THRESHOLD_HOURS*3600*1000).toISOString();
+
+    const {data:coupons}=await supabaseClient.from('transactions')
+      .select('code, discount, expires_at, store_id')
+      .eq('user_id',SESSION.userId)
+      .eq('type','redeem')
+      .eq('status','pendente')
+      .gt('expires_at',now.toISOString())
+      .lt('expires_at',in6h);
+
+    if(!coupons||!coupons.length)return;
+
+    // Evita repetir a mesma notificação na mesma sessão
+    let notified=[];
+    try{notified=JSON.parse(sessionStorage.getItem('ql_notified_coupons')||'[]');}catch(e){}
+    const newOnes=coupons.filter(c=>!notified.includes(c.code));
+    if(!newOnes.length)return;
+
+    // Busca nomes das lojas (uma query só)
+    const storeIds=[...new Set(newOnes.map(c=>c.store_id).filter(Boolean))];
+    let storeMap={};
+    if(storeIds.length){
+      const {data:stores}=await supabaseClient.from('users').select('id, store').in('id',storeIds);
+      (stores||[]).forEach(s=>{storeMap[s.id]=s.store;});
+    }
+
+    newOnes.forEach(c=>{
+      const tr=timeRemaining(c.expires_at);
+      const storeName=storeMap[c.store_id]||'uma loja parceira';
+      try{
+        new Notification('🎯 QuizLocal — Cupom expirando!',{
+          body:`Cupom de ${fmtMoney(c.discount)} em ${storeName} expira em ${tr.text}. Use antes que os pontos vão para o Caixa do Projeto.`,
+          tag:'ql-coupon-'+c.code,
+          requireInteraction:false
+        });
+      }catch(e){console.warn('Falha ao exibir notificação:',e);}
+      notified.push(c.code);
+    });
+
+    try{sessionStorage.setItem('ql_notified_coupons',JSON.stringify(notified.slice(-50)));}catch(e){}
+  }catch(e){
+    console.warn('Erro checkPushCoupons:',e);
+  }
+}
 function startPushChecksIfGranted(){
   if(!('Notification' in window))return;
   if(Notification.permission!=='granted')return;
