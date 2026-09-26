@@ -408,6 +408,9 @@ th{color:var(--gold);background:rgba(255,215,0,.1)}
       <div class="stat"><div class="stat-val" id="cli-balance">R$ 0</div><div class="stat-lbl">Saldo em Reais</div></div>
       <div class="stat"><div class="stat-val" id="cli-games">0</div><div class="stat-lbl">Quizes Jogados</div></div>
       <div class="stat"><div class="stat-val" id="cli-redeemed">R$ 0</div><div class="stat-lbl">Total Resgatado</div></div>
+	  <div id="urgent-alert-container"></div>
+<div id="premium-banner-container"></div>
+<div id="notif-banner-container"></div>   <!-- ✅ NOVO -->
     </div>
     <button class="btn" onclick="startQuiz(this)">🎮 JOGAR QUIZ AGORA</button>
     <button class="btn btn-purple" onclick="showScreen('scr-daily-offers')">🎁 OFERTAS DO DIA</button>
@@ -1547,6 +1550,8 @@ async function refreshClient(){
       if(cnt)cnt.textContent=count||0;
       await checkUrgentCoupons();
       renderPremiumBanner(u);
+	  renderPremiumBanner(u);
+renderNotificationBanner();   // ✅ NOVO
     }
   }catch(e){console.error(e);}
 }
@@ -1594,43 +1599,86 @@ async function checkUrgentCoupons(){
     },30000);
   }catch(e){console.warn('Erro urgent coupons:',e);}
 }
-async function initPushNotifications(){
+/* ==================== NOTIFICAÇÕES PUSH (opt-in) ==================== */
+// Não pede permissão. Só inicia o loop se já foi concedida antes.
+function startPushChecksIfGranted(){
   if(!('Notification' in window))return;
-  if(Notification.permission==='default'){
-    try{await Notification.requestPermission();}catch(e){}
-  }
   if(Notification.permission!=='granted')return;
   if(notifInterval)clearInterval(notifInterval);
   notifInterval=setInterval(checkPushCoupons,CFG.NOTIF_CHECK_INTERVAL_MS);
   checkPushCoupons();
 }
-async function checkPushCoupons(){
-  if(!SESSION.userId||!supabaseClient)return;
-  if(Notification.permission!=='granted')return;
+
+// Chamada APENAS dentro de um handler de clique.
+async function enableNotifications(btn){
+  if(!('Notification' in window)){
+    toast('Este navegador não suporta notificações.','error');
+    return;
+  }
+  if(Notification.permission==='granted'){
+    toast('Notificações já estão ativas.','info');
+    startPushChecksIfGranted();
+    renderNotificationBanner();
+    return;
+  }
+  if(Notification.permission==='denied'){
+    toast('Notificações bloqueadas. Habilite nas configurações do navegador.','error');
+    renderNotificationBanner();
+    return;
+  }
+  setLoading(btn,true,'Solicitando...');
   try{
-    const now=new Date();
-    const in6h=new Date(now.getTime()+CFG.URGENT_THRESHOLD_HOURS*3600*1000).toISOString();
-    const {data:coupons}=await supabaseClient.from('transactions')
-      .select('code, discount, expires_at, store_id')
-      .eq('user_id',SESSION.userId).eq('type','redeem').eq('status','pendente')
-      .gt('expires_at',now.toISOString()).lt('expires_at',in6h);
-    if(!coupons||!coupons.length)return;
-    let notified=[];
-    try{notified=JSON.parse(sessionStorage.getItem('ql_notified_coupons')||'[]');}catch(e){}
-    const newOnes=coupons.filter(c=>!notified.includes(c.code));
-    if(!newOnes.length)return;
-    newOnes.forEach(c=>{
-      const tr=timeRemaining(c.expires_at);
-      try{
-        new Notification('🎯 QuizLocal — Cupom expirando!',{
-          body:`Cupom de ${fmtMoney(c.discount)} expira em ${tr.text}. Use antes que os pontos vão para o Caixa do Projeto.`,
-          tag:'ql-coupon-'+c.code
-        });
-      }catch(e){}
-      notified.push(c.code);
-    });
-    try{sessionStorage.setItem('ql_notified_coupons',JSON.stringify(notified.slice(-50)));}catch(e){}
-  }catch(e){}
+    const result=await Notification.requestPermission();
+    if(result==='granted'){
+      sndCorrect();
+      toast('✅ Notificações ativadas!','success');
+      try{sessionStorage.removeItem('ql_notif_dismissed');}catch(e){}
+      startPushChecksIfGranted();
+    }else if(result==='denied'){
+      sndWrong();
+      toast('Notificações recusadas. Você pode ativar depois no navegador.','info');
+    }
+  }catch(e){
+    console.warn('Erro ao pedir permissão:',e);
+    toast('Não foi possível solicitar permissão.','error');
+  }finally{
+    setLoading(btn,false);
+    renderNotificationBanner();
+  }
+}
+
+function dismissNotificationBanner(){
+  try{sessionStorage.setItem('ql_notif_dismissed','1');}catch(e){}
+  renderNotificationBanner();
+}
+
+// Desenha o banner de opt-in no dashboard do cliente
+function renderNotificationBanner(){
+  const cont=document.getElementById('notif-banner-container');
+  if(!cont)return;
+  // Não mostra se já concedida ou se o navegador não suporta
+  if(!('Notification' in window)){cont.innerHTML='';return;}
+  if(Notification.permission==='granted'){cont.innerHTML='';return;}
+  // Não mostra se o usuário fechou nesta sessão
+  try{if(sessionStorage.getItem('ql_notif_dismissed')==='1'){cont.innerHTML='';return;}}catch(e){}
+  // Não mostra se o usuário negou permanentemente
+  if(Notification.permission==='denied'){
+    cont.innerHTML=`<div style="background:rgba(192,57,43,.15);border:1px solid rgba(192,57,43,.5);border-radius:12px;padding:12px 14px;margin-bottom:15px;font-size:.85em">
+      <strong style="color:#ffb3b3">🔕 Notificações bloqueadas</strong><br>
+      <span style="opacity:.85">Você não receberá avisos de cupom expirando. Para ativar, acesse as configurações do navegador.</span>
+    </div>`;
+    return;
+  }
+  cont.innerHTML=`<div style="background:linear-gradient(135deg,rgba(52,152,219,.18),rgba(155,48,255,.08));border:1px solid rgba(52,152,219,.5);border-radius:12px;padding:14px;margin-bottom:15px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
+      <div style="flex:1">
+        <strong style="color:#a5d8ff">🔔 Ativar notificações?</strong>
+        <p style="font-size:.85em;opacity:.9;line-height:1.4;margin-top:6px">Receba avisos quando seus cupons estiverem perto de expirar, para não perder os pontos.</p>
+      </div>
+      <button onclick="dismissNotificationBanner()" style="background:transparent;border:none;color:#fff;opacity:.6;cursor:pointer;font-size:1.2em;padding:0 4px" aria-label="Fechar">×</button>
+    </div>
+    <button class="btn btn-sm" style="margin-top:10px;background:linear-gradient(90deg,#3498db,#9b30ff);color:#fff" onclick="enableNotifications(this)">🔔 Ativar notificações</button>
+  </div>`;
 }
 
 /* ==================== INDICAÇÃO ==================== */
@@ -2681,7 +2729,7 @@ window.addEventListener('load',async()=>{
           SESSION.userId=u.id;
           console.log('✅ Sessão restaurada.');
           redirectToRole(u.type);
-          await initPushNotifications();
+          startPushChecksIfGranted();
           return;
         }
       }
