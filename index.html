@@ -480,8 +480,8 @@ th{color:var(--gold);background:rgba(255,215,0,.1)}
     <p style="text-align:center;opacity:.8;font-size:.9em;margin-bottom:15px">Leia antes de começar. Boa sorte!</p>
     <ul class="instructions-list">
       <li><span class="il-icon">✅</span><div class="il-text"><strong>Acertos valem pontos</strong>Fácil = 100 · média = 200 · difícil = 300 pts.</div></li>
-      <li><span class="il-icon">📊</span><div class="il-text"><strong>Progressão de dificuldade</strong>4 fáceis, 3 médias, 3 difíceis.</div></li>
-      <li><span class="il-icon">⏱️</span><div class="il-text"><strong>Tempo por pergunta</strong>15s · 20s · 30s.</div></li>
+      <li><span class="il-icon">📊</span><div class="il-text"><strong>Progressão de dificuldade</strong>4 fáceis, 5 médias, 6 difíceis.</div></li>
+      <li><span class="il-icon">⏱️</span><div class="il-text"><strong>Tempo por pergunta</strong>12s · 18s · 25s.</div></li>
       <li><span class="il-icon">✂️</span><div class="il-text"><strong>Ajudas (1 uso cada)</strong>50/50 · Pular · Parar.</div></li>
       <li><span class="il-icon">🏆</span><div class="il-text"><strong>Ao final</strong>Total de acertos, pontos e saldo.</div></li>
       <li><span class="il-icon">🏷️</span><div class="il-text"><strong>Cupons com validade de 48h</strong>Ao resgatar um desconto, você tem 48 horas para usar na loja. Passado o prazo, o cupom expira.</div></li>
@@ -802,9 +802,10 @@ th{color:var(--gold);background:rgba(255,215,0,.1)}
 const CFG={
   POINTS_PER_REAL:1000,MAX_DISCOUNT_PCT:0.10,TRANSFER_TAX_PCT:0.20,
   TRANSFER_DAILY_LIMIT:5000,TRANSFER_MONTHLY_LIMIT:150000,TRANSFER_MIN:100,
-  OFFER_MIN_POINTS:1000,QUIZ_QUESTIONS_PER_ROUND:10,MIN_DB_QUESTIONS:10,
-  SESSION_TTL_MS:24*3600*1000,DIFFICULTY_DISTRIBUTION:{1:4,2:3,3:3},
-  TIME_BY_DIFFICULTY:{1:15,2:20,3:30},
+  OFFER_MIN_POINTS:1000,QUIZ_QUESTIONS_PER_ROUND: 15,
+  MIN_DB_QUESTIONS: 10,
+  DIFFICULTY_DISTRIBUTION: { 1: 4, 2: 5, 3: 6 },
+  TIME_BY_DIFFICULTY:{1:12,2:18,3:25},
   REWARDS:{CHECKIN:50,FOLLOW:50,VIEW_OFFER:10,VIEW_OFFER_DAILY_CAP:50},
   REFERRAL_BONUS:2000,SITE_URL:'https://quizlocal.vercel.app',
   COUPON_TTL_HOURS:48,URGENT_THRESHOLD_HOURS:6,
