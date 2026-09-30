@@ -1193,32 +1193,6 @@ async function startQuiz(btn){
     showScreen('scr-quiz-intro');
   }catch(e){toast('Erro: '+e.message,'error');console.error(e);}
   finally{setLoading(btn,false);}
-}
-function beginQuiz(btn){
-  if(!quiz.questions||!quiz.questions.length){toast('Nenhuma pergunta carregada.','error');return;}
-  quiz.active=true;quiz.current=0;
-  showScreen('scr-quiz');renderQuestion();
-}
-function renderQuestion(){
-  if(quiz.current>=quiz.questions.length){finishQuiz();return;}
-  const q=quiz.questions[quiz.current];
-  document.getElementById('q-num').textContent=quiz.current+1;
-  document.getElementById('q-round-pts').textContent=quiz.points;
-  document.getElementById('q-text').innerHTML=`<small style="color:var(--gold)">[${escapeHtml(q.c)} • Dif. ${escapeHtml(q.d)}]</small><br><br>${escapeHtml(q.q)}`;
-  const qOptions=document.getElementById('q-options');
-  qOptions.innerHTML='';
-  q.o.forEach((o,i)=>{
-    const d=document.createElement('div');
-    d.className='opt';d.tabIndex=0;d.setAttribute('role','button');
-    d.textContent=`${String.fromCharCode(65+i)}) ${o}`;
-    d.onclick=()=>answerQ(i,d);
-    d.onkeydown=(e)=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();answerQ(i,d);}};
-    qOptions.appendChild(d);
-  });
-  updateHelpersUI();
-  const seconds=CFG.TIME_BY_DIFFICULTY[q.d]||15;
-  startTimer(seconds);
-}
 function updateHelpersUI(){
   const map={fifty:'help-5050',skip:'help-skip',stop:'help-stop'};
   for(const [key,id] of Object.entries(map)){
@@ -1293,6 +1267,7 @@ function answerQ(idx,el){
   setTimeout(nextQuestion,1600);
 }
 function nextQuestion(){quiz.active=true;quiz.current++;renderQuestion();}
+
 async function finishQuiz(){
   quiz.active=false;
   clearInterval(timerInterval);
@@ -1321,18 +1296,6 @@ async function finishQuiz(){
     SESSION.user=null;
     showScreen('scr-result');
   }catch(e){toast('Erro ao finalizar: '+e.message,'error');console.error(e);}
-}
-
-  }catch(e){console.error(e);}
-  document.getElementById('res-correct').textContent=quiz.correct;
-  document.getElementById('res-wrong').textContent=quiz.wrong;
-  document.getElementById('res-earned').textContent=earnedPoints;
-  const pct=quiz.correct/quiz.questions.length;
-  if(pct>=0.8){document.getElementById('res-icon').textContent='🏆';document.getElementById('res-title').textContent='Excelente!';sndWin();}
-  else if(pct>=0.5){document.getElementById('res-icon').textContent='🥈';document.getElementById('res-title').textContent='Muito Bem!';sndCorrect();}
-  else{document.getElementById('res-icon').textContent='🎯';document.getElementById('res-title').textContent='Continue Tentando!';}
-  document.getElementById('res-msg').textContent=`Você acertou ${quiz.correct}/${quiz.questions.length}. Pontos: ${earnedPoints}.`;
-  showScreen('scr-result');
 }
 
 /* ==================== OFERTAS DO DIA ==================== */
