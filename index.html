@@ -1147,52 +1147,174 @@ function logout(){
   showScreen('scr-home');
   toast('Você saiu do sistema','info');
 }
+
+/* ==================== BANCO LOCAL DE PERGUNTAS ==================== */
+const QUESTIONS=[
+  {q:"Capital do Brasil?",o:["São Paulo","Rio de Janeiro","Brasília","Salvador"],a:2,c:"Geografia",d:1},
+  {q:"Quem pintou a Mona Lisa?",o:["Van Gogh","Da Vinci","Picasso","Michelangelo"],a:1,c:"Arte",d:1},
+  {q:"7 × 8 = ?",o:["54","56","58","64"],a:1,c:"Matemática",d:1},
+  {q:"Maior planeta do Sistema Solar?",o:["Terra","Marte","Júpiter","Saturno"],a:2,c:"Ciências",d:1},
+  {q:"Ano do descobrimento do Brasil?",o:["1492","1500","1510","1488"],a:1,c:"História",d:1},
+  {q:"Símbolo químico da água?",o:["H2O","CO2","O2","HO"],a:0,c:"Química",d:1},
+  {q:"Campeã Copa 2022?",o:["Brasil","França","Argentina","Alemanha"],a:2,c:"Esportes",d:1},
+  {q:"Jogadores em campo no futebol?",o:["10","11","12","9"],a:1,c:"Esportes",d:1},
+  {q:"Moeda do Japão?",o:["Yuan","Won","Iene","Dólar"],a:2,c:"Economia",d:1},
+  {q:"Maior oceano?",o:["Atlântico","Índico","Pacífico","Ártico"],a:2,c:"Geografia",d:1},
+  {q:"Homem na Lua?",o:["1965","1969","1972","1975"],a:1,c:"História",d:1},
+  {q:"Maior mamífero?",o:["Elefante","Baleia Azul","Girafa","Tubarão"],a:1,c:"Biologia",d:1},
+  {q:"Fórmula do CO2?",o:["CO","CO2","C2O","O2C"],a:1,c:"Química",d:1},
+  {q:"Capital da França?",o:["Lyon","Paris","Marselha","Nice"],a:1,c:"Geografia",d:1},
+  {q:"Unidade básica da vida?",o:["Átomo","Molécula","Célula","Tecido"],a:2,c:"Biologia",d:1},
+  {q:"Cordas do violão clássico?",o:["4","5","6","7"],a:2,c:"Música",d:1},
+  {q:"Capital do Japão?",o:["Osaka","Kyoto","Tóquio","Hiroshima"],a:2,c:"Geografia",d:1},
+  {q:"Maior animal terrestre?",o:["Rinoceronte","Elefante Africano","Hipopótamo","Girafa"],a:1,c:"Biologia",d:1},
+  {q:"Planeta mais próximo do Sol?",o:["Vênus","Terra","Mercúrio","Marte"],a:2,c:"Ciências",d:1},
+  {q:"Quantos continentes existem?",o:["5","6","7","8"],a:2,c:"Geografia",d:1},
+  {q:"Cor da esmeralda?",o:["Azul","Vermelho","Verde","Amarelo"],a:2,c:"Geral",d:1},
+  {q:"Animal conhecido como rei da selva?",o:["Tigre","Leão","Urso","Pantera"],a:1,c:"Biologia",d:1},
+  {q:"Quantas patas tem uma aranha?",o:["6","8","10","12"],a:1,c:"Biologia",d:1},
+  {q:"Idioma falado na Argentina?",o:["Português","Espanhol","Italiano","Francês"],a:1,c:"Geografia",d:1},
+  {q:"O que é H2O?",o:["Sal","Açúcar","Água","Oxigênio"],a:2,c:"Química",d:1},
+  {q:"Quem escreveu Cinderela?",o:["Irmãos Grimm","Disney","Andersen","Perrault"],a:0,c:"Literatura",d:1},
+  {q:"Qual a cor do céu em um dia limpo?",o:["Verde","Azul","Roxo","Amarelo"],a:1,c:"Geral",d:1},
+  {q:"Quantos dias tem um ano bissexto?",o:["364","365","366","367"],a:2,c:"Geral",d:1},
+  {q:"O que mede um termômetro?",o:["Pressão","Umidade","Temperatura","Velocidade"],a:2,c:"Ciências",d:1},
+  {q:"Qual é o satélite natural da Terra?",o:["Sol","Lua","Marte","Vênus"],a:1,c:"Ciências",d:1},
+  {q:"Quantos estados tem o Brasil?",o:["25","26","27","28"],a:1,c:"Geografia",d:2},
+  {q:"Autor de Dom Casmurro?",o:["Alencar","Machado","Graciliano","Amado"],a:1,c:"Literatura",d:2},
+  {q:"Velocidade da luz?",o:["300.000 km/s","150.000 km/s","500.000 km/s","1.000.000 km/s"],a:0,c:"Física",d:2},
+  {q:"Rio mais longo do mundo?",o:["Amazonas","Nilo","Mississipi","Yangtze"],a:0,c:"Geografia",d:2},
+  {q:"1º presidente do Brasil?",o:["Pedro II","Deodoro","Getúlio","JK"],a:1,c:"História",d:2},
+  {q:"Elemento mais abundante no universo?",o:["Oxigênio","Carbono","Hidrogênio","Hélio"],a:2,c:"Química",d:2},
+  {q:"Queda do Muro de Berlim?",o:["1987","1989","1991","1985"],a:1,c:"História",d:2},
+  {q:"Teoria da Relatividade?",o:["Newton","Einstein","Tesla","Hawking"],a:1,c:"Ciências",d:2},
+  {q:"Osso mais longo do corpo?",o:["Tíbia","Fêmur","Úmero","Rádio"],a:1,c:"Biologia",d:2},
+  {q:"Descobridor da penicilina?",o:["Pasteur","Fleming","Koch","Curie"],a:1,c:"Ciências",d:2},
+  {q:"Compositor da 9ª Sinfonia?",o:["Mozart","Beethoven","Bach","Chopin"],a:1,c:"Música",d:2},
+  {q:"Dentes de um adulto?",o:["28","30","32","34"],a:2,c:"Biologia",d:2},
+  {q:"País mais populoso (2024)?",o:["EUA","Índia","China","Indonésia"],a:1,c:"Geografia",d:2},
+  {q:"Instrumento com 88 teclas?",o:["Órgão","Piano","Acordeão","Cravo"],a:1,c:"Música",d:2},
+  {q:"Noite Estrelada foi pintada por?",o:["Monet","Van Gogh","Renoir","Cézanne"],a:1,c:"Arte",d:2},
+  {q:"Autor de Romeu e Julieta?",o:["Dante","Shakespeare","Cervantes","Goethe"],a:1,c:"Literatura",d:2},
+  {q:"Início da 2ª Guerra Mundial?",o:["1935","1939","1941","1945"],a:1,c:"História",d:2},
+  {q:"Capital da Austrália?",o:["Sydney","Melbourne","Canberra","Perth"],a:2,c:"Geografia",d:2},
+  {q:"Qual é o metal líquido à temperatura ambiente?",o:["Ferro","Mercúrio","Chumbo","Ouro"],a:1,c:"Química",d:2},
+  {q:"Quem descobriu o Brasil?",o:["Cabral","Colombo","Vespucci","Magalhães"],a:0,c:"História",d:2},
+  {q:"Quantos lados tem um hexágono?",o:["5","6","7","8"],a:1,c:"Matemática",d:2},
+  {q:"Qual é o maior órgão do corpo humano?",o:["Fígado","Coração","Pele","Pulmão"],a:2,c:"Biologia",d:2},
+  {q:"Em que continente fica o Egito?",o:["Ásia","África","Europa","América"],a:1,c:"Geografia",d:2},
+  {q:"Quem inventou a lâmpada elétrica?",o:["Tesla","Edison","Bell","Watt"],a:1,c:"História",d:2},
+  {q:"Qual é a raiz quadrada de 144?",o:["10","11","12","14"],a:2,c:"Matemática",d:2},
+  {q:"Qual é o símbolo do ouro na tabela periódica?",o:["Ag","Au","Fe","Cu"],a:1,c:"Química",d:2},
+  {q:"Quem foi o primeiro homem no espaço?",o:["Armstrong","Gagarin","Aldrin","Collins"],a:1,c:"História",d:2},
+  {q:"Qual é a capital da Itália?",o:["Milão","Roma","Veneza","Nápoles"],a:1,c:"Geografia",d:2},
+  {q:"Quantas cores tem o arco-íris?",o:["5","6","7","8"],a:2,c:"Geral",d:2},
+  {q:"Qual é o animal mais rápido do mundo?",o:["Guepardo","Leão","Águia","Falcão"],a:0,c:"Biologia",d:2},
+  {q:"Metal mais leve?",o:["Alumínio","Lítio","Magnésio","Sódio"],a:1,c:"Química",d:3},
+  {q:"Maior deserto do mundo?",o:["Saara","Gobi","Antártica","Atacama"],a:2,c:"Geografia",d:3},
+  {q:"Autor de 'Em Busca do Tempo Perdido'?",o:["Proust","Joyce","Kafka","Woolf"],a:0,c:"Literatura",d:3},
+  {q:"Ano da Proclamação da República no Brasil?",o:["1888","1889","1890","1891"],a:1,c:"História",d:3},
+  {q:"Qual é o elemento mais eletronegativo?",o:["Oxigênio","Flúor","Cloro","Nitrogênio"],a:1,c:"Química",d:3},
+  {q:"Quem formulou as leis do movimento?",o:["Galileu","Newton","Kepler","Copérnico"],a:1,c:"Física",d:3},
+  {q:"Qual é a montanha mais alta do mundo?",o:["K2","Everest","Kilimanjaro","Aconcágua"],a:1,c:"Geografia",d:3},
+  {q:"Em que ano foi fundado o Google?",o:["1996","1998","2000","2002"],a:1,c:"Tecnologia",d:3},
+  {q:"Qual é o menor país do mundo?",o:["Mônaco","Vaticano","San Marino","Liechtenstein"],a:1,c:"Geografia",d:3},
+  {q:"Quem pintou 'O Grito'?",o:["Van Gogh","Munch","Dalí","Kandinsky"],a:1,c:"Arte",d:3},
+  {q:"Qual é a moeda oficial da Suíça?",o:["Euro","Franco Suíço","Libra","Dólar"],a:1,c:"Economia",d:3},
+  {q:"Quantos ossos tem o corpo humano adulto?",o:["206","210","215","200"],a:0,c:"Biologia",d:3},
+  {q:"Qual é o rio mais caudaloso do mundo?",o:["Nilo","Amazonas","Mississipi","Congo"],a:1,c:"Geografia",d:3},
+  {q:"Quem escreveu '1984'?",o:["Huxley","Orwell","Bradbury","Asimov"],a:1,c:"Literatura",d:3},
+  {q:"Qual é a velocidade do som no ar?",o:["340 m/s","500 m/s","1000 m/s","1200 m/s"],a:0,c:"Física",d:3},
+  {q:"Qual é o planeta mais quente do sistema solar?",o:["Mercúrio","Vênus","Marte","Júpiter"],a:1,c:"Ciências",d:3},
+  {q:"Quem descobriu a radioatividade?",o:["Curie","Becquerel","Rutherford","Thomson"],a:1,c:"Ciências",d:3},
+  {q:"Qual é a capital do Canadá?",o:["Toronto","Vancouver","Ottawa","Montreal"],a:2,c:"Geografia",d:3},
+  {q:"Em que ano caiu o Império Romano do Ocidente?",o:["476","500","450","410"],a:0,c:"História",d:3}
+];
+
+/* ==================== PERGUNTAS ==================== */
+async function loadQuestionsFromDB(){
+  if(!supabaseClient)return null;
+  try{
+    const {data,error}=await supabaseClient.from('questions')
+      .select('id, question, option_a, option_b, option_c, option_d, correct_answer, category, difficulty')
+      .eq('active',true);
+    if(error)return null;
+    if(!data||data.length<CFG.MIN_DB_QUESTIONS)return null;
+    const valid=data.map(normalizeQuestion).filter(Boolean);
+    if(valid.length<CFG.MIN_DB_QUESTIONS)return null;
+    console.log(`✅ ${valid.length} perguntas carregadas.`);
+    return valid;
+  }catch(e){return null;}
+}
+function normalizeQuestion(row){
+  const opts=[row.option_a,row.option_b,row.option_c,row.option_d];
+  if(opts.some(o=>o===null||o===undefined||String(o).trim()===''))return null;
+  const ans=Number(row.correct_answer);
+  if(!Number.isInteger(ans)||ans<0||ans>3)return null;
+  if(!row.question||String(row.question).trim()==='')return null;
+  return {q:String(row.question),o:opts.map(String),a:ans,c:row.category||'Geral',d:Math.min(3,Math.max(1,Number(row.difficulty)||1))};
+}
+function pickQuestionsByDifficulty(pool,total){
+  const byDiff={1:[],2:[],3:[]};
+  pool.forEach(q=>{const d=Math.min(3,Math.max(1,Number(q.d)||1));byDiff[d].push(q);});
+  Object.keys(byDiff).forEach(k=>{byDiff[k]=byDiff[k].sort(()=>Math.random()-0.5);});
+  const dist=CFG.DIFFICULTY_DISTRIBUTION;
+  const picked=[],used={1:0,2:0,3:0};
+  for(const d of [1,2,3]){const take=Math.min(dist[d],byDiff[d].length);picked.push(...byDiff[d].slice(0,take));used[d]=take;}
+  const remaining=total-picked.length;
+  if(remaining>0){
+    const leftover=[];
+    for(const d of [1,2,3])leftover.push(...byDiff[d].slice(used[d]));
+    leftover.sort(()=>Math.random()-0.5);
+    picked.push(...leftover.slice(0,remaining));
+  }
+  picked.sort((a,b)=>(a.d||1)-(b.d||1));
+  return picked;
+}
+
 /* ==================== QUIZ ==================== */
 let quiz={},timerInterval=null,timerState={seconds:0,remaining:0,paused:false};
 document.addEventListener('visibilitychange',()=>{
   if(!quiz.active)return;
-  if(document.hidden){
-    timerState.paused=true;
-    document.getElementById('timer-bar')?.classList.add('paused');
-  }else{
-    timerState.paused=false;
-    document.getElementById('timer-bar')?.classList.remove('paused');
-  }
+  if(document.hidden){timerState.paused=true;document.getElementById('timer-bar')?.classList.add('paused');toast('⏸️ Jogo pausado.','info');}
+  else{timerState.paused=false;document.getElementById('timer-bar')?.classList.remove('paused');}
 });
 async function startQuiz(btn){
-  if(!SESSION.userId||!supabaseClient){toast('Faça login primeiro.','error');return;}
   setLoading(btn,true,'Carregando perguntas...');
   try{
-    const {data,error}=await supabaseClient.rpc('start_quiz_session',{
-      p_user_id:Number(SESSION.userId)
-    });
-    if(error){toast('Erro: '+error.message,'error');return;}
-    if(data?.error){toast(data.error,'error');return;}
-
-    // Converte o formato do servidor para o formato usado na UI
-    const questions=(data.questions||[]).map(q=>({
-      id:q.id,
-      q:q.question,
-      o:q.options,
-      c:q.category,
-      d:q.difficulty
-    }));
-
-    quiz={
-      sessionId:data.session_id,
-      questions,
-      current:0,
-      correct:0,
-      wrong:0,
-      points:0,
-      active:false,
-      helpers:{fifty:true,skip:true,stop:true},
-      answered:{}
-    };
-    document.getElementById('q-total').textContent=questions.length;
+    let pool=await loadQuestionsFromDB();
+    if(!pool){console.warn('⚠️ Usando banco local.');pool=[...QUESTIONS];}
+    const selected=pickQuestionsByDifficulty(pool,CFG.QUIZ_QUESTIONS_PER_ROUND);
+    quiz={questions:selected,current:0,correct:0,wrong:0,points:0,active:false,caughtCheating:false,helpers:{fifty:true,skip:true,stop:true}};
+    document.getElementById('q-total').textContent=selected.length;
     showScreen('scr-quiz-intro');
-  }catch(e){toast('Erro: '+e.message,'error');console.error(e);}
-  finally{setLoading(btn,false);}
+  }finally{setLoading(btn,false);}
+}
+function beginQuiz(btn){
+  if(!quiz.questions||!quiz.questions.length){toast('Nenhuma pergunta carregada.','error');return;}
+  quiz.active=true;quiz.current=0;
+  showScreen('scr-quiz');renderQuestion();
+}
+function renderQuestion(){
+  if(quiz.current>=quiz.questions.length){finishQuiz();return;}
+  const q=quiz.questions[quiz.current];
+  document.getElementById('q-num').textContent=quiz.current+1;
+  document.getElementById('q-round-pts').textContent=quiz.points;
+  document.getElementById('q-text').innerHTML=`<small style="color:var(--gold)">[${escapeHtml(q.c)} • Dif. ${escapeHtml(q.d)}]</small><br><br>${escapeHtml(q.q)}`;
+  const qOptions=document.getElementById('q-options');
+  qOptions.innerHTML='';
+  q.o.forEach((o,i)=>{
+    const d=document.createElement('div');
+    d.className='opt';d.tabIndex=0;d.setAttribute('role','button');
+    d.textContent=`${String.fromCharCode(65+i)}) ${o}`;
+    d.onclick=()=>answerQ(i,d);
+    d.onkeydown=(e)=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();answerQ(i,d);}};
+    qOptions.appendChild(d);
+  });
+  updateHelpersUI();
+  const seconds=CFG.TIME_BY_DIFFICULTY[q.d]||15;
+  startTimer(seconds);
+}
 function updateHelpersUI(){
   const map={fifty:'help-5050',skip:'help-skip',stop:'help-stop'};
   for(const [key,id] of Object.entries(map)){
@@ -1227,23 +1349,22 @@ async function useStop(){
   toast('🛑 Quiz encerrado.','info');
   finishQuiz();
 }
-if(timerState.remaining<=0){
+function startTimer(seconds){
   clearInterval(timerInterval);
-  const q=quiz.questions[quiz.current];
-  // Envia resposta em branco para o servidor registrar como errada
-  (async()=>{
-    try{
-      await supabaseClient.rpc('submit_quiz_answer',{
-        p_session_id:quiz.sessionId,
-        p_question_id:q.id,
-        p_chosen_index:-1
-      });
-    }catch(e){}
-  })();
-  quiz.wrong++;
-  sndWrong();
-  toast('⏰ Tempo esgotado!','error');
-  setTimeout(nextQuestion,1200);
+  timerState={seconds,remaining:seconds,paused:false};
+  document.getElementById('timer-bar')?.classList.remove('paused');
+  updateTimerBar();
+  timerInterval=setInterval(()=>{
+    if(timerState.paused)return;
+    timerState.remaining--;
+    updateTimerBar();
+    if(timerState.remaining<=0){
+      clearInterval(timerInterval);
+      quiz.wrong++;sndWrong();
+      toast('⏰ Tempo esgotado!','error');
+      setTimeout(nextQuestion,1200);
+    }
+  },1000);
 }
 function updateTimerBar(){
   const pct=Math.max(0,(timerState.remaining/timerState.seconds)*100);
@@ -1267,35 +1388,30 @@ function answerQ(idx,el){
   setTimeout(nextQuestion,1600);
 }
 function nextQuestion(){quiz.active=true;quiz.current++;renderQuestion();}
-
 async function finishQuiz(){
-  quiz.active=false;
-  clearInterval(timerInterval);
-
-  if(!SESSION.userId||!supabaseClient||!quiz.sessionId){
-    toast('Sessão inválida','error');showScreen('scr-home');return;
-  }
-
+  quiz.active=false;clearInterval(timerInterval);
+  if(!SESSION.userId||!supabaseClient){toast('Faça login para salvar!','error');showScreen('scr-home');return;}
+  const earnedPoints=Math.max(0,quiz.points);
   try{
-    const {data,error}=await supabaseClient.rpc('finish_quiz_session',{
-      p_session_id:quiz.sessionId
-    });
-    if(error){toast('Erro ao finalizar: '+error.message,'error');return;}
-    if(data?.error){toast(data.error,'error');return;}
-
-    document.getElementById('res-correct').textContent=data.correct;
-    document.getElementById('res-wrong').textContent=data.wrong;
-    document.getElementById('res-earned').textContent=data.earned_points;
-
-    const total=data.correct+data.wrong||1;
-    const pct=data.correct/total;
-    if(pct>=0.8){document.getElementById('res-icon').textContent='🏆';document.getElementById('res-title').textContent='Excelente!';sndWin();}
-    else if(pct>=0.5){document.getElementById('res-icon').textContent='🥈';document.getElementById('res-title').textContent='Muito Bem!';sndCorrect();}
-    else{document.getElementById('res-icon').textContent='🎯';document.getElementById('res-title').textContent='Continue Tentando!';}
-    document.getElementById('res-msg').textContent=`Você acertou ${data.correct}/${total}. Pontos da rodada: ${data.earned_points}.`;
-    SESSION.user=null;
-    showScreen('scr-result');
-  }catch(e){toast('Erro ao finalizar: '+e.message,'error');console.error(e);}
+    const {data:user}=await supabaseClient.from('users').select('points, games_played, correct_answers').eq('id',SESSION.userId).single();
+    if(user){
+      await supabaseClient.from('users').update({
+        points:Math.max(0,user.points+earnedPoints),
+        games_played:user.games_played+1,
+        correct_answers:user.correct_answers+quiz.correct
+      }).eq('id',SESSION.userId);
+      SESSION.user=null;
+    }
+  }catch(e){console.error(e);}
+  document.getElementById('res-correct').textContent=quiz.correct;
+  document.getElementById('res-wrong').textContent=quiz.wrong;
+  document.getElementById('res-earned').textContent=earnedPoints;
+  const pct=quiz.correct/quiz.questions.length;
+  if(pct>=0.8){document.getElementById('res-icon').textContent='🏆';document.getElementById('res-title').textContent='Excelente!';sndWin();}
+  else if(pct>=0.5){document.getElementById('res-icon').textContent='🥈';document.getElementById('res-title').textContent='Muito Bem!';sndCorrect();}
+  else{document.getElementById('res-icon').textContent='🎯';document.getElementById('res-title').textContent='Continue Tentando!';}
+  document.getElementById('res-msg').textContent=`Você acertou ${quiz.correct}/${quiz.questions.length}. Pontos: ${earnedPoints}.`;
+  showScreen('scr-result');
 }
 
 /* ==================== OFERTAS DO DIA ==================== */
