@@ -1322,7 +1322,7 @@ async function finishQuiz(){
     showScreen('scr-result');
   }catch(e){toast('Erro ao finalizar: '+e.message,'error');console.error(e);}
 }
-    }
+
   }catch(e){console.error(e);}
   document.getElementById('res-correct').textContent=quiz.correct;
   document.getElementById('res-wrong').textContent=quiz.wrong;
