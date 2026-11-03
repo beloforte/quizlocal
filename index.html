@@ -360,23 +360,6 @@ th{color:var(--gold);background:rgba(255,215,0,.1)}
   </div>
 </div>
 
-<!-- FORGOT -->
-<div id="scr-forgot" class="screen">
-  <button class="back-btn" onclick="showScreen('scr-login')">← Voltar ao Login</button>
-  <div class="card">
-    <h2 style="color:var(--gold);text-align:center;margin-bottom:15px">🔐 Recuperar Senha</h2>
-    <div class="info"><strong>Como funciona:</strong><br>1. Informe email ou CPF<br>2. Código gerado no console<br>3. Digite e crie nova senha</div>
-    <label>E-mail ou CPF cadastrado:</label><input type="text" id="forgot-id" placeholder="seu@email.com ou 00000000000">
-    <button class="btn btn-purple" onclick="requestPasswordReset(this)">Enviar Código de Verificação</button>
-    <div id="forgot-step2" class="hidden" style="margin-top:15px">
-      <label>Código (6 dígitos):</label><input type="tel" id="forgot-code" placeholder="000000" maxlength="6" inputmode="numeric" style="text-align:center;font-size:1.3em;letter-spacing:5px">
-      <label>Nova Senha:</label><input type="password" id="forgot-newpass" placeholder="Crie uma nova senha forte">
-      <label>Confirmar Nova Senha:</label><input type="password" id="forgot-confirmpass" placeholder="Repita a nova senha">
-      <button class="btn btn-green" onclick="confirmPasswordReset(this)">Redefinir Senha</button>
-    </div>
-  </div>
-</div>
-
 <!-- REGISTER -->
 <div id="scr-register" class="screen">
   <button class="back-btn" onclick="showScreen('scr-home')">← Voltar</button>
@@ -1079,49 +1062,41 @@ async function handleRegister(btn) {
   } finally { setLoading(btn, false); }
 }
 /* ==================== RECUPERAÇÃO ==================== */
-async function requestPasswordReset(btn){
-  if(!supabaseClient)return;
-  const loginId=document.getElementById('forgot-id').value.trim().toLowerCase();
-  if(!loginId){toast('Informe email ou CPF!','error');return;}
-  setLoading(btn,true,'Gerando...');
-  try{
-    let query=supabaseClient.from('users').select('id, name, email');
-    if(isEmail(loginId))query=query.eq('email',loginId);
-    else{const cpf=cleanCPF(loginId);if(cpf.length!==11){toast('CPF inválido!','error');return;}query=query.eq('cpf',cpf);}
-    const {data:user,error}=await query.maybeSingle();
-    if(error||!user){toast('Email/CPF não encontrado!','error');sndWrong();return;}
-    const code=String(Math.floor(100000+Math.random()*900000));
-    SESSION.resetData={userId:user.id,code,email:user.email,expiresAt:Date.now()+10*60*1000};
-    console.log(`\n🔐 CÓDIGO: ${code}\n`);
-    document.getElementById('forgot-step2').classList.remove('hidden');
-    document.getElementById('forgot-code').focus();
-    toast('Código gerado! Verifique o console.','info');
+async function requestPasswordReset(btn) {
+  if (!supabaseClient) return;
+  const email = document.getElementById('forgot-id').value.trim().toLowerCase();
+  
+  if (!email) { 
+    toast('Informe seu e-mail cadastrado!', 'error'); 
+    return; 
+  }
+
+  setLoading(btn, true, 'Enviando e-mail...');
+  try {
+    // Pede ao Supabase Auth para enviar o link de recuperação
+    const { data, error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+      redirectTo: 'https://quizlocal.vercel.app/' // Para onde o usuário vai após clicar no link do e-mail
+    });
+
+    if (error) { 
+      toast('Erro: ' + error.message, 'error'); 
+      return; 
+    }
+
     sndCorrect();
-  }catch(e){toast('Erro: '+e.message,'error');}
-  finally{setLoading(btn,false);}
-}
-async function confirmPasswordReset(btn){
-  if(!supabaseClient||!SESSION.resetData){toast('Solicite um novo código!','error');return;}
-  const code=document.getElementById('forgot-code').value.trim();
-  const newPass=document.getElementById('forgot-newpass').value;
-  const confirmPass=document.getElementById('forgot-confirmpass').value;
-  if(code!==SESSION.resetData.code){toast('Código inválido!','error');sndWrong();return;}
-  if(Date.now()>SESSION.resetData.expiresAt){toast('Código expirado!','error');return;}
-  if(!newPass||newPass.length<4){toast('Senha deve ter 4+ caracteres!','error');return;}
-  if(newPass!==confirmPass){toast('As senhas não coincidem!','error');return;}
-  setLoading(btn,true,'Redefinindo...');
-  try{
-    const hashed=await hashPassword(newPass);
-    const {error}=await supabaseClient.from('users').update({pass:hashed}).eq('id',SESSION.resetData.userId);
-    if(error){toast('Erro: '+error.message,'error');return;}
-    SESSION.resetData=null;
-    toast('Senha redefinida!','success');sndWin();
-    showModal('✅','Senha Atualizada!','Faça login com a nova senha.');
-    setTimeout(()=>{closeModal();showScreen('scr-login');},2000);
-  }catch(e){toast('Erro: '+e.message,'error');}
-  finally{setLoading(btn,false);}
-}
-function redirectToRole(type){
+    // Mostra um modal avisando que o e-mail foi enviado
+    showModal('📧', 'E-mail Enviado!', `Enviamos um link de recuperação para:\n\n${email}\n\nVerifique sua caixa de entrada (e o spam) e clique no link para criar uma nova senha.`);
+    
+    // Limpa o campo
+    document.getElementById('forgot-id').value = '';
+    
+  } catch (e) {
+    toast('Erro inesperado: ' + e.message, 'error');
+    console.error(e);
+  } finally {
+    setLoading(btn, false);
+  }
+}function redirectToRole(type){
   if(type==='cliente')showScreen('scr-client');
   else if(type==='lojista')showScreen('scr-shopkeeper');
   else if(type==='admin')showScreen('scr-admin');
@@ -1408,7 +1383,7 @@ async function loadDailyOffers(){
   const cont=document.getElementById('daily-offers-list');
   cont.innerHTML='<p style="opacity:.6;text-align:center;padding:15px">Carregando...</p>';
   try{
-    const {data,error}=await supabaseClient.rpc('get_daily_summary',{p_user_id:Number(SESSION.userId)});
+    const {data,error}=await supabaseClient.rpc('get_daily_summary');
     if(error){cont.innerHTML=`<p style="color:var(--red);padding:15px">Erro: ${escapeHtml(error.message)}</p>`;return;}
     DAILY=data||{checked_today:false,streak:0,views_pts_today:0,views_cap:50,offers:[],followed:[]};
     renderStreakCalendar(DAILY);
@@ -1464,7 +1439,7 @@ async function doCheckin(btn){
   if(!SESSION.userId||!supabaseClient)return;
   setLoading(btn,true,'Fazendo check-in...');
   try{
-    const {data,error}=await supabaseClient.rpc('daily_checkin',{p_user_id:Number(SESSION.userId)});
+    const {data,error}=await supabaseClient.rpc('daily_checkin');
     if(error){toast('Erro: '+error.message,'error');return;}
     if(data?.error){toast(data.error,'error');return;}
     sndWin();
@@ -1478,7 +1453,7 @@ async function followStore(storeId,btn){
   if(!SESSION.userId||!supabaseClient)return;
   btn.disabled=true;btn.textContent='Seguindo...';
   try{
-    const {data,error}=await supabaseClient.rpc('follow_store',{p_user_id:Number(SESSION.userId),p_store_id:Number(storeId)});
+    const {data,error}=await supabaseClient.rpc('follow_store', { p_store_id: Number(storeId) });
     if(error){toast('Erro: '+error.message,'error');btn.disabled=false;btn.textContent='+ Seguir loja';return;}
     if(data?.error){toast(data.error,'error');btn.disabled=false;btn.textContent='+ Seguir loja';return;}
     sndCorrect();toast(`+${data.points} pts por seguir a loja!`,'success');
@@ -1502,7 +1477,7 @@ function viewOffer(offerId,btn){
 }
 async function creditViewOffer(offerId,btn,timerEl){
   try{
-    const {data,error}=await supabaseClient.rpc('view_offer',{p_user_id:Number(SESSION.userId),p_offer_id:Number(offerId)});
+    const {data,error}=await supabaseClient.rpc('view_offer', { p_offer_id: Number(offerId) });
     if(error){toast('Erro: '+error.message,'error');btn.disabled=false;btn.textContent='Ver oferta (+10 pts)';if(timerEl)timerEl.classList.add('hidden');return;}
     if(data?.error){toast(data.error,'error');btn.disabled=true;btn.textContent='Já vista hoje';if(timerEl)timerEl.textContent=data.error;return;}
     sndCorrect();toast(`+${data.points} pts!`,'success');
@@ -1795,7 +1770,10 @@ async function redeemCoupon(value,minPurchase,points){
     `💼 Se não for usado a tempo, os pontos vão para o Caixa do Projeto.\n\nConfirmar?`);
   if(!ok)return;
   try{
-    const {data,error}=await supabaseClient.rpc('redeem_discount',{p_user_id:Number(SESSION.userId),p_store_id:Number(storeId),p_purchase_value:Number(minPurchase)});
+    const {data,error}=await supabaseClient.rpc('redeem_discount', {
+  p_store_id: Number(storeId),
+  p_purchase_value: Number(minPurchase)
+});
     if(error){toast('Erro: '+error.message,'error');return;}
     if(data?.error){toast(data.error,'error');return;}
     sndWin();
@@ -1879,7 +1857,10 @@ async function confirmTransfer(btn){
   if(!ok)return;
   setLoading(btn,true,'Transferindo...');
   try{
-    const {data,error}=await supabaseClient.rpc('transfer_points',{p_from_user_id:Number(SESSION.userId),p_to_cpf:cleanCPF(document.getElementById('tr-cpf').value),p_amount:Number(d.amount)});
+    const {data,error}=await supabaseClient.rpc('transfer_points', {
+  p_to_cpf: cleanCPF(document.getElementById('tr-cpf').value),
+  p_amount: Number(d.amount)
+});
     if(error){toast('Erro: '+error.message,'error');return;}
     if(data?.error){toast(data.error,'error');return;}
     sndCorrect();
@@ -2358,10 +2339,15 @@ async function withdrawFund(btn){
   try{
     let data,error;
     if(payload.kind==='user'){
-      const res=await supabaseClient.rpc('withdraw_fund',{p_admin_id:Number(SESSION.userId),p_recipient_user_id:payload.id,p_amount:Number(amount),p_category:String(category),p_reason:String(reason)});
+      const res=const res = await supabaseClient.rpc('withdraw_fund', {
+  p_recipient_user_id: payload.id,
+  p_amount: Number(amount),
+  p_category: String(category),
+  p_reason: String(reason)
+});
       data=res.data;error=res.error;
     }else{
-      const res=await supabaseClient.rpc('withdraw_fund_external',{p_admin_id:Number(SESSION.userId),p_recipient_id:payload.id,p_amount:Number(amount),p_reason:String(reason)});
+      const res=await supabaseClient.rpc('withdraw_fund_external',p_recipient_id:payload.id,p_amount:Number(amount),p_reason:String(reason)});
       data=res.data;error=res.error;
     }
     if(error){toast('Erro: '+error.message,'error');return;}
