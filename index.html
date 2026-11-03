@@ -1009,84 +1009,75 @@ function showReferralBanner(code){
 }
 
 /* ==================== LOGIN ==================== */
-async function handleLogin(btn){
-  if(!supabaseClient){toast('Supabase não configurado!','error');return;}
-  const loginId=document.getElementById('login-id').value.trim().toLowerCase();
-  const pass=document.getElementById('login-pass').value;
-  if(!loginId||!pass){toast('Preencha email/CPF e senha!','error');return;}
-  setLoading(btn,true,'Entrando...');
-  try{
-    let query=supabaseClient.from('users').select('id,type,name,cpf,email,pass,store,points,games_played,correct_answers,total_redeemed,verified,referral_code,referred_by,is_premium,premium_until,is_player');
-    if(isEmail(loginId))query=query.eq('email',loginId);
-    else{
-      const cpf=cleanCPF(loginId);
-      if(cpf.length!==11){toast('CPF deve ter 11 dígitos.','error');return;}
-      query=query.eq('cpf',cpf);
-    }
-    const {data:user,error}=await query.maybeSingle();
-    if(error){toast('Erro: '+error.message,'error');return;}
-    if(!user){toast('Usuário não encontrado!','error');sndWrong();return;}
-    if(!(await verifyPassword(pass,user.pass))){toast('Senha incorreta!','error');sndWrong();return;}
-    if(!user.pass.startsWith('sha256:')){
-      try{await supabaseClient.from('users').update({pass:await hashPassword(pass)}).eq('id',user.id);}catch(e){}
-    }
-    SESSION.userId=user.id;SESSION.user=user;saveSession();
-    toast(`Bem-vindo, ${user.name}!`,'success');
-    sndCorrect();
-    redirectToRole(user.type);
-  }catch(e){toast('Erro: '+e.message,'error');console.error(e);}
-  finally{setLoading(btn,false);}
-}
+async function handleLogin(btn) {
+  const loginId = document.getElementById('login-id').value.trim().toLowerCase();
+  const pass = document.getElementById('login-pass').value;
+  if (!loginId || !pass) { toast('Preencha email/CPF e senha!', 'error'); return; }
 
+  setLoading(btn, true, 'Entrando...');
+  try {
+    let email = loginId;
+    // Se for CPF, busca o email correspondente no banco (mas não valida senha aqui)
+    if (!isEmail(loginId)) {
+      const cpf = cleanCPF(loginId);
+      const { data: u } = await supabaseClient.from('users').select('email').eq('cpf', cpf).single();
+      if (!u) { toast('Usuário não encontrado!', 'error'); return; }
+      email = u.email;
+    }
+
+    // Pede ao Supabase Auth para validar a senha e gerar o token
+    const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
+    if (authError) { toast('Credenciais inválidas!', 'error'); sndWrong(); return; }
+
+    // Login OK. Busca o perfil numérico completo
+    const { data: profile } = await supabaseClient.from('users').select('*').eq('email', email).single();
+    
+    SESSION.userId = profile.id;
+    SESSION.user = profile;
+    sndCorrect();
+    toast(`Bem-vindo, ${profile.name}!`, 'success');
+    redirectToRole(profile.type);
+  } catch (e) {
+    toast('Erro: ' + e.message, 'error');
+  } finally { setLoading(btn, false); }
+}
 /* ==================== CADASTRO ==================== */
-async function handleRegister(btn){
-  if(!supabaseClient){toast('Supabase não configurado!','error');return;}
-  const name=document.getElementById('reg-name').value.trim();
-  const cpf=cleanCPF(document.getElementById('reg-cpf').value);
-  const email=document.getElementById('reg-email').value.trim().toLowerCase();
-  const pass=document.getElementById('reg-pass').value;
-  const type=document.getElementById('reg-type').value;
-  const store=(document.getElementById('reg-store')?.value||'').trim();
-  if(!name||!cpf||!email||!pass){toast('Preencha todos os campos!','error');return;}
-  if(!isValidCPF(cpf)){toast('CPF inválido!','error');return;}
-  if(type==='lojista'&&!store){toast('Informe o nome do estabelecimento!','error');return;}
-  if(pass.length<4){toast('Senha deve ter 4+ caracteres.','error');return;}
-  setLoading(btn,true,'Cadastrando...');
-  try{
-    const {data:byEmail}=await supabaseClient.from('users').select('id').eq('email',email).maybeSingle();
-    const {data:byCpf}=await supabaseClient.from('users').select('id').eq('cpf',cpf).maybeSingle();
-    if(byEmail||byCpf){toast('CPF ou Email já cadastrado!','error');return;}
-    const newUser={
-      type,name,cpf,email,pass:await hashPassword(pass),
-      store:type==='lojista'?store:null,
-      points:0,games_played:0,correct_answers:0,total_redeemed:0,
-      verified:true,is_player:true,
-      cashback_pct:type==='lojista'?CFG.DEFAULT_CASHBACK_PCT:null,
-      created_at:new Date().toISOString()
-    };
-    const {data:inserted,error:insertError}=await supabaseClient.from('users').insert([newUser]).select('id').single();
-    if(insertError){toast('Erro: '+insertError.message,'error');return;}
-    const refCode=REFERRAL_FROM_URL||sessionStorage.getItem('ql_referral_code');
-    if(refCode&&inserted?.id){
-      try{
-        const {data:refRes}=await supabaseClient.rpc('apply_referral',{p_new_user_id:Number(inserted.id),p_referral_code:String(refCode)});
-        if(refRes?.success)toast(`🎁 Você foi indicado! +${refRes.points} pts para quem te convidou.`,'success');
-      }catch(e){console.warn('Falha ao aplicar referral:',e);}
-      try{sessionStorage.removeItem('ql_referral_code');}catch(e){}
-      REFERRAL_FROM_URL=null;
-    }
-    toast('Conta criada! Faça login.','success');
-    sndCorrect();
-    ['reg-name','reg-cpf','reg-email','reg-pass','reg-store'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-    document.getElementById('reg-type').value='cliente';
-    document.getElementById('store-field').classList.add('hidden');
-    document.getElementById('login-id').value=email;
-    const lp=document.getElementById('login-pass');lp.value='';lp.focus();
-    showScreen('scr-login');
-  }catch(e){toast('Erro: '+e.message,'error');console.error(e);}
-  finally{setLoading(btn,false);}
-}
+async function handleRegister(btn) {
+  const name = document.getElementById('reg-name').value.trim();
+  const cpf = cleanCPF(document.getElementById('reg-cpf').value);
+  const email = document.getElementById('reg-email').value.trim().toLowerCase();
+  const pass = document.getElementById('reg-pass').value;
+  const type = document.getElementById('reg-type').value;
+  const store = (document.getElementById('reg-store')?.value || '').trim();
 
+  if (!name || !cpf || !email || !pass) { toast('Preencha todos os campos!', 'error'); return; }
+  if (!isValidCPF(cpf)) { toast('CPF inválido!', 'error'); return; }
+  
+  setLoading(btn, true, 'Cadastrando...');
+  try {
+    // 1. Cria a credencial no Supabase Auth
+    const { data: authData, error: authError } = await supabaseClient.auth.signUp({ email, password: pass });
+    if (authError) { toast('Erro ao criar usuário: ' + authError.message, 'error'); return; }
+
+    // 2. Cria o perfil na tabela pública users
+    const newUser = {
+      type, name, cpf, email, store: type === 'lojista' ? store : null,
+      points: 0, games_played: 0, correct_answers: 0, total_redeemed: 0,
+      verified: true, is_player: true, created_at: new Date().toISOString()
+    };
+    const { data: inserted, error: insertError } = await supabaseClient.from('users').insert([newUser]).select('id').single();
+    if (insertError) { toast('Erro ao salvar perfil: ' + insertError.message, 'error'); return; }
+
+    // 3. Cria a ponte entre o UUID do Auth e o ID numérico
+    await supabaseClient.from('auth_bridge').insert([{ auth_id: authData.user.id, user_id: inserted.id }]);
+
+    sndCorrect();
+    toast('Conta criada! Faça login.', 'success');
+    showScreen('scr-login');
+  } catch (e) {
+    toast('Erro: ' + e.message, 'error');
+  } finally { setLoading(btn, false); }
+}
 /* ==================== RECUPERAÇÃO ==================== */
 async function requestPasswordReset(btn){
   if(!supabaseClient)return;
@@ -1135,19 +1126,16 @@ function redirectToRole(type){
   else if(type==='lojista')showScreen('scr-shopkeeper');
   else if(type==='admin')showScreen('scr-admin');
 }
-function logout(){
-  if(countdownInterval){clearInterval(countdownInterval);countdownInterval=null;}
-  if(urgentCountdownInterval){clearInterval(urgentCountdownInterval);urgentCountdownInterval=null;}
-  if(notifInterval){clearInterval(notifInterval);notifInterval=null;}
-  SESSION={userId:null,user:null,resetData:null,transferData:null};
-  DAILY=null;COUPONS_DATA=[];
-  clearSessionStorage();
-  document.getElementById('login-id').value='';
-  document.getElementById('login-pass').value='';
+async function logout() {
+  if (typeof supabaseClient !== 'undefined') {
+    await supabaseClient.auth.signOut();
+  }
+  SESSION = { userId: null, user: null, resetData: null, transferData: null };
+  document.getElementById('login-id').value = '';
+  document.getElementById('login-pass').value = '';
   showScreen('scr-home');
-  toast('Você saiu do sistema','info');
+  toast('Você saiu do sistema', 'info');
 }
-
 /* ==================== BANCO LOCAL DE PERGUNTAS ==================== */
 const QUESTIONS=[
   {q:"Capital do Brasil?",o:["São Paulo","Rio de Janeiro","Brasília","Salvador"],a:2,c:"Geografia",d:1},
@@ -2770,27 +2758,22 @@ async function updateMarquee(){
 }
 
 /* ==================== INIT ==================== */
-window.addEventListener('load',async()=>{
-  try{await updateMarquee();}catch(e){console.warn(e);}
-
-  try{
-    const saved=sessionStorage.getItem('ql_session');
-    if(saved&&supabaseClient){
-      const parsed=JSON.parse(saved);
-      if(parsed.userId&&Date.now()-parsed.ts<CFG.SESSION_TTL_MS){
-        const {data:u}=await supabaseClient.from('users').select('id, type').eq('id',parsed.userId).maybeSingle();
-        if(u){
-          SESSION.userId=u.id;
-          console.log('✅ Sessão restaurada.');
-          redirectToRole(u.type);
-          startPushChecksIfGranted();
-          return;
-        }
-      }
-      clearSessionStorage();
-    }
-  }catch(e){console.warn('Falha ao restaurar sessão:',e);}
+window.addEventListener('load', async () => {
   showScreen('scr-home');
+  if (typeof supabaseClient !== 'undefined') {
+    // Verifica se o Supabase Auth já tem uma sessão ativa
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (session && session.user.email) {
+      // Se tem, busca o perfil numérico na tabela users
+      const { data: profile } = await supabaseClient.from('users').select('*').eq('email', session.user.email).single();
+      if (profile) {
+        SESSION.userId = profile.id;
+        SESSION.user = profile;
+        redirectToRole(profile.type);
+        return;
+      }
+    }
+  }
 });
 </script>
 </body>
