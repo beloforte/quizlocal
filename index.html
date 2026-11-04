@@ -2314,13 +2314,17 @@ async function createExternalRecipient(btn){
 }
 async function withdrawFund(btn){
   if(!supabaseClient||!SESSION.userId)return;
+  
   const type=document.getElementById('fund-recipient-type').value;
   const amount=parseInt(document.getElementById('fund-amount').value);
   const category=document.getElementById('fund-category').value;
   const reason=document.getElementById('fund-reason').value.trim();
+  
   if(!amount||amount<100){toast('Valor mínimo: 100 pts.','error');return;}
   if(!reason){toast('Descreva o motivo.','error');return;}
+  
   let recipientLabel='',payload=null;
+  
   if(type==='user'){
     const recipientId=document.getElementById('fund-recipient').value;
     if(!recipientId){toast('Selecione o destinatário.','error');return;}
@@ -2332,14 +2336,18 @@ async function withdrawFund(btn){
     recipientLabel=document.getElementById('fund-external-recipient').selectedOptions[0].textContent;
     payload={kind:'external',id:Number(extId)};
   }
+  
   const catLabel=category==='projeto_comunitario'?'🌍 Projeto comunitário':'🔧 Manutenção do QuizLocal';
   const ok=await confirmDialog('Confirmar Retirada',`Destinatário: ${recipientLabel}\nValor: ${amount.toLocaleString('pt-BR')} pts (${fmtMoney(amount/CFG.POINTS_PER_REAL)})\nFinalidade: ${catLabel}\nMotivo: ${reason}\n\n⚠️ O piso mínimo do caixa é 10% do movimento do mês.\n\nConfirma?`);
+  
   if(!ok)return;
+  
   setLoading(btn,true,'Processando...');
+  
   try{
     let data, error;
 
-    if(payload.kind === 'user'){
+    if(payload.kind==='user'){
       const res = await supabaseClient.rpc('withdraw_fund', {
         p_recipient_user_id: payload.id,
         p_amount: Number(amount),
@@ -2382,21 +2390,7 @@ async function withdrawFund(btn){
   } finally {
     setLoading(btn, false);
   }
-    document.getElementById('fund-amount').value='';
-    document.getElementById('fund-reason').value='';
-    document.getElementById('fund-recipient').value='';
-    document.getElementById('fund-external-recipient').value='';
-    document.getElementById('fund-amount-reais').textContent='R$ 0,00';
-
-    await loadFundScreen();
-    await renderFundWithdrawalsHistory();
-  } catch(e) {
-    toast('Erro: ' + e.message, 'error');
-    console.error(e);
-  } finally {
-    setLoading(btn, false);
-  }
-async function renderFundWithdrawalsHistory(){
+}async function renderFundWithdrawalsHistory(){
   const cont=document.getElementById('fund-withdrawals-list');
   if(!cont)return;
   cont.innerHTML='<p style="opacity:.6;text-align:center;padding:15px">Carregando...</p>';
