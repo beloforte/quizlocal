@@ -1147,7 +1147,6 @@ async function saveNewPassword(btn) {
 
   setLoading(btn, true, 'Salvando...');
   try {
-    // Atualiza a senha no Supabase Auth
     const { data, error } = await supabaseClient.auth.updateUser({ password: newPass });
     
     if (error) {
@@ -1158,14 +1157,12 @@ async function saveNewPassword(btn) {
     sndWin();
     toast('✅ Senha atualizada com sucesso!', 'success');
     
-    // Fecha o modal e limpa os campos
     document.getElementById('modal-new-password').classList.remove('active');
-    document.getElementById('new-pass-input').value = '';
-    document.getElementById('confirm-pass-input').value = '';
-
-    // Opcional: Redireciona para o dashboard ou login
+    
+    // Limpa o hash da URL e recarrega para limpar o estado
     setTimeout(() => {
-      window.location.href = '/'; // Recarrega limpo para remover o token da URL
+      window.location.hash = '';
+      window.location.href = window.location.pathname;
     }, 2000);
 
   } catch(e) {
@@ -2856,30 +2853,36 @@ async function updateMarquee(){
 
 /* ==================== INIT ==================== */
 window.addEventListener('load', async () => {
-  // 1. Verifica se a URL tem erro de recuperação de senha (link expirado)
+  // 1. Captura o hash da URL antes de qualquer coisa
   const hash = window.location.hash;
+
+  // 2. Se a URL tem um erro (link expirado)
   if (hash && hash.includes('error=')) {
-    const params = new URLSearchParams(hash.substring(1));
-    if (params.get('error') === 'access_denied' && params.get('error_code') === 'otp_expired') {
-      toast('O link de recuperação expirou ou já foi usado. Solicite um novo.', 'error');
-      showScreen('scr-forgot');
-      return;
-    }
+    toast('O link expirou ou já foi usado.', 'error');
+    showScreen('scr-forgot');
+    return;
   }
 
+  // 3. A MÁGICA: Se for link de recuperação, para tudo e abre o modal
+  const isRecovery = hash && hash.includes('type=recovery');
+  
+  if (isRecovery) {
+    showScreen('scr-home'); // Limpa a tela de fundo
+    document.getElementById('modal-new-password').classList.add('active');
+    return; // <-- O 'return' impede que o código abaixo mande pro dashboard
+  }
+
+  // 4. Fluxo normal (Login diário, F5 na página, etc)
   showScreen('scr-home');
   if (typeof supabaseClient !== 'undefined') {
     const { data: { session } } = await supabaseClient.auth.getSession();
-    // 2. A MÁGICA AQUI: Só tenta buscar o perfil se o usuário existir
+    
     if (session && session.user && session.user.email) {
       const { data: profile } = await supabaseClient.from('users').select('*').eq('email', session.user.email).single();
       if (profile) {
         SESSION.userId = profile.id;
         SESSION.user = profile;
         redirectToRole(profile.type);
-      } else {
-        // Se por acaso o usuário está no Auth mas não na tabela users
-        toast('Perfil não encontrado no banco de dados.', 'error');
       }
     }
   }
