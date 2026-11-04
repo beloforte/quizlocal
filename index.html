@@ -1130,47 +1130,6 @@ supabaseClient.auth.onAuthStateChange((event, session) => {
     document.getElementById('modal-new-password').classList.add('active');
   }
 });
-
-// Função que salva a nova senha
-async function saveNewPassword(btn) {
-  const newPass = document.getElementById('new-pass-input').value;
-  const confirmPass = document.getElementById('confirm-pass-input').value;
-
-  if (!newPass || newPass.length < 6) {
-    toast('A senha deve ter pelo menos 6 caracteres.', 'error');
-    return;
-  }
-  if (newPass !== confirmPass) {
-    toast('As senhas não coincidem.', 'error');
-    return;
-  }
-
-  setLoading(btn, true, 'Salvando...');
-  try {
-    const { data, error } = await supabaseClient.auth.updateUser({ password: newPass });
-    
-    if (error) {
-      toast('Erro ao atualizar senha: ' + error.message, 'error');
-      return;
-    }
-
-    sndWin();
-    toast('✅ Senha atualizada com sucesso!', 'success');
-    
-    document.getElementById('modal-new-password').classList.remove('active');
-    
-    // Limpa o hash da URL e recarrega para limpar o estado
-    setTimeout(() => {
-      window.location.hash = '';
-      window.location.href = window.location.pathname;
-    }, 2000);
-
-  } catch(e) {
-    toast('Erro inesperado: ' + e.message, 'error');
-  } finally {
-    setLoading(btn, false);
-  }
-}
 }async function logout() {
   if (typeof supabaseClient !== 'undefined') {
     await supabaseClient.auth.signOut();
@@ -2887,6 +2846,52 @@ window.addEventListener('load', async () => {
     }
   }
 });
+
+async function saveNewPassword(btn) {
+  console.log("1. Botão clicado. Iniciando...");
+  
+  const newPass = document.getElementById('new-pass-input')?.value;
+  const confirmPass = document.getElementById('confirm-pass-input')?.value;
+
+  if (!newPass || !confirmPass) {
+    toast('Erro interno: campos de senha não encontrados.', 'error');
+    return;
+  }
+
+  if (newPass.length < 6) {
+    toast('A senha deve ter pelo menos 6 caracteres.', 'error');
+    return;
+  }
+  if (newPass !== confirmPass) {
+    toast('As senhas não coincidem.', 'error');
+    return;
+  }
+
+  setLoading(btn, true, 'Salvando...');
+
+  try {
+    const { data, error } = await supabaseClient.auth.updateUser({ password: newPass });
+    
+    if (error) {
+      toast('Erro do Supabase: ' + error.message, 'error');
+      return;
+    }
+
+    sndWin();
+    toast('✅ Senha atualizada com sucesso!', 'success');
+    document.getElementById('modal-new-password').classList.remove('active');
+    
+    setTimeout(() => {
+      window.location.hash = '';
+      window.location.href = window.location.pathname;
+    }, 2000);
+
+  } catch(e) {
+    toast('Erro inesperado: ' + e.message, 'error');
+  } finally {
+    setLoading(btn, false);
+  }
+}
 </script>
 </body>
 </html>
