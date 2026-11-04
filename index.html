@@ -1109,6 +1109,18 @@ async function requestPasswordReset(btn) {
   showScreen('scr-home');
   toast('Você saiu do sistema', 'info');
 }
+function redirectToRole(type) {
+  if (type === 'cliente') {
+    showScreen('scr-client');
+  } else if (type === 'lojista') {
+    showScreen('scr-shopkeeper');
+  } else if (type === 'admin') {
+    showScreen('scr-admin');
+  } else {
+    // Caso o tipo esteja vazio ou errado no banco, manda pro cliente por padrão
+    showScreen('scr-client');
+  }
+}
 /* ==================== BANCO LOCAL DE PERGUNTAS ==================== */
 const QUESTIONS=[
   {q:"Capital do Brasil?",o:["São Paulo","Rio de Janeiro","Brasília","Salvador"],a:2,c:"Geografia",d:1},
