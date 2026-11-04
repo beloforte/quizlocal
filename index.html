@@ -792,7 +792,19 @@ th{color:var(--gold);background:rgba(255,215,0,.1)}
 <div id="modal" class="modal"><div class="modal-box"><div class="modal-icon" id="m-icon"></div><h2 id="m-title" style="color:var(--gold);margin-bottom:10px"></h2><p id="m-text" style="margin-bottom:15px;line-height:1.5;white-space:pre-line"></p><button class="btn" onclick="closeModal()">OK</button></div></div>
 <div id="modal-confirm" class="modal"><div class="modal-box"><div class="modal-icon" id="mc-icon">⚠️</div><h2 id="mc-title" style="color:var(--gold);margin-bottom:10px"></h2><p id="mc-text" style="margin-bottom:15px;line-height:1.5;white-space:pre-line"></p><div class="modal-actions"><button class="btn btn-red" id="mc-no">Cancelar</button><button class="btn btn-green" id="mc-yes">Confirmar</button></div></div></div>
 <div id="modal-qr" class="modal"><div class="modal-box"><div style="font-size:3em;margin-bottom:8px">🏷️</div><h2 style="color:var(--gold);margin-bottom:8px">Cupom Gerado!</h2><p style="font-size:.85em;opacity:.85">Apresente este QR Code ao lojista</p><div class="qr-container" id="qr-code-container"></div><div id="qr-modal-code" style="font-family:monospace;font-size:1.3em;color:var(--gold);letter-spacing:2px;margin:10px 0"></div><p id="qr-modal-info" style="font-size:.9em;line-height:1.4;margin:10px 0;opacity:.9"></p><p style="font-size:.82em;background:rgba(243,156,18,.2);padding:8px;border-radius:8px;margin:10px 0"><strong>⏰ Válido por 48 horas</strong><br>Se não for usado a tempo, os pontos vão para o <strong>Caixa do Projeto</strong>.</p><button class="btn" onclick="closeQrModal()">OK</button></div></div>
-
+<!-- MODAL DE NOVA SENHA -->
+<div id="modal-new-password" class="modal">
+  <div class="modal-box">
+    <div class="modal-icon">🔐</div>
+    <h2 style="color:var(--gold);margin-bottom:10px">Criar Nova Senha</h2>
+    <p style="font-size:.85em;opacity:.85;margin-bottom:15px">Você acessou via link de recuperação. Digite sua nova senha abaixo.</p>
+    
+    <input type="password" id="new-pass-input" placeholder="Nova Senha" style="margin-bottom:10px">
+    <input type="password" id="confirm-pass-input" placeholder="Confirme a Nova Senha">
+    
+    <button class="btn btn-green" style="margin-top:15px" onclick="saveNewPassword(this)">Salvar Nova Senha</button>
+  </div>
+</div>
 <script>
 /* ============================================================
    CONFIG
@@ -1111,6 +1123,57 @@ async function requestPasswordReset(btn) {
   } finally {
     setLoading(btn, false);
   }
+  // Escuta o evento de recuperação de senha do Supabase
+supabaseClient.auth.onAuthStateChange((event, session) => {
+  if (event === 'PASSWORD_RECOVERY') {
+    // Se o evento for de recuperação, abre o modal
+    document.getElementById('modal-new-password').classList.add('active');
+  }
+});
+
+// Função que salva a nova senha
+async function saveNewPassword(btn) {
+  const newPass = document.getElementById('new-pass-input').value;
+  const confirmPass = document.getElementById('confirm-pass-input').value;
+
+  if (!newPass || newPass.length < 6) {
+    toast('A senha deve ter pelo menos 6 caracteres.', 'error');
+    return;
+  }
+  if (newPass !== confirmPass) {
+    toast('As senhas não coincidem.', 'error');
+    return;
+  }
+
+  setLoading(btn, true, 'Salvando...');
+  try {
+    // Atualiza a senha no Supabase Auth
+    const { data, error } = await supabaseClient.auth.updateUser({ password: newPass });
+    
+    if (error) {
+      toast('Erro ao atualizar senha: ' + error.message, 'error');
+      return;
+    }
+
+    sndWin();
+    toast('✅ Senha atualizada com sucesso!', 'success');
+    
+    // Fecha o modal e limpa os campos
+    document.getElementById('modal-new-password').classList.remove('active');
+    document.getElementById('new-pass-input').value = '';
+    document.getElementById('confirm-pass-input').value = '';
+
+    // Opcional: Redireciona para o dashboard ou login
+    setTimeout(() => {
+      window.location.href = '/'; // Recarrega limpo para remover o token da URL
+    }, 2000);
+
+  } catch(e) {
+    toast('Erro inesperado: ' + e.message, 'error');
+  } finally {
+    setLoading(btn, false);
+  }
+}
 }async function logout() {
   if (typeof supabaseClient !== 'undefined') {
     await supabaseClient.auth.signOut();
