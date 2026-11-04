@@ -359,7 +359,22 @@ th{color:var(--gold);background:rgba(255,215,0,.1)}
     <div class="auth-toggle">Não tem conta? <a onclick="showScreen('scr-register')">Cadastre-se aqui</a></div>
   </div>
 </div>
-
+<!-- TELA ESQUECI MINHA SENHA -->
+<div id="scr-forgot" class="screen">
+  <button class="back-btn" onclick="showScreen('scr-login')">← Voltar ao Login</button>
+  <div class="card">
+    <h2 style="color:var(--gold);text-align:center;margin-bottom:15px">🔐 Recuperar Senha</h2>
+    <div class="info">
+      <strong>Como funciona:</strong><br>
+      1. Informe seu email cadastrado<br>
+      2. Você receberá um link mágico no seu e-mail<br>
+      3. Clique no link para redefinir a senha
+    </div>
+    <label>E-mail cadastrado:</label>
+    <input type="email" id="forgot-id" placeholder="seu@email.com">
+    <button class="btn btn-purple" onclick="requestPasswordReset(this)">Enviar Link de Recuperação</button>
+  </div>
+</div>
 <!-- REGISTER -->
 <div id="scr-register" class="screen">
   <button class="back-btn" onclick="showScreen('scr-home')">← Voltar</button>
@@ -940,13 +955,10 @@ function showScreen(id) {
   if (id === 'scr-ranking') loadWeeklyRanking();
   if (id === 'scr-cashback') loadCashbackScreen();
   
+  // Limpa o campo de email se for a tela de recuperação
   if (id === 'scr-forgot') {
-    // Limpa apenas os campos que realmente existem
     const forgotId = document.getElementById('forgot-id');
     if (forgotId) forgotId.value = '';
-    
-    const step2 = document.getElementById('forgot-step2');
-    if (step2) step2.classList.add('hidden');
   }
 }
 function toast(msg,type='info'){
