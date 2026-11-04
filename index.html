@@ -2337,33 +2337,65 @@ async function withdrawFund(btn){
   if(!ok)return;
   setLoading(btn,true,'Processando...');
   try{
-    let data,error;
-    if(payload.kind==='user'){
-      const res=const res = await supabaseClient.rpc('withdraw_fund', {
-  p_recipient_user_id: payload.id,
-  p_amount: Number(amount),
-  p_category: String(category),
-  p_reason: String(reason)
-});
-      data=res.data;error=res.error;
-    }else{
-      const res=await supabaseClient.rpc('withdraw_fund_external',p_recipient_id:payload.id,p_amount:Number(amount),p_reason:String(reason)});
-      data=res.data;error=res.error;
+    let data, error;
+
+    if(payload.kind === 'user'){
+      const res = await supabaseClient.rpc('withdraw_fund', {
+        p_recipient_user_id: payload.id,
+        p_amount: Number(amount),
+        p_category: String(category),
+        p_reason: String(reason)
+      });
+      data = res.data;
+      error = res.error;
+    } else {
+      const res = await supabaseClient.rpc('withdraw_fund_external', {
+        p_recipient_id: payload.id,
+        p_amount: Number(amount),
+        p_reason: String(reason)
+      });
+      data = res.data;
+      error = res.error;
     }
-    if(error){toast('Erro: '+error.message,'error');return;}
-    if(data?.error){toast(data.error,'error');return;}
+
+    if(error) { toast('Erro: ' + error.message, 'error'); return; }
+    if(data?.error) { toast(data.error, 'error'); return; }
+
     sndWin();
-    showModal('💼','Retirada realizada!',`Destinatário: ${data.recipient_name}\nValor: ${amount.toLocaleString('pt-BR')} pts\n\nSaldo atual: ${Number(data.new_balance).toLocaleString('pt-BR')} pts\nPiso mínimo: ${Number(data.floor).toLocaleString('pt-BR')} pts`);
+    showModal('💼', 'Retirada realizada!', `Destinatário: ${data.recipient_name}\nValor: ${amount.toLocaleString('pt-BR')} pts\n\nSaldo atual: ${Number(data.new_balance).toLocaleString('pt-BR')} pts\nPiso mínimo: ${Number(data.floor).toLocaleString('pt-BR')} pts`);
+
+    document.getElementById('fund-amount').value = '';
+    document.getElementById('fund-reason').value = '';
+    document.getElementById('fund-recipient').value = '';
+    
+    if(document.getElementById('fund-external-recipient')) {
+      document.getElementById('fund-external-recipient').value = '';
+    }
+    document.getElementById('fund-amount-reais').textContent = 'R$ 0,00';
+
+    await loadFundScreen();
+    await renderFundWithdrawalsHistory();
+    
+  } catch(e) {
+    toast('Erro: ' + e.message, 'error');
+    console.error(e);
+  } finally {
+    setLoading(btn, false);
+  }
     document.getElementById('fund-amount').value='';
     document.getElementById('fund-reason').value='';
     document.getElementById('fund-recipient').value='';
     document.getElementById('fund-external-recipient').value='';
     document.getElementById('fund-amount-reais').textContent='R$ 0,00';
+
     await loadFundScreen();
     await renderFundWithdrawalsHistory();
-  }catch(e){toast('Erro: '+e.message,'error');console.error(e);}
-  finally{setLoading(btn,false);}
-}
+  } catch(e) {
+    toast('Erro: ' + e.message, 'error');
+    console.error(e);
+  } finally {
+    setLoading(btn, false);
+  }
 async function renderFundWithdrawalsHistory(){
   const cont=document.getElementById('fund-withdrawals-list');
   if(!cont)return;
